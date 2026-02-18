@@ -1,0 +1,62 @@
+name: Scheduled Database Backup
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to backup'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  backup:
+    name: Backup Database
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Set environment
+        id: set-env
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "ENVIRONMENT=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+          else
+            echo "ENVIRONMENT=production" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create backup
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ steps.set-env.outputs.ENVIRONMENT == 'production' && secrets.PRODUCTION_HOST || secrets.STAGING_HOST }}
+          username: ${{ steps.set-env.outputs.ENVIRONMENT == 'production' && secrets.PRODUCTION_USERNAME || secrets.STAGING_USERNAME }}
+          key: ${{ steps.set-env.outputs.ENVIRONMENT == 'production' && secrets.PRODUCTION_SSH_KEY || secrets.STAGING_SSH_KEY }}
+          script: |
+            cd /opt/app
+            ./scripts/backup-db.sh ${{ steps.set-env.outputs.ENVIRONMENT }}
+
+      - name: Verify backup
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ steps.set-env.outputs.ENVIRONMENT == 'production' && secrets.PRODUCTION_HOST || secrets.STAGING_HOST }}
+          username: ${{ steps.set-env.outputs.ENVIRONMENT == 'production' && secrets.PRODUCTION_USERNAME || secrets.STAGING_USERNAME }}
+          key: ${{ steps.set-env.outputs.ENVIRONMENT == 'production' && secrets.PRODUCTION_SSH_KEY || secrets.STAGING_SSH_KEY }}
+          script: |
+            cd /opt/app
+            LATEST_BACKUP=$(ls -t backups/${{ steps.set-env.outputs.ENVIRONMENT }}_backup_*.sql.gz 2>/dev/null | head -n 1)
+            if [ -n "$LATEST_BACKUP" ]; then
+              echo "✅ Backup verified: $LATEST_BACKUP"
+              ls -lh "$LATEST_BACKUP"
+            else
+              echo "❌ No backup found"
+              exit 1
+            fi
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "❌ Backup failed for ${{ steps.set-env.outputs.ENVIRONMENT }}"

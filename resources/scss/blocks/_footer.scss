@@ -1,0 +1,28 @@
+.footer {
+    background: $color-background;
+    padding: 32px 16px;
+    margin-top: 48px;
+    text-align: center;
+
+    &__links {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    &__link {
+        font-size: 14px;
+        color: $color-text-secondary;
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    &__copyright {
+        font-size: 14px;
+        color: $color-text-secondary;
+    }
+}
