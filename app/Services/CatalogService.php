@@ -133,8 +133,8 @@ class CatalogService
 
         /** @var LengthAwarePaginator $favorites */
         $favorites = $query->with('product')
-            ->withQueryString()
             ->paginate(24)
+            ->withQueryString()
             ->through(function (Favorite $favorite) use ($favoriteIds) {
                 $favorite->product->loadMissing('category');
                 return $this->transformProduct($favorite->product, $favoriteIds);

@@ -179,6 +179,30 @@ export default {
         back: "Повернутися до замовлень"
     },
 
+    payments: {
+        mockTitle: "Mock payment",
+        completePayment: "Завершіть оплату",
+        mockDescription: "Це безпечна тестова сторінка оплати. Вона імітує зовнішній платіжний провайдер і дозволяє перевірити повний lifecycle замовлення та webhook-обробку.",
+        amount: "Сума платежу",
+        provider: "Провайдер",
+        statusLabel: "Статус платежу",
+        payNow: "Позначити як оплачено",
+        failPayment: "Імітувати помилку",
+        cancelPayment: "Скасувати оплату",
+        retryPayment: "Повторити оплату",
+        continuePayment: "Продовжити оплату",
+        redirecting: "Перехід...",
+        payCard: "Перейти до оплати карткою",
+        payCash: "Оформити з оплатою готівкою",
+        mockHint: "Для карткової оплати відкриється тестова платіжна сторінка з webhook-оновленням статусу.",
+        status: {
+            pending: "Очікує оплати",
+            paid: "Оплачено",
+            failed: "Помилка оплати",
+            canceled: "Оплату скасовано"
+        }
+    },
+
     checkout: {
         title: "Оформлення замовлення",
         items: "Товари",
@@ -209,19 +233,36 @@ export default {
         },
         orders: {
             title: "Замовлення",
+            subtitle: "CRM-центр для обробки замовлень, платежів і внутрішніх нотаток менеджерів.",
             id: "ID",
             status: "Статус",
+            customer: "Клієнт",
+            paymentStatus: "Статус платежу",
             totalPrice: "Загальна сума",
+            discountAmount: "Знижка",
             createdAt: "Дата створення",
             actions: "Дії",
             view: "Переглянути",
             orderNumber: "Замовлення",
+            searchPlaceholder: "Пошук по ID, імені, email або телефону",
+            crmTitle: "CRM-замовлення",
+            openCustomer: "Відкрити клієнта",
+            summary: "Зведення",
+            deliveryBlock: "Доставка та оплата",
+            itemsTitle: "Склад замовлення",
+            paymentsTitle: "Платежі",
+            timelineTitle: "Таймлайн",
+            notePlaceholder: "Внутрішня нотатка для команди: що перевірити, кому подзвонити, які ризики по замовленню.",
+            addNote: "Додати нотатку",
 
             statuses: {
                 pending: "В очікуванні",
                 completed: "Завершено",
                 canceled: "Скасовано",
-            }
+            },
+            paymentStatuses: {
+                all: "Усі платежі",
+            },
         },
         dashboard: {
             title: "Дашборд",

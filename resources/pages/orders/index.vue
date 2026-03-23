@@ -54,6 +54,10 @@
                              {{ order.payment_method === 'card' ? t("orders.card") : t("orders.cash") }}
                             </span>
                         </div>
+                        <div v-if="order.latest_payment" class="orders__info">
+                            <span class="orders__label">{{ t("payments.statusLabel") }}:</span>
+                            <span class="orders__value">{{ t(`payments.status.${order.latest_payment.status}`) }}</span>
+                        </div>
                         <div class="orders__info">
                             <span class="orders__label">{{ t("orders.date") }}:</span>
                             <span class="orders__value">{{ formatDate(order.created_at) }}</span>

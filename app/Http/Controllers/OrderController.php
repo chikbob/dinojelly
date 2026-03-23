@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Services\CheckoutService;
 use App\Services\CartService;
 use App\Services\OrderService;
+use App\Services\PaymentService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -15,6 +16,7 @@ class OrderController extends Controller
         protected CheckoutService $checkoutService,
         protected OrderService $orderService,
         protected CartService $cartService,
+        protected PaymentService $paymentService,
     ) {
     }
 
@@ -49,6 +51,19 @@ class OrderController extends Controller
                 (int) $data['address_id'],
                 (int) $data['delivery_slot_id'],
             );
+            $payment = $order->latestPayment;
+
+            if ($payment && $order->payment_method === 'card') {
+                $redirectUrl = $this->paymentService->getCheckoutRedirect($payment);
+
+                if ($request->header('X-Inertia')) {
+                    return Inertia::location($redirectUrl);
+                }
+
+                return redirect()->away($redirectUrl)
+                    ->with('success', 'Заказ создан. Завершите оплату.');
+            }
+
             return redirect()->route('orders.show', $order->id)
                 ->with('success', 'Заказ успешно оформлен!');
         } catch (\Exception $e) {

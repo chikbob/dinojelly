@@ -32,6 +32,12 @@
                             {{ order.payment_method === 'card' ? t("order.card") : t("order.cash") }}
                         </span>
                     </div>
+                    <div v-if="order.latest_payment" class="order__summary-item">
+                        <span class="order__label">{{ t("payments.statusLabel") }}:</span>
+                        <span class="order__payment-status" :class="`order__payment-status--${order.latest_payment.status}`">
+                            {{ t(`payments.status.${order.latest_payment.status}`) }}
+                        </span>
+                    </div>
                     <div class="order__summary-item">
                         <span class="order__label">{{ t("order.amount") }}:</span>
                         <span class="order__value">{{ order.total_price }} {{ t("currency.symbol") }}</span>
@@ -50,6 +56,13 @@
                 <div v-if="order.status === 'pending'" class="order__actions">
                     <button @click="cancelOrder" class="order__cancel-btn">
                         {{ isCanceling ? t("order.canceling") : t("order.cancel") }}
+                    </button>
+                    <button
+                        v-if="canRetryPayment"
+                        @click="retryPayment"
+                        class="order__retry-btn"
+                    >
+                        {{ retryLabel }}
                     </button>
                 </div>
 
@@ -84,7 +97,7 @@
 
 <script setup>
 import MainLayout from "../../layouts/mainLayout.vue";
-import {ref} from 'vue';
+import {computed, ref} from 'vue';
 import {router} from '@inertiajs/vue3';
 import {useI18n} from "../../lang/useI18n.js";
 
@@ -95,6 +108,23 @@ const props = defineProps({
 });
 
 const isCanceling = ref(false);
+const isRetrying = ref(false);
+
+const canRetryPayment = computed(() => {
+    if (props.order.payment_method !== 'card' || !props.order.latest_payment) {
+        return false
+    }
+
+    return ['pending', 'failed', 'canceled'].includes(props.order.latest_payment.status)
+})
+
+const retryLabel = computed(() => {
+    if (props.order.latest_payment?.status === 'pending') {
+        return t("payments.continuePayment")
+    }
+
+    return isRetrying.value ? t("payments.redirecting") : t("payments.retryPayment")
+})
 
 const formatStatus = (status) => {
     return t(`order.status.${status}`);
@@ -105,7 +135,7 @@ const goBack = () => {
 };
 
 const cancelOrder = async () => {
-    if (!confirm('Вы уверены, что хотите отменить заказ?')) {
+    if (!confirm(t("order.confirmCancel"))) {
         return;
     }
 
@@ -131,6 +161,17 @@ const cancelOrder = async () => {
         console.error('Cancel order error:', error);
         alert('Ошибка при отмене заказа');
     }
+};
+
+const retryPayment = () => {
+    isRetrying.value = true;
+
+    router.post(`/orders/${props.order.id}/payments/retry`, {}, {
+        preserveScroll: true,
+        onFinish: () => {
+            isRetrying.value = false;
+        }
+    });
 };
 </script>
 
@@ -218,6 +259,8 @@ const cancelOrder = async () => {
         margin-bottom: 30px;
         display: flex;
         justify-content: center;
+        flex-wrap: wrap;
+        gap: 12px;
     }
 
     &__cancel-btn {
@@ -241,6 +284,52 @@ const cancelOrder = async () => {
             background: #9ca3af;
             cursor: not-allowed;
             transform: none;
+        }
+    }
+
+    &__retry-btn {
+        padding: 12px 24px;
+        background: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 10px;
+        font-family: inherit;
+        text-transform: uppercase;
+        transition: all 0.3s ease;
+
+        &:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+        }
+    }
+
+    &__payment-status {
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 9px;
+        text-transform: uppercase;
+
+        &--pending {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        &--paid {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        &--failed {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        &--canceled {
+            background: #fee2e2;
+            color: #b91c1c;
         }
     }
 

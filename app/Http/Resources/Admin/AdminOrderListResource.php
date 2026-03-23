@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Admin;
 
+use App\Http\Resources\DeliverySlotResource;
+use App\Http\Resources\PaymentResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class OrderListResource extends JsonResource
+class AdminOrderListResource extends JsonResource
 {
     /**
      * @return array<string, mixed>
@@ -14,16 +16,17 @@ class OrderListResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'total_price' => $this->total_price,
-            'delivery_price' => $this->delivery_price,
-            'discount_amount' => $this->discount_amount,
-            'total_quantity' => $this->total_quantity,
-            'payment_method' => $this->payment_method,
             'status' => $this->status,
+            'total_price' => $this->total_price,
+            'payment_method' => $this->payment_method,
             'created_at' => $this->created_at,
-            'address' => $this->whenLoaded('address', function () use ($request) {
-                return AddressResource::make($this->address)->resolve($request);
-            }),
+            'items_count' => $this->items_count,
+            'customer' => [
+                'id' => $this->user?->id,
+                'name' => $this->user?->name,
+                'email' => $this->user?->email,
+                'phone' => $this->user?->phone,
+            ],
             'delivery_slot' => $this->whenLoaded('deliverySlot', function () use ($request) {
                 return DeliverySlotResource::make($this->deliverySlot)->resolve($request);
             }),

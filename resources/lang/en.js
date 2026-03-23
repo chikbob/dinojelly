@@ -168,6 +168,30 @@ export default {
         back: "Back to orders"
     },
 
+    payments: {
+        mockTitle: "Mock payment",
+        completePayment: "Complete your payment",
+        mockDescription: "This is a safe test payment page. It simulates an external payment provider so the full order lifecycle and webhook handling can be verified.",
+        amount: "Payment amount",
+        provider: "Provider",
+        statusLabel: "Payment status",
+        payNow: "Mark as paid",
+        failPayment: "Simulate failure",
+        cancelPayment: "Cancel payment",
+        retryPayment: "Retry payment",
+        continuePayment: "Continue payment",
+        redirecting: "Redirecting...",
+        payCard: "Proceed to card payment",
+        payCash: "Place cash order",
+        mockHint: "Card payments open a mock payment page with webhook-based status updates.",
+        status: {
+            pending: "Awaiting payment",
+            paid: "Paid",
+            failed: "Payment failed",
+            canceled: "Payment canceled"
+        }
+    },
+
     checkout: {
         title: "Checkout",
         items: "Items",
@@ -198,19 +222,36 @@ export default {
         },
         orders: {
             title: "Orders",
+            subtitle: "CRM center for handling orders, payments and internal manager notes.",
             id: "ID",
             status: "Status",
+            customer: "Customer",
+            paymentStatus: "Payment status",
             totalPrice: "Total Price",
+            discountAmount: "Discount",
             createdAt: "Created At",
             actions: "Actions",
             view: "View",
             orderNumber: "Order",
+            searchPlaceholder: "Search by ID, name, email or phone",
+            crmTitle: "CRM order",
+            openCustomer: "Open customer",
+            summary: "Summary",
+            deliveryBlock: "Delivery and payment",
+            itemsTitle: "Order items",
+            paymentsTitle: "Payments",
+            timelineTitle: "Timeline",
+            notePlaceholder: "Internal note for the team: what to verify, whom to call, what risks this order has.",
+            addNote: "Add note",
 
             statuses: {
                 pending: "Pending",
                 completed: "Completed",
                 canceled: "Canceled",
-            }
+            },
+            paymentStatuses: {
+                all: "All payments",
+            },
         },
         dashboard: {
             title: "Dashboard",

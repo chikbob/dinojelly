@@ -58,6 +58,11 @@ class User extends Authenticatable
         return $this->hasMany(Review::class);
     }
 
+    public function orderEvents(): HasMany
+    {
+        return $this->hasMany(OrderEvent::class, 'actor_user_id');
+    }
+
     public function usedPromoCodes(): BelongsToMany
     {
         return $this->belongsToMany(PromoCode::class)

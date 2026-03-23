@@ -17,6 +17,8 @@ class CheckoutService
     public function __construct(
         protected CartService $cartService,
         protected OrderService $orderService,
+        protected PaymentService $paymentService,
+        protected OrderEventService $orderEventService,
     ) {
     }
 
@@ -107,9 +109,23 @@ class CheckoutService
                 ]);
             }
 
+            $this->paymentService->createForOrder($order);
+            $this->orderEventService->log(
+                $order,
+                'order_created',
+                'Заказ создан',
+                'Пользователь оформил заказ через checkout',
+                $user,
+                [
+                    'payment_method' => $paymentMethod,
+                    'address_id' => $address->id,
+                    'delivery_slot_id' => $deliverySlot->id,
+                ],
+            );
+
             $this->cartService->clear($user);
 
-            return $order;
+            return $order->load('latestPayment');
         });
     }
 }

@@ -5,6 +5,8 @@ use App\Http\Controllers\AddressController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PaymentWebhookController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\AdminHomeController;
@@ -98,11 +100,16 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/checkout', [OrderController::class, 'create'])->name('checkout.create');
     Route::post('/checkout', [OrderController::class, 'store'])->name('checkout.store');
+    Route::get('/payments/mock/{payment}', [PaymentController::class, 'showMock'])->name('payments.mock.show');
+    Route::post('/orders/{order}/payments/retry', [PaymentController::class, 'retry'])->name('payments.retry');
 
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 });
+
+Route::post('/webhooks/payments/mock', [PaymentWebhookController::class, 'mock'])
+    ->name('webhooks.payments.mock');
 
 /*
 |--------------------------------------------------------------------------
@@ -124,6 +131,8 @@ Route::middleware(['auth', 'admin'])
         Route::resource('products', \App\Http\Controllers\Admin\ProductController::class);
         Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class)
             ->only(['index', 'show', 'update']);
+        Route::post('orders/{order}/notes', [\App\Http\Controllers\Admin\OrderController::class, 'addNote'])
+            ->name('orders.notes.store');
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class)
             ->only(['index', 'show']);
     });

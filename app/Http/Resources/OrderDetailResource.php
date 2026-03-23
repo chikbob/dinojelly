@@ -27,6 +27,9 @@ class OrderDetailResource extends JsonResource
             'delivery_slot' => $this->whenLoaded('deliverySlot', function () use ($request) {
                 return DeliverySlotResource::make($this->deliverySlot)->resolve($request);
             }),
+            'latest_payment' => $this->whenLoaded('latestPayment', function () use ($request) {
+                return PaymentResource::make($this->latestPayment)->resolve($request);
+            }),
             'items' => OrderItemResource::collection($this->whenLoaded('items'))->resolve($request),
         ];
     }

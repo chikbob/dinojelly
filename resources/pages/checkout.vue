@@ -57,7 +57,7 @@
                     :disabled="isDisabled"
                     @click.prevent="submitOrder('card')"
                 >
-                    {{ t("orders.card") }}
+                    {{ t("payments.payCard") }}
                 </button>
 
                 <button
@@ -65,9 +65,10 @@
                     :disabled="isDisabled"
                     @click.prevent="submitOrder('cash')"
                 >
-                    {{ t("orders.cash") }}
+                    {{ t("payments.payCash") }}
                 </button>
             </div>
+            <p class="checkout__payment-hint">{{ t("payments.mockHint") }}</p>
         </div>
     </MainLayout>
 </template>
@@ -216,6 +217,13 @@ function submitOrder(method) {
     justify-content: center;
     gap: 20px;
     margin-top: 30px;
+}
+
+.checkout__payment-hint {
+    margin-top: 16px;
+    text-align: center;
+    color: #64748b;
+    font-size: 14px;
 }
 
 .checkout__btn--card {

@@ -168,6 +168,30 @@ export default {
         back: "Вернуться к заказам"
     },
 
+    payments: {
+        mockTitle: "Mock payment",
+        completePayment: "Завершите оплату заказа",
+        mockDescription: "Это безопасная тестовая форма оплаты. Она имитирует внешний платёжный провайдер и позволяет проверить полный lifecycle заказа и webhook-обработку.",
+        amount: "Сумма платежа",
+        provider: "Провайдер",
+        statusLabel: "Статус платежа",
+        payNow: "Оплатить успешно",
+        failPayment: "Сымитировать ошибку",
+        cancelPayment: "Отменить оплату",
+        retryPayment: "Повторить оплату",
+        continuePayment: "Продолжить оплату",
+        redirecting: "Переход...",
+        payCard: "Перейти к оплате картой",
+        payCash: "Оформить с оплатой наличными",
+        mockHint: "Для карточной оплаты откроется тестовая платёжная страница с webhook-обновлением статуса.",
+        status: {
+            pending: "Ожидает оплаты",
+            paid: "Оплачен",
+            failed: "Ошибка оплаты",
+            canceled: "Оплата отменена"
+        }
+    },
+
     checkout: {
         title: "Оформление заказа",
         items: "Товары",
@@ -204,19 +228,36 @@ export default {
         },
         orders: {
             title: "Заказы",
+            subtitle: "CRM-центр для обработки заказов, платежей и внутренних заметок менеджеров.",
             id: "ID",
             status: "Статус",
+            customer: "Клиент",
+            paymentStatus: "Статус платежа",
             totalPrice: "Общая сумма",
+            discountAmount: "Скидка",
             createdAt: "Дата создания",
             actions: "Действия",
             view: "Просмотр",
             orderNumber: "Заказ",
+            searchPlaceholder: "Поиск по ID, имени, email или телефону",
+            crmTitle: "CRM-заказ",
+            openCustomer: "Открыть клиента",
+            summary: "Сводка",
+            deliveryBlock: "Доставка и оплата",
+            itemsTitle: "Состав заказа",
+            paymentsTitle: "Платежи",
+            timelineTitle: "Таймлайн",
+            notePlaceholder: "Внутренняя заметка для команды: что проверить, кому позвонить, какие риски по заказу.",
+            addNote: "Добавить заметку",
 
             statuses: {
                 pending: "В ожидании",
                 completed: "Завершён",
                 canceled: "Отменён",
-            }
+            },
+            paymentStatuses: {
+                all: "Все платежи",
+            },
         },
         dashboard: {
             title: "Дашборд",

@@ -10,6 +10,12 @@ use Illuminate\Auth\Access\AuthorizationException;
 
 class OrderService
 {
+    public function __construct(
+        protected PaymentService $paymentService,
+        protected OrderEventService $orderEventService,
+    ) {
+    }
+
     public function getPendingOrdersCount(User $user): int
     {
         return (int) Order::query()
@@ -25,7 +31,7 @@ class OrderService
     {
         $ordersQuery = Order::query()
             ->where('user_id', $user->id)
-            ->with(['items.product', 'address', 'deliverySlot'])
+            ->with(['items.product', 'address', 'deliverySlot', 'latestPayment'])
             ->orderByDesc('created_at');
 
         if ($status) {
@@ -49,7 +55,7 @@ class OrderService
     {
         $this->assertOwnership($user, $order);
 
-        $order->load(['items.product', 'address', 'deliverySlot']);
+        $order->load(['items.product', 'address', 'deliverySlot', 'latestPayment']);
 
         return OrderDetailResource::make($order)->resolve(request());
     }
@@ -68,6 +74,15 @@ class OrderService
         $order->update([
             'status' => 'canceled',
         ]);
+
+        $this->paymentService->cancelPendingPayments($order);
+        $this->orderEventService->log(
+            $order,
+            'order_canceled',
+            'Заказ отменен',
+            'Пользователь отменил заказ',
+            $user,
+        );
     }
 
     /**

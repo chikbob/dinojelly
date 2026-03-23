@@ -1,75 +1,129 @@
 <template>
     <div class="orders-index">
-        <h1 class="orders-index__title">{{ t("admin.orders.title") }}</h1>
+        <div class="orders-index__head">
+            <div>
+                <h1 class="orders-index__title">{{ t("admin.orders.title") }}</h1>
+                <p class="orders-index__subtitle">{{ t("admin.orders.subtitle") }}</p>
+            </div>
+        </div>
 
-        <table class="orders-index__table">
-            <thead>
-            <tr>
-                <th>{{ t("admin.orders.id") }}</th>
-                <th>{{ t("admin.orders.status") }}</th>
-                <th>{{ t("admin.orders.totalPrice") }}</th>
-                <th>{{ t("admin.orders.createdAt") }}</th>
-                <th>{{ t("admin.orders.actions") }}</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-for="order in orders.data" :key="order.id">
-                <td>{{ order.id }}</td>
+        <section class="orders-index__filters">
+            <input
+                v-model="localFilters.search"
+                type="text"
+                :placeholder="t('admin.orders.searchPlaceholder')"
+                class="orders-index__input"
+                @keyup.enter="applyFilters"
+            />
 
-                <!-- Select для изменения статуса -->
-                <td>
-                    <div
-                        class="orders-index__status"
-                        :class="statusClass(order.status)"
-                    >
-                        <select
-                            v-model="order.status"
-                            @change="updateStatus(order.id, order.status)"
-                            class="orders-index__select"
+            <select v-model="localFilters.status" class="orders-index__select" @change="applyFilters">
+                <option value="">{{ t("orders.all") }}</option>
+                <option value="pending">{{ t("admin.orders.statuses.pending") }}</option>
+                <option value="completed">{{ t("admin.orders.statuses.completed") }}</option>
+                <option value="canceled">{{ t("admin.orders.statuses.canceled") }}</option>
+            </select>
+
+            <select v-model="localFilters.payment_status" class="orders-index__select" @change="applyFilters">
+                <option value="">{{ t("admin.orders.paymentStatuses.all") }}</option>
+                <option value="pending">{{ t("payments.status.pending") }}</option>
+                <option value="paid">{{ t("payments.status.paid") }}</option>
+                <option value="failed">{{ t("payments.status.failed") }}</option>
+                <option value="canceled">{{ t("payments.status.canceled") }}</option>
+            </select>
+
+            <button class="orders-index__button orders-index__button--apply" @click="applyFilters">
+                {{ t("catalog.apply") }}
+            </button>
+            <button class="orders-index__button orders-index__button--ghost" @click="resetFilters">
+                {{ t("catalog.reset") }}
+            </button>
+        </section>
+
+        <div class="orders-index__table-wrap">
+            <table class="orders-index__table">
+                <thead>
+                <tr>
+                    <th>{{ t("admin.orders.id") }}</th>
+                    <th>{{ t("admin.orders.customer") }}</th>
+                    <th>{{ t("admin.orders.status") }}</th>
+                    <th>{{ t("admin.orders.paymentStatus") }}</th>
+                    <th>{{ t("admin.orders.totalPrice") }}</th>
+                    <th>{{ t("admin.orders.createdAt") }}</th>
+                    <th>{{ t("admin.orders.actions") }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="order in orders.data" :key="order.id">
+                    <td>#{{ order.id }}</td>
+                    <td>
+                        <div class="orders-index__customer">
+                            <strong>{{ order.customer?.name || t("profile.notProvided") }}</strong>
+                            <span>{{ order.customer?.email || t("profile.notProvided") }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="orders-index__status" :class="statusClass(order.status)">
+                            <select
+                                v-model="order.status"
+                                @change="updateStatus(order.id, order.status)"
+                                class="orders-index__status-select"
+                            >
+                                <option value="pending">{{ t("admin.orders.statuses.pending") }}</option>
+                                <option value="completed">{{ t("admin.orders.statuses.completed") }}</option>
+                                <option value="canceled">{{ t("admin.orders.statuses.canceled") }}</option>
+                            </select>
+                        </div>
+                    </td>
+                    <td>
+                        <span
+                            v-if="order.latest_payment"
+                            class="orders-index__payment-pill"
+                            :class="`orders-index__payment-pill--${order.latest_payment.status}`"
                         >
-                            <option value="pending">{{ t("admin.orders.statuses.pending") }}</option>
-                            <option value="completed">{{ t("admin.orders.statuses.completed") }}</option>
-                            <option value="canceled">{{ t("admin.orders.statuses.canceled") }}</option>
-                        </select>
-                    </div>
-                </td>
-
-                <td>{{ order.total_price }}</td>
-                <td>{{ formatDateTime(order.created_at) }}</td>
-                <td>
-                    <a :href="route('admin.orders.show', order.id)" class="btn btn-show">
-                        {{ t("admin.orders.view") }}
-                    </a>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+                            {{ t(`payments.status.${order.latest_payment.status}`) }}
+                        </span>
+                        <span v-else>—</span>
+                    </td>
+                    <td>{{ order.total_price }} {{ t("currency.symbol") }}</td>
+                    <td>{{ formatDateTime(order.created_at) }}</td>
+                    <td>
+                        <a :href="route('admin.orders.show', order.id)" class="orders-index__link">
+                            {{ t("admin.orders.view") }}
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
 
         <Paginate :links="orders.links"/>
     </div>
 </template>
 
 <script setup>
+import {reactive} from 'vue'
 import {router} from '@inertiajs/vue3'
 import {route} from 'ziggy-js'
 import {useI18n} from '../../../lang/useI18n.js'
-import Paginate from '../../../components/pagination.vue';
+import Paginate from '../../../components/pagination.vue'
 
 const props = defineProps({
     orders: Object,
+    filters: Object,
 })
 
 const {t, currentLang} = useI18n()
 
+const localFilters = reactive({
+    status: props.filters?.status ?? '',
+    payment_status: props.filters?.payment_status ?? '',
+    search: props.filters?.search ?? '',
+})
+
 const formatDateTime = (dateString) => {
     if (!dateString) return t("profile.notProvided")
 
-    const localeMap = {
-        ru: "ru-RU",
-        uk: "uk-UA",
-        en: "en-US",
-    }
-
+    const localeMap = {ru: "ru-RU", uk: "uk-UA", en: "en-US"}
     const lang = currentLang?.value ?? "ru"
 
     return new Date(dateString).toLocaleDateString(localeMap[lang], {
@@ -81,12 +135,28 @@ const formatDateTime = (dateString) => {
     })
 }
 
-const statusClass = (status) => {
-    return {
-        'orders-index__status--success': status === 'completed',
-        'orders-index__status--pending': status === 'pending',
-        'orders-index__status--canceled': status === 'canceled',
-    }
+const statusClass = (status) => ({
+    'orders-index__status--success': status === 'completed',
+    'orders-index__status--pending': status === 'pending',
+    'orders-index__status--canceled': status === 'canceled',
+})
+
+const applyFilters = () => {
+    router.get(route('admin.orders.index'), {
+        status: localFilters.status || undefined,
+        payment_status: localFilters.payment_status || undefined,
+        search: localFilters.search || undefined,
+    }, {
+        preserveState: true,
+        preserveScroll: true,
+    })
+}
+
+const resetFilters = () => {
+    localFilters.status = ''
+    localFilters.payment_status = ''
+    localFilters.search = ''
+    applyFilters()
 }
 
 const updateStatus = (orderId, status) => {
@@ -99,13 +169,77 @@ const updateStatus = (orderId, status) => {
 
 <style scoped lang="scss">
 .orders-index {
-    max-width: 1200px;
+    max-width: 1320px;
     margin: 0 auto;
-    padding: 40px 20px;
+    padding: 24px 8px 40px;
     font-family: "Press Start 2P", system-ui;
 
+    &__head {
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 20px;
+    }
+
     &__title {
+        margin: 0 0 8px;
         font-size: 24px;
+    }
+
+    &__subtitle {
+        margin: 0;
+        color: #64748b;
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    &__filters {
+        display: grid;
+        grid-template-columns: 1.4fr repeat(2, minmax(0, 220px)) auto auto;
+        gap: 12px;
+        margin-bottom: 24px;
+        padding: 16px;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+    }
+
+    &__input,
+    &__select,
+    &__status-select {
+        width: 100%;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        background: #fff;
+        padding: 10px 12px;
+        font-family: inherit;
+        font-size: 11px;
+    }
+
+    &__button {
+        border: none;
+        border-radius: 10px;
+        padding: 10px 14px;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 11px;
+
+        &--apply {
+            background: #16a34a;
+            color: #fff;
+        }
+
+        &--ghost {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+    }
+
+    &__table-wrap {
+        overflow-x: auto;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
         margin-bottom: 24px;
     }
 
@@ -113,68 +247,83 @@ const updateStatus = (orderId, status) => {
         width: 100%;
         border-collapse: collapse;
 
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
+        th,
+        td {
+            padding: 14px;
+            border-bottom: 1px solid #e2e8f0;
             text-align: left;
+            vertical-align: top;
+            font-size: 11px;
         }
 
         th {
-            background-color: #f5f7fa;
+            background: #f8fafc;
         }
     }
 
-    &__select {
-        font-family: "Press Start 2P", system-ui;
-        font-size: 12px;
-        padding: 6px;
-        border-radius: 6px;
-        border: 1px solid #ddd;
-        cursor: pointer;
-        background-color: white;
-        width: 100%;
-        max-width: 140px;
-        appearance: none;
+    &__customer {
+        display: grid;
+        gap: 6px;
+
+        span {
+            color: #64748b;
+            font-size: 10px;
+        }
     }
 
-    .btn-show {
-        background-color: #3ecf8e;
-        color: white;
-        padding: 6px 12px;
-        border-radius: 6px;
-        font-size: 14px;
+    &__status {
+        display: inline-flex;
+        padding: 4px;
+        border-radius: 12px;
+
+        &--success {
+            background: #dcfce7;
+        }
+
+        &--pending {
+            background: #fef3c7;
+        }
+
+        &--canceled {
+            background: #fee2e2;
+        }
+    }
+
+    &__payment-pill {
+        display: inline-flex;
+        padding: 8px 10px;
+        border-radius: 999px;
+        font-size: 10px;
+
+        &--pending {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        &--paid {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        &--failed {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        &--canceled {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+    }
+
+    &__link {
+        display: inline-flex;
+        align-items: center;
+        padding: 10px 12px;
+        border-radius: 10px;
         text-decoration: none;
+        background: #2563eb;
+        color: #fff;
     }
 }
-
-.orders-index__status {
-    display: inline-block;
-    padding: 4px 6px;
-    border-radius: 6px;
-
-    &--success {
-        background: #29CC5F;
-        color: #333;
-    }
-
-    &--pending {
-        background: #ffc107;
-        color: #333;
-    }
-
-    &--canceled {
-        background: #ff6b6b;
-        color: #333;
-    }
-
-    select {
-        background: transparent;
-        border: none;
-        color: inherit;
-        font-weight: 600;
-        cursor: pointer;
-        outline: none;
-    }
-}
-
 </style>
