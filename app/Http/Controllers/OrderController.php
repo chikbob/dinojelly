@@ -7,6 +7,7 @@ use App\Services\CheckoutService;
 use App\Services\CartService;
 use App\Services\OrderService;
 use App\Services\PaymentService;
+use App\Services\ReorderService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -17,6 +18,7 @@ class OrderController extends Controller
         protected OrderService $orderService,
         protected CartService $cartService,
         protected PaymentService $paymentService,
+        protected ReorderService $reorderService,
     ) {
     }
 
@@ -127,6 +129,20 @@ class OrderController extends Controller
             return response()->json([
                 'error' => 'Ошибка при отмене заказа: ' . $e->getMessage()
             ], $status);
+        }
+    }
+
+    public function reorder(Order $order, Request $request)
+    {
+        try {
+            $result = $this->reorderService->reorder($request->user(), $order);
+
+            return redirect()->route('cart.index')->with(
+                'success',
+                "В корзину добавлено {$result['added']} шт."
+            );
+        } catch (\Throwable $e) {
+            return back()->withErrors(['reorder' => $e->getMessage()]);
         }
     }
 }

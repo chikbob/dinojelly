@@ -12,6 +12,7 @@ class AdminOrderService
 {
     public function __construct(
         protected OrderEventService $orderEventService,
+        protected InventoryService $inventoryService,
     ) {
     }
 
@@ -94,6 +95,14 @@ class AdminOrderService
         $order->update([
             'status' => $status,
         ]);
+
+        if ($previous !== 'completed' && $status === 'completed') {
+            $this->inventoryService->commitOrderStock($order);
+        }
+
+        if ($previous !== 'canceled' && $status === 'canceled') {
+            $this->inventoryService->releaseOrderStock($order);
+        }
 
         $this->orderEventService->log(
             $order,

@@ -63,6 +63,11 @@
                     <span v-if="ordersCount" class="header__badge">{{ ordersCount }}</span>
                 </button>
 
+                <button @click="handleSubscriptionsClick" class="header__orders">
+                    <span class="header__icon">🔁</span>
+                    <span>{{ t("header.subscriptions") }}</span>
+                </button>
+
                 <!-- Корзина -->
                 <button @click="handleCartClick" class="header__cart">
                     <span class="header__icon">🛒</span>
@@ -105,6 +110,14 @@ const handleOrdersClick = () => {
         router.visit("/orders");
     }
 };
+
+const handleSubscriptionsClick = () => {
+    if (!user.value) {
+        showAuth.value = true
+    } else {
+        router.visit("/subscriptions")
+    }
+}
 
 const user = computed(() => page.props.auth?.user)
 const showAuth = ref(false)

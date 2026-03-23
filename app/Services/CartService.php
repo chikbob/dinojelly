@@ -11,6 +11,7 @@ class CartService
 {
     public function __construct(
         protected AbandonedCartService $abandonedCartService,
+        protected InventoryService $inventoryService,
     ) {
     }
 
@@ -18,7 +19,7 @@ class CartService
     {
         return CartItem::query()
             ->where('user_id', $user->id)
-            ->with('product')
+            ->with('product.stockItem')
             ->get();
     }
 
@@ -47,10 +48,19 @@ class CartService
     {
         $this->abandonedCartService->markRecovered($user, 'cart_updated');
 
+        $stockItem = $this->inventoryService->ensureProductInventory($productId);
+        if (!$stockItem->is_active || $this->inventoryService->getAvailableQuantity($stockItem) < 1) {
+            throw new \RuntimeException('Товар временно недоступен');
+        }
+
         $cartItem = CartItem::query()->firstOrCreate(
             ['user_id' => $user->id, 'product_id' => $productId],
             ['quantity' => 0]
         );
+
+        if (!$this->inventoryService->canPurchaseQuantity($stockItem, $cartItem->quantity + 1)) {
+            throw new \RuntimeException('Недостаточно остатка на складе');
+        }
 
         $cartItem->increment('quantity');
     }
@@ -59,10 +69,21 @@ class CartService
     {
         $this->abandonedCartService->markRecovered($user, 'cart_updated');
 
-        CartItem::query()
+        $cartItem = CartItem::query()
             ->where('user_id', $user->id)
             ->where('product_id', $productId)
-            ->first()?->increment('quantity');
+            ->first();
+
+        if (!$cartItem) {
+            return;
+        }
+
+        $stockItem = $this->inventoryService->ensureProductInventory($productId);
+        if (!$this->inventoryService->canPurchaseQuantity($stockItem, $cartItem->quantity + 1)) {
+            throw new \RuntimeException('Недостаточно остатка на складе');
+        }
+
+        $cartItem->increment('quantity');
     }
 
     public function decreaseQuantity(User $user, int $productId): void

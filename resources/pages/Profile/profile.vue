@@ -126,6 +126,28 @@
                     </button>
                 </form>
             </div>
+
+            <div class="profile-addresses">
+                <div class="profile-addresses__header">
+                    <h2>{{ t("subscriptions.title") }}</h2>
+                    <button class="profile-card__button" @click="router.visit('/subscriptions')">
+                        {{ t("subscriptions.openAll") }}
+                    </button>
+                </div>
+
+                <div v-if="subscriptions.length" class="profile-addresses__list">
+                    <div v-for="subscription in subscriptions" :key="subscription.id" class="profile-address">
+                        <div>
+                            <strong>{{ subscription.name }}</strong>
+                            <p>{{ t(`subscriptions.status.${subscription.status}`) }}</p>
+                            <small v-if="subscription.next_run_at">
+                                {{ t("subscriptions.nextRun") }}: {{ formatDate(subscription.next_run_at) }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                <p v-else class="profile-info__value">{{ t("subscriptions.empty") }}</p>
+            </div>
         </div>
     </MainLayout>
 </template>
@@ -141,6 +163,10 @@ const props = defineProps({
     user: Object,
     cartCount: Number,
     addresses: {
+        type: Array,
+        default: () => ([]),
+    },
+    subscriptions: {
         type: Array,
         default: () => ([]),
     },

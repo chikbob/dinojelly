@@ -80,6 +80,11 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === 'admin';

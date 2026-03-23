@@ -11,6 +11,7 @@ use App\Http\Controllers\PaymentWebhookController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\Admin\AdminHomeController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -111,6 +112,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+    Route::post('/orders/{order}/reorder', [OrderController::class, 'reorder'])->name('orders.reorder');
+    Route::get('/subscriptions', [SubscriptionController::class, 'index'])->name('subscriptions.index');
+    Route::post('/orders/{order}/subscriptions', [SubscriptionController::class, 'storeFromOrder'])->name('subscriptions.store-from-order');
+    Route::put('/subscriptions/{subscription}', [SubscriptionController::class, 'update'])->name('subscriptions.update');
+    Route::post('/subscriptions/{subscription}/run', [SubscriptionController::class, 'run'])->name('subscriptions.run');
 });
 
 Route::post('/webhooks/payments/mock', [PaymentWebhookController::class, 'mock'])
@@ -133,11 +139,33 @@ Route::middleware(['auth', 'admin'])
 
         Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class)
             ->except(['show']);
+        Route::resource('collections', \App\Http\Controllers\Admin\CollectionController::class)
+            ->except(['show']);
         Route::resource('products', \App\Http\Controllers\Admin\ProductController::class);
         Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class)
             ->only(['index', 'show', 'update']);
         Route::post('orders/{order}/notes', [\App\Http\Controllers\Admin\OrderController::class, 'addNote'])
             ->name('orders.notes.store');
+        Route::get('payments', [\App\Http\Controllers\Admin\PaymentController::class, 'index'])
+            ->name('payments.index');
+        Route::put('payments/{payment}', [\App\Http\Controllers\Admin\PaymentController::class, 'update'])
+            ->name('payments.update');
+        Route::resource('delivery-slots', \App\Http\Controllers\Admin\DeliverySlotController::class)
+            ->except(['show']);
+        Route::get('inventory', [\App\Http\Controllers\Admin\InventoryController::class, 'index'])
+            ->name('inventory.index');
+        Route::put('inventory/{inventory}', [\App\Http\Controllers\Admin\InventoryController::class, 'update'])
+            ->name('inventory.update');
+        Route::get('reviews', [\App\Http\Controllers\Admin\ReviewController::class, 'index'])
+            ->name('reviews.index');
+        Route::put('reviews/{review}', [\App\Http\Controllers\Admin\ReviewController::class, 'update'])
+            ->name('reviews.update');
+        Route::delete('reviews/{review}', [\App\Http\Controllers\Admin\ReviewController::class, 'destroy'])
+            ->name('reviews.destroy');
+        Route::get('recoveries', [\App\Http\Controllers\Admin\CartRecoveryController::class, 'index'])
+            ->name('recoveries.index');
+        Route::resource('promo-codes', \App\Http\Controllers\Admin\PromoCodeController::class)
+            ->except(['show']);
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class)
             ->only(['index', 'show']);
     });

@@ -15,12 +15,12 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
-        $faker = \Faker\Factory::create('ru_RU');
+        $faker = fake('ru_RU');
 
         return [
             'name' => $faker->firstName . ' ' . $faker->lastName,
             'email' => $faker->unique()->safeEmail,
-            'phone' => $faker->unique()->phoneNumber,
+            'phone' => '+79' . $faker->unique()->numerify('#########'),
             'address' => $faker->address,
             'role' => 'user',
             'password' => Hash::make('password'),

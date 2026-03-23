@@ -1,59 +1,42 @@
 <template>
     <div class="admin">
-        <!-- Sidebar -->
         <aside class="admin__sidebar">
             <div class="admin__logo">Admin</div>
 
             <nav class="admin__nav">
-                <Link
-                    class="admin__link"
-                    :class="{ active: isActive('admin.dashboard') }"
-                    :href="route('admin.dashboard')"
-                >
-                    {{ t("admin.sidebar.dashboard") }}
-                </Link>
-
-                <Link
-                    class="admin__link"
-                    :class="{ active: isActive('admin.products.index') }"
-                    :href="route('admin.products.index')"
-                >
-                    {{ t("admin.sidebar.products") }}
-                </Link>
-
-                <Link
-                    class="admin__link"
-                    :class="{ active: isActive('admin.categories.index') }"
-                    :href="route('admin.categories.index')"
-                >
-                    {{ t("admin.sidebar.categories") }}
-                </Link>
-
-                <Link
-                    class="admin__link"
-                    :class="{ active: isActive('admin.orders.index') }"
-                    :href="route('admin.orders.index')"
-                >
-                    {{ t("admin.sidebar.orders") }}
-                </Link>
-
-                <Link
-                    class="admin__link"
-                    :class="{ active: isActive('admin.users.index') }"
-                    :href="route('admin.users.index')"
-                >
-                    {{ t("admin.sidebar.users") }}
-                </Link>
+                <section v-for="section in sections" :key="section.key" class="admin__section">
+                    <p class="admin__section-title">{{ t(section.title) }}</p>
+                    <Link
+                        v-for="item in section.items"
+                        :key="item.route"
+                        class="admin__link"
+                        :class="{ active: isActive(item.route) }"
+                        :href="route(item.route)"
+                    >
+                        <span>{{ t(item.label) }}</span>
+                        <small v-if="badgeValue(item.badgeKey)" class="admin__badge">{{ badgeValue(item.badgeKey) }}</small>
+                    </Link>
+                </section>
             </nav>
         </aside>
 
-        <!-- Content -->
         <div class="admin__content">
             <header class="admin__header">
-                <span>{{ t("admin.header.title") }}</span>
+                <div class="admin__header-main">
+                    <span>{{ t("admin.header.title") }}</span>
+                    <div class="admin__breadcrumbs">
+                        <Link
+                            v-for="crumb in breadcrumbs"
+                            :key="crumb.route"
+                            class="admin__breadcrumb"
+                            :href="route(crumb.route)"
+                        >
+                            {{ t(crumb.label) }}
+                        </Link>
+                    </div>
+                </div>
 
                 <div class="admin__actions">
-                    <!-- Language switch -->
                     <select
                         v-model="currentLang"
                         @change="setLang(currentLang)"
@@ -83,6 +66,7 @@
 </template>
 
 <script setup>
+import {computed} from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
 import { route } from 'ziggy-js'
 import { useI18n } from '../lang/useI18n'
@@ -90,9 +74,89 @@ import { useI18n } from '../lang/useI18n'
 const { t, setLang, currentLang } = useI18n()
 const page = usePage()
 
+const sections = [
+    {
+        key: 'analytics',
+        title: 'admin.nav.analytics',
+        items: [
+            { route: 'admin.dashboard', label: 'admin.sidebar.dashboard' },
+        ],
+    },
+    {
+        key: 'catalog',
+        title: 'admin.nav.catalog',
+        items: [
+            { route: 'admin.products.index', label: 'admin.sidebar.products', badgeKey: 'low_stock' },
+            { route: 'admin.categories.index', label: 'admin.sidebar.categories' },
+            { route: 'admin.collections.index', label: 'admin.sidebar.collections' },
+            { route: 'admin.reviews.index', label: 'admin.sidebar.reviews', badgeKey: 'pending_reviews' },
+        ],
+    },
+    {
+        key: 'operations',
+        title: 'admin.nav.operations',
+        items: [
+            { route: 'admin.orders.index', label: 'admin.sidebar.orders', badgeKey: 'pending_orders' },
+            { route: 'admin.payments.index', label: 'admin.sidebar.payments', badgeKey: 'failed_payments' },
+            { route: 'admin.delivery-slots.index', label: 'admin.sidebar.deliverySlots' },
+            { route: 'admin.inventory.index', label: 'admin.sidebar.inventory', badgeKey: 'low_stock' },
+        ],
+    },
+    {
+        key: 'customers',
+        title: 'admin.nav.customers',
+        items: [
+            { route: 'admin.users.index', label: 'admin.sidebar.users' },
+            { route: 'admin.recoveries.index', label: 'admin.sidebar.recoveries', badgeKey: 'pending_recovery' },
+        ],
+    },
+    {
+        key: 'marketing',
+        title: 'admin.nav.marketing',
+        items: [
+            { route: 'admin.promo-codes.index', label: 'admin.sidebar.promoCodes' },
+        ],
+    },
+]
+
 const isActive = (name) => {
-    return page.props?.ziggy?.location?.includes(route(name))
+    return route().current(name) || route().current(`${name.replace('.index', '')}.*`)
 }
+
+const badgeValue = (badgeKey) => {
+    if (!badgeKey) return null
+    return page.props.adminIndicators?.[badgeKey] ?? null
+}
+
+const breadcrumbMap = {
+    'admin.dashboard': [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }],
+    'admin.products.index': [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }, { route: 'admin.products.index', label: 'admin.sidebar.products' }],
+    'admin.products.create': [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }, { route: 'admin.products.index', label: 'admin.sidebar.products' }],
+    'admin.products.edit': [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }, { route: 'admin.products.index', label: 'admin.sidebar.products' }],
+    'admin.categories.index': [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }, { route: 'admin.categories.index', label: 'admin.sidebar.categories' }],
+    'admin.orders.index': [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }, { route: 'admin.orders.index', label: 'admin.sidebar.orders' }],
+    'admin.orders.show': [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }, { route: 'admin.orders.index', label: 'admin.sidebar.orders' }],
+    'admin.users.index': [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }, { route: 'admin.users.index', label: 'admin.sidebar.users' }],
+    'admin.users.show': [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }, { route: 'admin.users.index', label: 'admin.sidebar.users' }],
+    'admin.payments.index': [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }, { route: 'admin.payments.index', label: 'admin.sidebar.payments' }],
+    'admin.inventory.index': [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }, { route: 'admin.inventory.index', label: 'admin.sidebar.inventory' }],
+    'admin.delivery-slots.index': [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }, { route: 'admin.delivery-slots.index', label: 'admin.sidebar.deliverySlots' }],
+    'admin.reviews.index': [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }, { route: 'admin.reviews.index', label: 'admin.sidebar.reviews' }],
+    'admin.recoveries.index': [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }, { route: 'admin.recoveries.index', label: 'admin.sidebar.recoveries' }],
+    'admin.collections.index': [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }, { route: 'admin.collections.index', label: 'admin.sidebar.collections' }],
+    'admin.collections.create': [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }, { route: 'admin.collections.index', label: 'admin.sidebar.collections' }],
+    'admin.collections.edit': [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }, { route: 'admin.collections.index', label: 'admin.sidebar.collections' }],
+    'admin.promo-codes.index': [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }, { route: 'admin.promo-codes.index', label: 'admin.sidebar.promoCodes' }],
+    'admin.promo-codes.create': [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }, { route: 'admin.promo-codes.index', label: 'admin.sidebar.promoCodes' }],
+    'admin.promo-codes.edit': [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }, { route: 'admin.promo-codes.index', label: 'admin.sidebar.promoCodes' }],
+    'admin.delivery-slots.create': [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }, { route: 'admin.delivery-slots.index', label: 'admin.sidebar.deliverySlots' }],
+    'admin.delivery-slots.edit': [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }, { route: 'admin.delivery-slots.index', label: 'admin.sidebar.deliverySlots' }],
+}
+
+const breadcrumbs = computed(() => {
+    const current = route().current()
+    return breadcrumbMap[current] ?? [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }]
+})
 </script>
 
 <style scoped lang="scss">
@@ -122,10 +186,25 @@ const isActive = (name) => {
 .admin__nav {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 20px;
+}
+
+.admin__section {
+    display: grid;
+    gap: 8px;
+}
+
+.admin__section-title {
+    margin: 0;
+    color: #64748b;
+    font-size: 10px;
+    text-transform: uppercase;
 }
 
 .admin__link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: 12px;
     border-radius: 8px;
     color: #cbd5e1;
@@ -143,6 +222,16 @@ const isActive = (name) => {
     }
 }
 
+.admin__badge {
+    min-width: 20px;
+    padding: 4px 6px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.16);
+    color: inherit;
+    font-size: 10px;
+    text-align: center;
+}
+
 .admin__content {
     flex: 1;
     display: flex;
@@ -157,6 +246,23 @@ const isActive = (name) => {
     align-items: center;
     justify-content: space-between;
     padding: 0 24px;
+}
+
+.admin__header-main {
+    display: grid;
+    gap: 6px;
+}
+
+.admin__breadcrumbs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.admin__breadcrumb {
+    color: #64748b;
+    text-decoration: none;
+    font-size: 10px;
 }
 
 .admin__actions {

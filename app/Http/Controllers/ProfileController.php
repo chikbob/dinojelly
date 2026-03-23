@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\AddressResource;
 use App\Models\CartItem;
 use App\Models\Order;
+use App\Http\Resources\SubscriptionResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -29,6 +30,13 @@ class ProfileController extends Controller
             'cartCount' => $cartCount,
             'addresses' => AddressResource::collection(
                 $user->addresses()->orderByDesc('is_default')->latest()->get()
+            )->resolve(request()),
+            'subscriptions' => SubscriptionResource::collection(
+                $user->subscriptions()
+                    ->with(['address', 'deliverySlot', 'items.product.stockItem', 'lastOrder.latestPayment'])
+                    ->latest()
+                    ->limit(6)
+                    ->get()
             )->resolve(request()),
             'pendingOrdersCount' => $ordersCount,
         ]);

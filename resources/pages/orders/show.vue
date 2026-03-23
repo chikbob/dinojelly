@@ -66,6 +66,15 @@
                     </button>
                 </div>
 
+                <div class="order__actions">
+                    <button @click="reorderOrder" class="order__retry-btn">
+                        {{ t("orders.reorder") }}
+                    </button>
+                    <button @click="subscribeToOrder" class="order__retry-btn order__retry-btn--dark">
+                        {{ t("subscriptions.createFromOrder") }}
+                    </button>
+                </div>
+
                 <div class="order__items">
                     <h2 class="order__subtitle">{{ t("order.items") }}</h2>
                     <div
@@ -173,6 +182,16 @@ const retryPayment = () => {
         }
     });
 };
+
+const reorderOrder = () => {
+    router.post(`/orders/${props.order.id}/reorder`, {}, { preserveScroll: true })
+}
+
+const subscribeToOrder = () => {
+    router.post(`/orders/${props.order.id}/subscriptions`, {
+        interval_days: 30,
+    }, { preserveScroll: true })
+}
 </script>
 
 <style scoped lang="scss">
@@ -258,6 +277,8 @@ const retryPayment = () => {
     &__actions {
         margin-bottom: 30px;
         display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
         justify-content: center;
         flex-wrap: wrap;
         gap: 12px;

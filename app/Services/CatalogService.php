@@ -32,7 +32,7 @@ class CatalogService
             ->get();
 
         $productsQuery = Product::query()
-            ->with('category')
+            ->with(['category', 'stockItem'])
             ->withCount(['reviews' => fn ($query) => $query->where('is_published', true)])
             ->withAvg(['reviews as average_rating' => fn ($query) => $query->where('is_published', true)], 'rating');
 
@@ -102,7 +102,7 @@ class CatalogService
      */
     public function getProductPage(Product $product, ?User $user): array
     {
-        $product->loadMissing('category')
+        $product->loadMissing(['category', 'stockItem'])
             ->loadCount(['reviews' => fn ($query) => $query->where('is_published', true)])
             ->loadAvg(['reviews as average_rating' => fn ($query) => $query->where('is_published', true)], 'rating');
         $favoriteIds = $this->getFavoriteIds($user);
@@ -144,7 +144,7 @@ class CatalogService
             ->paginate(24)
             ->withQueryString()
             ->through(function (Favorite $favorite) use ($favoriteIds) {
-                $favorite->product->loadMissing('category');
+                $favorite->product->loadMissing(['category', 'stockItem']);
                 return $this->transformProduct($favorite->product, $favoriteIds);
             });
 

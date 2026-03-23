@@ -13,6 +13,7 @@ class OrderService
     public function __construct(
         protected PaymentService $paymentService,
         protected OrderEventService $orderEventService,
+        protected InventoryService $inventoryService,
     ) {
     }
 
@@ -76,6 +77,7 @@ class OrderService
         ]);
 
         $this->paymentService->cancelPendingPayments($order);
+        $this->inventoryService->releaseOrderStock($order);
         $this->orderEventService->log(
             $order,
             'order_canceled',

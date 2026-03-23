@@ -49,6 +49,31 @@
             </div>
 
             <div class="form-group">
+                <label for="sku">{{ t("admin.products.fields.sku") }}</label>
+                <input v-model="form.sku" id="sku" type="text"/>
+                <p v-if="errors.sku" class="error">{{ errors.sku }}</p>
+            </div>
+
+            <div class="form-group">
+                <label for="stock_quantity">{{ t("admin.products.fields.stockQuantity") }}</label>
+                <input v-model.number="form.stock_quantity" id="stock_quantity" type="number" min="0"/>
+                <p v-if="errors.stock_quantity" class="error">{{ errors.stock_quantity }}</p>
+            </div>
+
+            <div class="form-group">
+                <label for="low_stock_threshold">{{ t("admin.products.fields.lowStockThreshold") }}</label>
+                <input v-model.number="form.low_stock_threshold" id="low_stock_threshold" type="number" min="0"/>
+                <p v-if="errors.low_stock_threshold" class="error">{{ errors.low_stock_threshold }}</p>
+            </div>
+
+            <div class="form-group form-group--checkbox">
+                <label>
+                    <input v-model="form.stock_is_active" type="checkbox"/>
+                    {{ t("admin.products.fields.stockActive") }}
+                </label>
+            </div>
+
+            <div class="form-group">
                 <label for="image">{{ t("admin.products.fields.image") }} ({{ t("admin.products.optional") }})</label>
                 <input @change="handleFileChange" id="image" type="file" accept="image/*"/>
                 <p v-if="errors.image" class="error">{{ errors.image }}</p>
@@ -79,6 +104,10 @@ const form = reactive({
     price: 0,
     old_price: null,
     description: '',
+    sku: '',
+    stock_quantity: 0,
+    low_stock_threshold: 5,
+    stock_is_active: true,
 })
 
 const imageFile = ref(null)
@@ -98,6 +127,10 @@ const submit = () => {
     formData.append('price', form.price)
     if (form.old_price !== null) formData.append('old_price', form.old_price)
     if (form.description) formData.append('description', form.description)
+    formData.append('sku', form.sku)
+    formData.append('stock_quantity', String(form.stock_quantity))
+    if (form.low_stock_threshold !== null) formData.append('low_stock_threshold', String(form.low_stock_threshold))
+    formData.append('stock_is_active', form.stock_is_active ? '1' : '0')
     if (imageFile.value) formData.append('image', imageFile.value)
 
     router.post(route('admin.products.store'), formData, {

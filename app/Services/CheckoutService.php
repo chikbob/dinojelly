@@ -20,6 +20,7 @@ class CheckoutService
         protected PaymentService $paymentService,
         protected OrderEventService $orderEventService,
         protected AbandonedCartService $abandonedCartService,
+        protected InventoryService $inventoryService,
     ) {
     }
 
@@ -33,6 +34,8 @@ class CheckoutService
         if ($cartItems->isEmpty()) {
             return null;
         }
+
+        $stockErrors = $this->inventoryService->validateCartStock($user, $cartItems);
 
         $items = CheckoutItemResource::collection($cartItems)->resolve(request());
         $addresses = $user->addresses()->orderByDesc('is_default')->latest()->get();
@@ -56,6 +59,7 @@ class CheckoutService
             'deliverySlots' => DeliverySlotResource::collection($slots)->resolve(request()),
             'defaultAddressId' => $defaultAddress?->id,
             'defaultDeliverySlotId' => $defaultSlot?->id,
+            'stockErrors' => $stockErrors,
             'pendingOrdersCount' => $this->orderService->getPendingOrdersCount($user),
             'cartCount' => $cartItems->sum('quantity'),
         ];
@@ -67,6 +71,11 @@ class CheckoutService
 
         if ($cartItems->isEmpty()) {
             throw new \RuntimeException('Корзина пуста');
+        }
+
+        $stockErrors = $this->inventoryService->validateCartStock($user, $cartItems);
+        if ($stockErrors !== []) {
+            throw new \RuntimeException(implode(' ', $stockErrors));
         }
 
         $address = Address::query()
@@ -111,6 +120,7 @@ class CheckoutService
             }
 
             $this->paymentService->createForOrder($order);
+            $this->inventoryService->reserveOrderStock($order);
             $this->orderEventService->log(
                 $order,
                 'order_created',

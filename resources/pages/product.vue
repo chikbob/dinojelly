@@ -13,6 +13,9 @@
                         <strong>{{ product.average_rating ?? '—' }}</strong>
                         <span>{{ t("reviews.basedOn") }} {{ product.reviews_count }}</span>
                     </div>
+                    <p class="product__stock" :class="{ 'product__stock--low': product.is_low_stock, 'product__stock--out': !product.is_in_stock }">
+                        {{ stockText }}
+                    </p>
 
                     <div class="product__prices">
                         <span class="product__price">{{ product.price }} {{ t("currency.symbol") }}</span>
@@ -41,7 +44,7 @@
                             <span class="counter-value">{{ cartItems[product.id].quantity }}</span>
                             <button class="counter-btn" @click="updateQuantity(1)">+</button>
                         </div>
-                        <button v-else class="product__add-to-cart" @click="addToCart">
+                        <button v-else class="product__add-to-cart" :disabled="!product.is_in_stock" @click="addToCart">
                             {{ t("product.addToCart") }}
                         </button>
                     </div>
@@ -123,6 +126,7 @@ import {router, useForm} from '@inertiajs/vue3'
 import MainLayout from '../layouts/mainLayout.vue'
 import {route} from "ziggy-js"
 import {useI18n} from "../lang/useI18n"
+import {computed} from "vue";
 
 const {t} = useI18n()
 
@@ -139,6 +143,18 @@ const reviewForm = useForm({
     rating: props.userReview?.rating ?? 5,
     title: props.userReview?.title ?? '',
     body: props.userReview?.body ?? '',
+})
+
+const stockText = computed(() => {
+    if (!props.product.is_in_stock) {
+        return t("inventory.outOfStock")
+    }
+
+    if (props.product.is_low_stock) {
+        return `${t("inventory.lowStock")}: ${props.product.available_quantity}`
+    }
+
+    return `${t("inventory.inStock")}: ${props.product.available_quantity}`
 })
 
 // Добавление в корзину
@@ -211,6 +227,20 @@ function deleteReview() {
     align-items: center;
     margin: 10px 0 18px;
     color: #475569;
+}
+
+.product__stock {
+    margin: 0 0 18px;
+    color: #166534;
+    font-weight: 700;
+}
+
+.product__stock--low {
+    color: #92400e;
+}
+
+.product__stock--out {
+    color: #b91c1c;
 }
 
 .product__actions {

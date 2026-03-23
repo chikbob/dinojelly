@@ -19,6 +19,9 @@ class CheckoutItemResource extends JsonResource
             'quantity' => $this->quantity,
             'image_url' => $this->product->image_url,
             'subtotal' => $this->product->price * $this->quantity,
+            'available_quantity' => $this->product->stockItem
+                ? max(0, (int) $this->product->stockItem->quantity - (int) $this->product->stockItem->reserved_quantity)
+                : 0,
         ];
     }
 }

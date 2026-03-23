@@ -16,6 +16,7 @@
                 <th>{{ t("admin.products.weight") }}</th>
                 <th>{{ t("admin.products.price") }}</th>
                 <th>{{ t("admin.products.oldPrice") }}</th>
+                <th>{{ t("admin.products.stock") }}</th>
                 <th>{{ t("admin.products.actions") }}</th>
             </tr>
             </thead>
@@ -36,6 +37,11 @@
                 <td>{{ product.weight ?? '—' }}</td>
                 <td>{{ product.price }}</td>
                 <td>{{ product.old_price ?? '—' }}</td>
+                <td>
+                    <span :class="stockClass(product)">
+                        {{ stockLabel(product) }}
+                    </span>
+                </td>
                 <td>
                     <div class="actions">
                         <a :href="route('admin.products.edit', product.id)" class="btn btn-edit">
@@ -65,6 +71,24 @@ const props = defineProps({
 })
 
 const {t} = useI18n()
+
+const stockLabel = (product) => {
+    if (!product.stock_item?.is_active) return t("admin.products.stockInactive")
+    const quantity = (product.stock_item?.quantity ?? 0) - (product.stock_item?.reserved_quantity ?? 0)
+    if (quantity <= 0) return t("admin.products.outOfStock")
+    if (quantity <= (product.stock_item?.low_stock_threshold ?? 0)) {
+        return `${t("admin.products.lowStock")} (${quantity})`
+    }
+    return `${t("admin.products.inStock")} (${quantity})`
+}
+
+const stockClass = (product) => {
+    if (!product.stock_item?.is_active) return 'stock-pill stock-pill--inactive'
+    const quantity = (product.stock_item?.quantity ?? 0) - (product.stock_item?.reserved_quantity ?? 0)
+    if (quantity <= 0) return 'stock-pill stock-pill--out'
+    if (quantity <= (product.stock_item?.low_stock_threshold ?? 0)) return 'stock-pill stock-pill--low'
+    return 'stock-pill stock-pill--ok'
+}
 
 const destroy = (id) => {
     if (confirm(t("admin.products.confirmDelete"))) {
@@ -138,6 +162,29 @@ const destroy = (id) => {
 .actions {
     display: flex;
     align-items: center; /* Вертикальное выравнивание */
+}
+
+.stock-pill {
+    display: inline-flex;
+    padding: 8px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+
+    &--ok {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    &--low {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    &--out,
+    &--inactive {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
 }
 
 </style>

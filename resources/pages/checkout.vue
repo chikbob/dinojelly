@@ -34,6 +34,9 @@
             </div>
 
             <div class="checkout__items">
+                <p v-if="stockErrors?.length" class="checkout__stock-error">
+                    {{ stockErrors.join(' ') }}
+                </p>
                 <div v-for="item in items" :key="item.id" class="checkout__item">
                     <img :src="item.image_url" class="checkout__img"/>
                     <div class="checkout__info">
@@ -91,6 +94,7 @@ const props = defineProps({
     deliverySlots: Array,
     defaultAddressId: Number,
     defaultDeliverySlotId: Number,
+    stockErrors: Array,
 });
 
 const paymentMethod = ref(null);
@@ -103,7 +107,7 @@ const selectedSlot = computed(() =>
 
 const currentDeliveryPrice = computed(() => selectedSlot.value?.price ?? 0)
 const finalTotal = computed(() => Number(props.subtotalPrice) + Number(currentDeliveryPrice.value))
-const isDisabled = computed(() => !selectedAddressId.value || !selectedDeliverySlotId.value)
+const isDisabled = computed(() => !selectedAddressId.value || !selectedDeliverySlotId.value || (props.stockErrors?.length ?? 0) > 0)
 
 const formatSlot = (slot) => {
     const localeMap = { ru: "ru-RU", uk: "uk-UA", en: "en-US" }
@@ -186,6 +190,14 @@ function submitOrder(method) {
     gap: 16px;
     padding: 12px;
     border-bottom: 1px solid #ddd;
+}
+
+.checkout__stock-error {
+    margin-bottom: 16px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: #fee2e2;
+    color: #b91c1c;
 }
 
 .checkout__img {

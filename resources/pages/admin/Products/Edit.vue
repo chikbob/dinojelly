@@ -49,6 +49,31 @@
             </div>
 
             <div class="form-group">
+                <label for="sku">{{ t("admin.products.fields.sku") }}</label>
+                <input v-model="form.sku" id="sku" type="text"/>
+                <p v-if="errors.sku" class="error">{{ errors.sku }}</p>
+            </div>
+
+            <div class="form-group">
+                <label for="stock_quantity">{{ t("admin.products.fields.stockQuantity") }}</label>
+                <input v-model.number="form.stock_quantity" id="stock_quantity" type="number" min="0"/>
+                <p v-if="errors.stock_quantity" class="error">{{ errors.stock_quantity }}</p>
+            </div>
+
+            <div class="form-group">
+                <label for="low_stock_threshold">{{ t("admin.products.fields.lowStockThreshold") }}</label>
+                <input v-model.number="form.low_stock_threshold" id="low_stock_threshold" type="number" min="0"/>
+                <p v-if="errors.low_stock_threshold" class="error">{{ errors.low_stock_threshold }}</p>
+            </div>
+
+            <div class="form-group form-group--checkbox">
+                <label>
+                    <input v-model="form.stock_is_active" type="checkbox"/>
+                    {{ t("admin.products.fields.stockActive") }}
+                </label>
+            </div>
+
+            <div class="form-group">
                 <label for="image_url">{{ t("admin.products.fields.imageUrl") }} ({{
                         t("admin.products.optional")
                     }})</label>
@@ -87,6 +112,10 @@ const form = reactive({
     old_price: props.product.old_price ?? null,
     description: props.product.description ?? '',
     image_url: props.product.image_url ?? '',
+    sku: props.product.stock_item?.sku ?? `SKU-${props.product.id}`,
+    stock_quantity: props.product.stock_item?.quantity ?? 0,
+    low_stock_threshold: props.product.stock_item?.low_stock_threshold ?? 5,
+    stock_is_active: props.product.stock_item?.is_active ?? true,
 })
 
 watch(() => props.product, (newVal) => {
@@ -97,6 +126,10 @@ watch(() => props.product, (newVal) => {
     form.old_price = newVal.old_price ?? null
     form.description = newVal.description ?? ''
     form.image_url = newVal.image_url ?? ''
+    form.sku = newVal.stock_item?.sku ?? `SKU-${newVal.id}`
+    form.stock_quantity = newVal.stock_item?.quantity ?? 0
+    form.low_stock_threshold = newVal.stock_item?.low_stock_threshold ?? 5
+    form.stock_is_active = newVal.stock_item?.is_active ?? true
 }, {immediate: true})
 
 const submit = () => {
@@ -110,6 +143,10 @@ const submit = () => {
     if (form.image_url.trim()) {
         formData.append('image_url', form.image_url.trim())
     }
+    formData.append('sku', form.sku)
+    formData.append('stock_quantity', String(form.stock_quantity))
+    if (form.low_stock_threshold !== null) formData.append('low_stock_threshold', String(form.low_stock_threshold))
+    formData.append('stock_is_active', form.stock_is_active ? '1' : '0')
     formData.append('_method', 'PUT')
 
     router.post(route('admin.products.update', props.product.id), formData, {

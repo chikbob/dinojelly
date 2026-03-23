@@ -5,16 +5,22 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
+use App\Services\InventoryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class ProductController extends Controller
 {
+    public function __construct(
+        protected InventoryService $inventoryService,
+    ) {
+    }
+
     public function index()
     {
         $products = Product::query()
-            ->with('category')
+            ->with(['category', 'stockItem'])
             ->paginate(15);
         return Inertia::render('admin/Products/Index', ['products' => $products]);
     }
@@ -40,6 +46,10 @@ class ProductController extends Controller
             'old_price' => 'nullable|numeric|min:0',
             'description' => 'nullable|string',
             'image' => 'nullable|image|max:2048',
+            'sku' => 'required|string|max:255|unique:stock_items,sku',
+            'stock_quantity' => 'required|integer|min:0',
+            'low_stock_threshold' => 'nullable|integer|min:0',
+            'stock_is_active' => 'nullable|boolean',
         ]);
 
         $productData = [
@@ -55,7 +65,13 @@ class ProductController extends Controller
             $productData['image'] = $request->file('image')->store('products', 'public');
         }
 
-        Product::create($productData);
+        $product = Product::create($productData);
+        $this->inventoryService->upsertForProduct($product->id, [
+            'sku' => $validated['sku'],
+            'quantity' => $validated['stock_quantity'],
+            'low_stock_threshold' => $validated['low_stock_threshold'] ?? 5,
+            'is_active' => (bool) ($validated['stock_is_active'] ?? true),
+        ]);
 
         return redirect()->route('admin.products.index')->with('success', 'Product created');
     }
@@ -63,7 +79,7 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         return Inertia::render('admin/Products/Edit', [
-            'product' => $product->load('category'),
+            'product' => $product->load(['category', 'stockItem']),
             'categories' => Category::query()
                 ->orderBy('sort_order')
                 ->orderBy('name')
@@ -82,6 +98,10 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'image' => 'nullable|image|max:2048',
             'image_url' => 'nullable|url',
+            'sku' => 'required|string|max:255|unique:stock_items,sku,' . optional($product->stockItem)->id,
+            'stock_quantity' => 'required|integer|min:0',
+            'low_stock_threshold' => 'nullable|integer|min:0',
+            'stock_is_active' => 'nullable|boolean',
         ]);
 
         $product->category_id = $validated['category_id'] ?? null;
@@ -100,6 +120,13 @@ class ProductController extends Controller
         }
 
         $product->save();
+
+        $this->inventoryService->upsertForProduct($product->id, [
+            'sku' => $validated['sku'],
+            'quantity' => $validated['stock_quantity'],
+            'low_stock_threshold' => $validated['low_stock_threshold'] ?? 5,
+            'is_active' => (bool) ($validated['stock_is_active'] ?? true),
+        ]);
 
         return redirect()->route('admin.products.index')->with('success', 'Product updated!');
     }

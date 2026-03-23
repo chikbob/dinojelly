@@ -19,6 +19,9 @@ class CartItemResource extends JsonResource
             'old_price' => $this->product->old_price,
             'quantity' => $this->quantity,
             'image_url' => $this->product->image_url,
+            'available_quantity' => $this->product->stockItem
+                ? max(0, (int) $this->product->stockItem->quantity - (int) $this->product->stockItem->reserved_quantity)
+                : 0,
         ];
     }
 }

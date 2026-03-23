@@ -34,7 +34,11 @@ class CartController extends Controller
             'product_id' => 'required|integer|exists:products,id',
         ]);
 
-        $this->cartService->addProduct($request->user(), $data['product_id']);
+        try {
+            $this->cartService->addProduct($request->user(), $data['product_id']);
+        } catch (\RuntimeException $exception) {
+            return back()->withErrors(['cart' => $exception->getMessage()]);
+        }
 
         return back();
     }
@@ -42,7 +46,11 @@ class CartController extends Controller
     public function increase(Request $request)
     {
         $request->validate(['product_id' => 'required|exists:products,id']);
-        $this->cartService->increaseQuantity($request->user(), (int) $request->product_id);
+        try {
+            $this->cartService->increaseQuantity($request->user(), (int) $request->product_id);
+        } catch (\RuntimeException $exception) {
+            return back()->withErrors(['cart' => $exception->getMessage()]);
+        }
 
         return back();
     }

@@ -53,7 +53,8 @@ RUN composer install \
     --prefer-dist \
     --no-interaction \
     --no-progress \
-    --optimize-autoloader
+    --optimize-autoloader \
+    --no-scripts
 
 # Create required directories
 RUN mkdir -p /var/log/supervisor /var/run/supervisor
@@ -76,6 +77,10 @@ COPY routes ./routes
 COPY storage ./storage
 COPY artisan ./
 COPY --from=frontend-builder /app/public/build ./public/build
+
+# Run package discovery after the full application source is present
+RUN composer dump-autoload --optimize --no-dev \
+    && php artisan package:discover --ansi
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \

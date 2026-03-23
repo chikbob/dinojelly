@@ -11,6 +11,7 @@ class Order extends Model
 {
     protected $fillable = [
         'user_id',
+        'subscription_id',
         'address_id',
         'delivery_slot_id',
         'promo_code_id',
@@ -30,6 +31,11 @@ class Order extends Model
     public function address(): BelongsTo
     {
         return $this->belongsTo(Address::class);
+    }
+
+    public function subscription(): BelongsTo
+    {
+        return $this->belongsTo(Subscription::class);
     }
 
     public function deliverySlot(): BelongsTo

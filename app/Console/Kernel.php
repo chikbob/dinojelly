@@ -13,6 +13,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         $schedule->command('cart:send-recovery-reminders --minutes=60')->everyFifteenMinutes();
+        $schedule->command('subscriptions:process-due --limit=25')->hourly();
     }
 
     /**

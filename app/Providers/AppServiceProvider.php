@@ -44,6 +44,25 @@ class AppServiceProvider extends ServiceProvider
 
                 return [];
             },
+
+            'adminIndicators' => function () {
+                $user = Auth::user();
+
+                if (!$user || $user->role !== 'admin') {
+                    return null;
+                }
+
+                return [
+                    'pending_orders' => (int) \App\Models\Order::where('status', 'pending')->count(),
+                    'failed_payments' => (int) \App\Models\Payment::where('status', 'failed')->count(),
+                    'low_stock' => (int) \App\Models\StockItem::query()
+                        ->where('is_active', true)
+                        ->whereRaw('(quantity - reserved_quantity) <= low_stock_threshold')
+                        ->count(),
+                    'pending_reviews' => (int) \App\Models\Review::where('is_published', false)->count(),
+                    'pending_recovery' => (int) \App\Models\CartRecoveryReminder::where('status', 'pending')->count(),
+                ];
+            },
         ]);
     }
 }

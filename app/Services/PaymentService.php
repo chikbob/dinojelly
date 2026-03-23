@@ -12,6 +12,7 @@ class PaymentService
 {
     public function __construct(
         protected OrderEventService $orderEventService,
+        protected InventoryService $inventoryService,
     ) {
     }
 
@@ -163,6 +164,12 @@ class PaymentService
                 default => 'pending',
             },
         ]);
+
+        match ($status) {
+            'paid' => $this->inventoryService->commitOrderStock($payment->order),
+            'canceled', 'failed' => $this->inventoryService->releaseOrderStock($payment->order),
+            default => null,
+        };
 
         $this->orderEventService->log(
             $payment->order,

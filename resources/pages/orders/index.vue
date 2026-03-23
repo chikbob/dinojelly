@@ -66,6 +66,14 @@
                             <span class="orders__label">{{ t("checkout.deliveryTitle") }}:</span>
                             <span class="orders__value">{{ order.delivery_slot.name }}</span>
                         </div>
+                        <div class="orders__actions">
+                            <button class="orders__action" @click.stop="reorder(order.id)">
+                                {{ t("orders.reorder") }}
+                            </button>
+                            <button class="orders__action orders__action--secondary" @click.stop="subscribe(order.id)">
+                                {{ t("subscriptions.createFromOrder") }}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -116,6 +124,16 @@ const formatStatus = (status) => {
 // при выборе фильтра
 const filterOrders = () => {
     router.get('/orders', {status: selectedStatus.value}, {preserveState: true})
+}
+
+const reorder = (orderId) => {
+    router.post(`/orders/${orderId}/reorder`, {}, { preserveScroll: true })
+}
+
+const subscribe = (orderId) => {
+    router.post(`/orders/${orderId}/subscriptions`, {
+        interval_days: 30,
+    }, { preserveScroll: true })
 }
 </script>
 
@@ -256,6 +274,27 @@ const filterOrders = () => {
 
     &__value {
         color: #777;
+    }
+
+    &__actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 12px;
+    }
+
+    &__action {
+        border: none;
+        background: #2563eb;
+        color: #fff;
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-size: 10px;
+        font-family: "Press Start 2P", system-ui;
+        cursor: pointer;
+    }
+
+    &__action--secondary {
+        background: #0f172a;
     }
 
     &__empty {
