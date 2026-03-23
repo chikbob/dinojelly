@@ -6,6 +6,10 @@
                 <sup>{{ totalQuantity }}</sup>
             </h1>
 
+            <div v-if="recovered" class="cart__recovered">
+                {{ t("cart.recovered") }}
+            </div>
+
             <div v-if="cartItems.length" class="cart__layout">
                 <!-- Левая колонка -->
                 <div class="cart__items">
@@ -97,7 +101,8 @@ const {t} = useI18n()
 
 const props = defineProps({
     cart: Object,
-    favorites: Array
+    favorites: Array,
+    recovered: Boolean,
 })
 
 const cartItems = computed(() => props.cart ? Object.values(props.cart) : [])
@@ -154,6 +159,15 @@ function goToCheckout() {
 <style lang="scss" scoped>
 .cart {
     padding: 32px;
+
+    &__recovered {
+        margin-bottom: 20px;
+        padding: 16px 18px;
+        border-radius: 14px;
+        background: #dbeafe;
+        color: #1d4ed8;
+        font-weight: 700;
+    }
 
     &__title {
         font-size: 32px;

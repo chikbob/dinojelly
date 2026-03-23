@@ -22,6 +22,7 @@ class CartController extends Controller
         return Inertia::render('cart', [
             'cart' => $this->cartService->getCartMap($user),
             'favorites' => $user->favorites()->pluck('product_id')->toArray(),
+            'recovered' => $request->boolean('recovered'),
             'pendingOrdersCount' => $this->orderService->getPendingOrdersCount($user),
             'cartCount' => $this->cartService->getCartCount($user),
         ]);

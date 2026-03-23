@@ -20,6 +20,8 @@ class StorefrontProductResource extends JsonResource
             'old_price' => $this->old_price,
             'description' => $this->description,
             'image_url' => $this->image_url,
+            'average_rating' => $this->average_rating ? round((float) $this->average_rating, 1) : null,
+            'reviews_count' => (int) ($this->reviews_count ?? 0),
             'category' => $this->whenLoaded('category', function () use ($request) {
                 return CategoryResource::make($this->category)->resolve($request);
             }),

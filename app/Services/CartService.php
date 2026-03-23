@@ -9,6 +9,11 @@ use Illuminate\Support\Collection;
 
 class CartService
 {
+    public function __construct(
+        protected AbandonedCartService $abandonedCartService,
+    ) {
+    }
+
     public function getCartItems(User $user): Collection
     {
         return CartItem::query()
@@ -40,6 +45,8 @@ class CartService
 
     public function addProduct(User $user, int $productId): void
     {
+        $this->abandonedCartService->markRecovered($user, 'cart_updated');
+
         $cartItem = CartItem::query()->firstOrCreate(
             ['user_id' => $user->id, 'product_id' => $productId],
             ['quantity' => 0]
@@ -50,6 +57,8 @@ class CartService
 
     public function increaseQuantity(User $user, int $productId): void
     {
+        $this->abandonedCartService->markRecovered($user, 'cart_updated');
+
         CartItem::query()
             ->where('user_id', $user->id)
             ->where('product_id', $productId)
@@ -58,6 +67,8 @@ class CartService
 
     public function decreaseQuantity(User $user, int $productId): void
     {
+        $this->abandonedCartService->markRecovered($user, 'cart_updated');
+
         $cartItem = CartItem::query()
             ->where('user_id', $user->id)
             ->where('product_id', $productId)
@@ -77,6 +88,8 @@ class CartService
 
     public function removeProduct(User $user, int $productId): void
     {
+        $this->abandonedCartService->markRecovered($user, 'cart_updated');
+
         CartItem::query()
             ->where('user_id', $user->id)
             ->where('product_id', $productId)
@@ -85,6 +98,8 @@ class CartService
 
     public function clear(User $user): void
     {
+        $this->abandonedCartService->markRecovered($user, 'cart_cleared');
+
         CartItem::query()
             ->where('user_id', $user->id)
             ->delete();

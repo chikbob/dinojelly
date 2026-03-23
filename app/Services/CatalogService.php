@@ -15,6 +15,7 @@ class CatalogService
     public function __construct(
         protected CartService $cartService,
         protected OrderService $orderService,
+        protected ReviewService $reviewService,
     ) {
     }
 
@@ -31,7 +32,9 @@ class CatalogService
             ->get();
 
         $productsQuery = Product::query()
-            ->with('category');
+            ->with('category')
+            ->withCount(['reviews' => fn ($query) => $query->where('is_published', true)])
+            ->withAvg(['reviews as average_rating' => fn ($query) => $query->where('is_published', true)], 'rating');
 
         if (!empty($filters['q'])) {
             $query = trim((string) $filters['q']);
@@ -99,12 +102,17 @@ class CatalogService
      */
     public function getProductPage(Product $product, ?User $user): array
     {
-        $product->loadMissing('category');
+        $product->loadMissing('category')
+            ->loadCount(['reviews' => fn ($query) => $query->where('is_published', true)])
+            ->loadAvg(['reviews as average_rating' => fn ($query) => $query->where('is_published', true)], 'rating');
         $favoriteIds = $this->getFavoriteIds($user);
         $payload = $this->transformProduct($product, $favoriteIds);
 
         return [
             'product' => $payload,
+            'reviews' => $this->reviewService->getPublishedReviewsPayload($product),
+            'userReview' => $this->reviewService->getUserReviewPayload($product, $user),
+            'canReview' => $this->reviewService->canUserReview($product, $user),
             'favorites' => $favoriteIds,
             'cartItems' => $user ? $this->cartService->getCartMap($user) : [],
             'cartCount' => $user ? $this->cartService->getCartCount($user) : 0,

@@ -26,11 +26,11 @@ class AuthController extends Controller
 
             $user = Auth::user();
 
-            if ($user->isAdmin()) {
-                return redirect()->route('admin.dashboard');
-            }
-
-            return redirect()->route('products.index');
+            return redirect()->intended(
+                $user->isAdmin()
+                    ? route('admin.dashboard')
+                    : route('products.index')
+            );
         }
 
         return back()->withErrors([

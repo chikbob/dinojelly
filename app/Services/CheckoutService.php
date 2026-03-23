@@ -19,6 +19,7 @@ class CheckoutService
         protected OrderService $orderService,
         protected PaymentService $paymentService,
         protected OrderEventService $orderEventService,
+        protected AbandonedCartService $abandonedCartService,
     ) {
     }
 
@@ -124,6 +125,7 @@ class CheckoutService
             );
 
             $this->cartService->clear($user);
+            $this->abandonedCartService->markRecovered($user, 'order_completed');
 
             return $order->load('latestPayment');
         });

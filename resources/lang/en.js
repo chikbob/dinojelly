@@ -55,9 +55,23 @@ export default {
         itemsShort: "pcs",
         discount: "Discount",
         finalTotal: "Final total",
+        recovered: "Your cart was restored from the email link. You can continue checkout.",
     },
     product: {
         addToCart: "Add to cart"
+    },
+    reviews: {
+        title: "Reviews",
+        subtitle: "Real customer feedback about taste, texture and delivery experience.",
+        basedOn: "Reviews:",
+        titlePlaceholder: "Short review title",
+        bodyPlaceholder: "What did you like, how was the delivery, and which flavor should others try?",
+        submit: "Leave review",
+        update: "Update review",
+        delete: "Delete review",
+        empty: "No reviews yet. Be the first to share your experience.",
+        gate: "Reviews are available to customers who already purchased this product.",
+        verifiedPurchase: "Verified purchase",
     },
     profile: {
         title: "User Profile",

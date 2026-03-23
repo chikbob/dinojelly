@@ -38,6 +38,11 @@ class User extends Authenticatable
         return $this->hasMany(Favorite::class);
     }
 
+    public function cartItems(): HasMany
+    {
+        return $this->hasMany(CartItem::class);
+    }
+
     public function favoriteProducts(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'favorites');
@@ -61,6 +66,11 @@ class User extends Authenticatable
     public function orderEvents(): HasMany
     {
         return $this->hasMany(OrderEvent::class, 'actor_user_id');
+    }
+
+    public function cartRecoveryReminders(): HasMany
+    {
+        return $this->hasMany(CartRecoveryReminder::class);
     }
 
     public function usedPromoCodes(): BelongsToMany
