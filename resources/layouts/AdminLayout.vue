@@ -52,7 +52,7 @@
                         class="admin__lang"
                     >
                         <option value="ru">RU</option>
-                        <option value="uk">UA</option>
+                        <!-- <option value="uk">UA</option> -->
                         <option value="en">EN</option>
                     </select>
 

@@ -218,8 +218,8 @@ export default {
             }
         },
         header: {
-            title: "Админ-панель",
-            logout: "Выйти",
+            title: "Admin-panel",
+            logout: "Exit",
         }
     }
 
