@@ -20,26 +20,28 @@ RUN npm run build
 # PHP application stage
 FROM php:8.2-fpm-alpine
 
-# Install system dependencies
+# Install system dependencies and PHP extensions
 RUN apk add --no-cache \
-    freetype-dev \
-    libjpeg-turbo-dev \
-    libpng-dev \
-    libzip-dev \
-    nginx \
-    nodejs \
-    npm \
-    supervisor \
-    zip
-
-# Install PHP extensions
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+        freetype-dev \
+        libjpeg-turbo-dev \
+        libpng-dev \
+        libzip-dev \
+        nginx \
+        nodejs \
+        npm \
+        supervisor \
+        zip \
+    && apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
         bcmath \
         gd \
         opcache \
         pdo_mysql \
-        zip
+        zip \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && apk del .build-deps
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -78,8 +80,9 @@ COPY storage ./storage
 COPY artisan ./
 COPY --from=frontend-builder /app/public/build ./public/build
 
-# Run package discovery after the full application source is present
-RUN composer dump-autoload --optimize --no-dev \
+# Drop stale bootstrap caches copied from the host before generating prod metadata
+RUN rm -f bootstrap/cache/*.php bootstrap/cache/*.json \
+    && composer dump-autoload --optimize --no-dev \
     && php artisan package:discover --ansi
 
 # Set permissions
