@@ -12,6 +12,7 @@
                 <th>{{ t("admin.products.id") }}</th>
                 <th>{{ t("admin.products.image") }}</th>
                 <th>{{ t("admin.products.name") }}</th>
+                <th>{{ t("admin.products.category") }}</th>
                 <th>{{ t("admin.products.weight") }}</th>
                 <th>{{ t("admin.products.price") }}</th>
                 <th>{{ t("admin.products.oldPrice") }}</th>
@@ -31,6 +32,7 @@
                     <span v-else>—</span>
                 </td>
                 <td>{{ product.name }}</td>
+                <td>{{ product.category?.name ?? '—' }}</td>
                 <td>{{ product.weight ?? '—' }}</td>
                 <td>{{ product.price }}</td>
                 <td>{{ product.old_price ?? '—' }}</td>

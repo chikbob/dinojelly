@@ -23,6 +23,14 @@
 
                 <Link
                     class="admin__link"
+                    :class="{ active: isActive('admin.categories.index') }"
+                    :href="route('admin.categories.index')"
+                >
+                    {{ t("admin.sidebar.categories") }}
+                </Link>
+
+                <Link
+                    class="admin__link"
                     :class="{ active: isActive('admin.orders.index') }"
                     :href="route('admin.orders.index')"
                 >
@@ -81,8 +89,6 @@ import { useI18n } from '../lang/useI18n'
 
 const { t, setLang, currentLang } = useI18n()
 const page = usePage()
-
-console.log(page)
 
 const isActive = (name) => {
     return page.props?.ziggy?.location?.includes(route(name))

@@ -31,7 +31,7 @@ class AppServiceProvider extends ServiceProvider
                         ->sum('quantity');
                 }
 
-                return (int)collect(session('cart', []))->sum('quantity');
+                return 0;
             },
 
             'favorites' => function () {

@@ -86,6 +86,46 @@
                     </button>
                 </div>
             </div>
+
+            <div class="profile-addresses">
+                <div class="profile-addresses__header">
+                    <h2>{{ t("profile.addresses") }}</h2>
+                </div>
+
+                <div v-if="addresses.length" class="profile-addresses__list">
+                    <div v-for="address in addresses" :key="address.id" class="profile-address">
+                        <div>
+                            <strong>{{ address.label || address.recipient_name }}</strong>
+                            <p>{{ address.full_address }}</p>
+                            <small>{{ address.phone }}</small>
+                        </div>
+                        <button class="profile-address__delete" @click="removeAddress(address.id)">
+                            {{ t("cart.delete") }}
+                        </button>
+                    </div>
+                </div>
+
+                <form class="profile-addresses__form" @submit.prevent="submitAddress">
+                    <div class="profile-addresses__grid">
+                        <input v-model="addressForm.label" :placeholder="t('profile.addressLabel')" />
+                        <input v-model="addressForm.recipient_name" :placeholder="t('profile.name')" />
+                        <input v-model="addressForm.phone" :placeholder="t('profile.phone')" />
+                        <input v-model="addressForm.city" :placeholder="t('profile.city')" />
+                        <input v-model="addressForm.street" :placeholder="t('profile.street')" />
+                        <input v-model="addressForm.building" :placeholder="t('profile.building')" />
+                        <input v-model="addressForm.apartment" :placeholder="t('profile.apartment')" />
+                        <input v-model="addressForm.postal_code" :placeholder="t('profile.postalCode')" />
+                    </div>
+                    <textarea v-model="addressForm.comment" :placeholder="t('profile.addressComment')" rows="3"></textarea>
+                    <label class="profile-addresses__checkbox">
+                        <input v-model="addressForm.is_default" type="checkbox" />
+                        <span>{{ t("profile.defaultAddress") }}</span>
+                    </label>
+                    <button type="submit" class="profile-card__button">
+                        {{ t("profile.addAddress") }}
+                    </button>
+                </form>
+            </div>
         </div>
     </MainLayout>
 </template>
@@ -100,7 +140,10 @@ import {router} from "@inertiajs/vue3"
 const props = defineProps({
     user: Object,
     cartCount: Number,
-    orders: Array,
+    addresses: {
+        type: Array,
+        default: () => ([]),
+    },
 })
 
 /* ---------------- STATE ---------------- */
@@ -112,6 +155,19 @@ const form = reactive({
     name: user.value.name,
     phone: user.value.phone,
     address: user.value.address,
+})
+
+const addressForm = reactive({
+    label: '',
+    recipient_name: user.value.name ?? '',
+    phone: user.value.phone ?? '',
+    city: '',
+    street: '',
+    building: '',
+    apartment: '',
+    postal_code: '',
+    comment: '',
+    is_default: props.addresses.length === 0,
 })
 
 /* ---------------- I18N ---------------- */
@@ -135,6 +191,28 @@ const submit = () => {
         onSuccess: () => {
             isEditing.value = false
         },
+    })
+}
+
+const submitAddress = () => {
+    router.post('/addresses', addressForm, {
+        preserveScroll: true,
+        onSuccess: () => {
+            addressForm.label = ''
+            addressForm.city = ''
+            addressForm.street = ''
+            addressForm.building = ''
+            addressForm.apartment = ''
+            addressForm.postal_code = ''
+            addressForm.comment = ''
+            addressForm.is_default = false
+        },
+    })
+}
+
+const removeAddress = (id) => {
+    router.delete(`/addresses/${id}`, {
+        preserveScroll: true,
     })
 }
 
@@ -269,6 +347,66 @@ const formatPhoneNumber = (phone) => {
             transform: none;
             box-shadow: none;
         }
+    }
+}
+
+.profile-addresses {
+    margin-top: 32px;
+    padding: 24px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+
+    &__header {
+        margin-bottom: 16px;
+    }
+
+    &__list {
+        display: grid;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    &__form {
+        display: grid;
+        gap: 14px;
+    }
+
+    &__grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    &__checkbox {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    input,
+    textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-family: "Press Start 2P", system-ui;
+    }
+}
+
+.profile-address {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px;
+    border-radius: 10px;
+    background: #f8fafc;
+
+    &__delete {
+        border: none;
+        background: transparent;
+        color: #ef4444;
+        cursor: pointer;
+        font-family: "Press Start 2P", system-ui;
     }
 }
 

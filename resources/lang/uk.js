@@ -21,7 +21,28 @@ export default {
 
     catalog: {
         title: "Каталог желейок",
-        addToCart: "Додати в кошик"
+        subtitle: "Використовуйте категорії, ціну та знижки, щоб швидко зібрати потрібну вітрину каталогу.",
+        addToCart: "Додати в кошик",
+        searchPlaceholder: "Пошук по каталогу",
+        search: "Знайти",
+        allCategories: "Усі категорії",
+        sort: "Сортування",
+        apply: "Застосувати",
+        reset: "Скинути",
+        empty: "За вашим запитом нічого не знайдено",
+        filters: {
+            title: "Фільтри",
+            minPrice: "Ціна від",
+            maxPrice: "Ціна до",
+            onSale: "Лише зі знижкою",
+        },
+        sortOptions: {
+            new: "Спочатку нові",
+            popular: "Популярні",
+            priceAsc: "Ціна за зростанням",
+            priceDesc: "Ціна за спаданням",
+            nameAsc: "За назвою",
+        }
     },
 
     cart: {
@@ -51,6 +72,16 @@ export default {
         notVerified: "Email не підтверджено",
         phone: "Телефон",
         address: "Адреса",
+        addresses: "Адреси доставки",
+        addressLabel: "Назва адреси",
+        addressComment: "Коментар для кур'єра",
+        city: "Місто",
+        street: "Вулиця",
+        building: "Будинок",
+        apartment: "Квартира",
+        postalCode: "Індекс",
+        defaultAddress: "Зробити адресою за замовчуванням",
+        addAddress: "Додати адресу",
         registeredAt: "Дата реєстрації",
         edit: "Редагувати",
         notProvided: "Не вказано",
@@ -152,6 +183,12 @@ export default {
         title: "Оформлення замовлення",
         items: "Товари",
         total: "Разом",
+        subtotal: "Товари",
+        deliveryPrice: "Доставка",
+        addressTitle: "Адреса доставки",
+        addressEmpty: "Додайте адресу в профілі перед оформленням замовлення",
+        deliveryTitle: "Слот доставки",
+        deliveryEmpty: "Немає доступних слотів доставки",
         choosePayment: "Оберіть спосіб оплати",
         payCard: "Оплата карткою",
         payCash: "Оплата готівкою"
@@ -166,6 +203,7 @@ export default {
         sidebar: {
             dashboard: "Дашборд",
             products: "Товари",
+            categories: "Категорії",
             orders: "Замовлення",
             users: "Користувачі",
         },
@@ -204,6 +242,7 @@ export default {
             id: "ID",
             image: "Зображення",
             name: "Назва",
+            category: "Категорія",
             weight: "Вага",
             price: "Ціна",
             oldPrice: "Стара ціна",
@@ -220,6 +259,7 @@ export default {
 
             fields: {
                 name: "Назва",
+                category: "Категорія",
                 weight: "Вага",
                 price: "Ціна",
                 oldPrice: "Стара ціна",
@@ -227,6 +267,18 @@ export default {
                 imageUrl: "URL зображення",
                 image: "Зображення",
             }
+        },
+        categories: {
+            title: "Категорії",
+            createNew: "Створити категорію",
+            editCategory: "Редагувати категорію",
+            name: "Назва",
+            slug: "Slug",
+            status: "Статус",
+            sortOrder: "Порядок",
+            active: "Активна",
+            inactive: "Неактивна",
+            confirmDelete: "Ви впевнені, що хочете видалити цю категорію?",
         },
         header: {
             title: "Адмін-панель",

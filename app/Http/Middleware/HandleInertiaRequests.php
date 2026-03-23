@@ -9,27 +9,13 @@ class HandleInertiaRequests extends Middleware
 {
     protected $rootView = 'app';
 
-    public function version(Request $request)
+    public function version(Request $request): ?string
     {
         return parent::version($request);
     }
 
-    public function share(Request $request)
+    public function share(Request $request): array
     {
-        $shared = parent::share($request);
-
-        $cart = session('cart', []); // формат: ['1' => ['id'=>1,'quantity'=>2], ...]
-        $cartCount = collect($cart)->sum('quantity');
-
-        $favorites = auth()->check()
-            ? auth()->user()->favorites()->pluck('product_id')->toArray()
-            : [];
-
-        return array_merge($shared, [
-            // auth.user уже часто возвращается — при необходимости расширяй
-            'cart' => $cart, // фронт может читать cart[productId].quantity
-            'cartCount' => $cartCount,
-            'favorites' => $favorites,
-        ]);
+        return parent::share($request);
     }
 }

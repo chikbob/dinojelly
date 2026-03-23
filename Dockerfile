@@ -3,14 +3,11 @@ FROM node:20-alpine AS frontend-builder
 
 WORKDIR /app
 
-# Create required directories
-RUN mkdir -p /var/log/supervisor /var/run/supervisor
-
 # Copy package files
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci --only=production=false
+RUN npm ci
 
 # Copy source files needed for build
 COPY vite.config.js ./
@@ -49,6 +46,15 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
+# Copy dependency manifests first for better build cache
+COPY composer.json composer.lock ./
+RUN composer install \
+    --no-dev \
+    --prefer-dist \
+    --no-interaction \
+    --no-progress \
+    --optimize-autoloader
+
 # Create required directories
 RUN mkdir -p /var/log/supervisor /var/run/supervisor
 
@@ -59,8 +65,21 @@ COPY docker/php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
 COPY docker/php.ini /usr/local/etc/php/conf.d/custom.ini
 COPY docker/supervisord.conf /etc/supervisord.conf
 
+# Copy application source and built frontend assets
+COPY app ./app
+COPY bootstrap ./bootstrap
+COPY config ./config
+COPY database ./database
+COPY public ./public
+COPY resources ./resources
+COPY routes ./routes
+COPY storage ./storage
+COPY artisan ./
+COPY --from=frontend-builder /app/public/build ./public/build
+
 # Set permissions
-RUN chown -R www-data:www-data /var/www/html
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod +x artisan
 
 EXPOSE 80 5173
 

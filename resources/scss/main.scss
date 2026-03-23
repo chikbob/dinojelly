@@ -1,12 +1,7 @@
-// Utilities
-@import 'utilities/variables';
-@import 'utilities/mixins';
-@import "app";
-
-// Блоки
-@import 'blocks/header';
-@import 'blocks/footer';
-@import 'blocks/product-card';
-@import 'blocks/product-page';
-@import 'blocks/modal';
-@import 'blocks/auth-form';
+@use 'app';
+@use 'blocks/header';
+@use 'blocks/footer';
+@use 'blocks/product-card';
+@use 'blocks/product-page';
+@use 'blocks/modal';
+@use 'blocks/auth-form';

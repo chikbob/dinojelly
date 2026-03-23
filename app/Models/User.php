@@ -6,6 +6,8 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -31,19 +33,36 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function favorites()
+    public function favorites(): HasMany
     {
-        return $this->hasMany(\App\Models\Favorite::class);
+        return $this->hasMany(Favorite::class);
     }
 
-    public function favoriteProducts()
+    public function favoriteProducts(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\Product::class, 'favorites');
+        return $this->belongsToMany(Product::class, 'favorites');
     }
 
-    public function orders()
+    public function orders(): HasMany
     {
-        return $this->hasMany(\App\Models\Order::class);
+        return $this->hasMany(Order::class);
+    }
+
+    public function addresses(): HasMany
+    {
+        return $this->hasMany(Address::class);
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function usedPromoCodes(): BelongsToMany
+    {
+        return $this->belongsToMany(PromoCode::class)
+            ->withPivot(['order_id', 'used_at'])
+            ->withTimestamps();
     }
 
     public function isAdmin(): bool

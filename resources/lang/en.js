@@ -19,7 +19,28 @@ export default {
     },
     catalog: {
         title: "Jelly Catalog",
-        addToCart: "Add to cart"
+        subtitle: "Use category, price and discount filters to build a focused catalog view that can be shared directly via URL.",
+        addToCart: "Add to cart",
+        searchPlaceholder: "Search the catalog",
+        search: "Search",
+        allCategories: "All categories",
+        sort: "Sort",
+        apply: "Apply",
+        reset: "Reset",
+        empty: "No products matched your filters",
+        filters: {
+            title: "Filters",
+            minPrice: "Min price",
+            maxPrice: "Max price",
+            onSale: "Only discounted",
+        },
+        sortOptions: {
+            new: "Newest first",
+            popular: "Popular",
+            priceAsc: "Price: low to high",
+            priceDesc: "Price: high to low",
+            nameAsc: "Name",
+        }
     },
     cart: {
         title: "Your Cart",
@@ -46,6 +67,16 @@ export default {
         notVerified: "Email not verified",
         phone: "Phone",
         address: "Address",
+        addresses: "Delivery addresses",
+        addressLabel: "Address label",
+        addressComment: "Courier comment",
+        city: "City",
+        street: "Street",
+        building: "Building",
+        apartment: "Apartment",
+        postalCode: "Postal code",
+        defaultAddress: "Make default",
+        addAddress: "Add address",
         registeredAt: "Registration date",
         edit: "Edit",
         notProvided: "Not provided",
@@ -141,6 +172,12 @@ export default {
         title: "Checkout",
         items: "Items",
         total: "Total",
+        subtotal: "Items subtotal",
+        deliveryPrice: "Delivery",
+        addressTitle: "Delivery address",
+        addressEmpty: "Add an address in your profile before checkout",
+        deliveryTitle: "Delivery slot",
+        deliveryEmpty: "No delivery slots available",
         choosePayment: "Choose a payment method",
         payCard: "Pay by card",
         payCash: "Pay with cash"
@@ -155,6 +192,7 @@ export default {
         sidebar: {
             dashboard: "Дашборд",
             products: "Товары",
+            categories: "Categories",
             orders: "Заказы",
             users: "Пользователи",
         },
@@ -193,6 +231,7 @@ export default {
             id: "ID",
             image: "Image",
             name: "Name",
+            category: "Category",
             weight: "Weight",
             price: "Price",
             oldPrice: "Old Price",
@@ -209,6 +248,7 @@ export default {
 
             fields: {
                 name: "Name",
+                category: "Category",
                 weight: "Weight",
                 price: "Price",
                 oldPrice: "Old Price",
@@ -216,6 +256,18 @@ export default {
                 imageUrl: "Image URL",
                 image: "Image",
             }
+        },
+        categories: {
+            title: "Categories",
+            createNew: "Create Category",
+            editCategory: "Edit Category",
+            name: "Name",
+            slug: "Slug",
+            status: "Status",
+            sortOrder: "Sort order",
+            active: "Active",
+            inactive: "Inactive",
+            confirmDelete: "Are you sure you want to delete this category?",
         },
         header: {
             title: "Admin-panel",

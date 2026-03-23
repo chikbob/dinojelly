@@ -10,6 +10,17 @@
             </div>
 
             <div class="form-group">
+                <label for="category_id">{{ t("admin.products.fields.category") }} ({{ t("admin.products.optional") }})</label>
+                <select v-model="form.category_id" id="category_id">
+                    <option :value="null">—</option>
+                    <option v-for="category in categories" :key="category.id" :value="category.id">
+                        {{ category.name }}
+                    </option>
+                </select>
+                <p v-if="errors.category_id" class="error">{{ errors.category_id }}</p>
+            </div>
+
+            <div class="form-group">
                 <label for="weight">{{ t("admin.products.fields.weight") }} ({{ t("admin.products.optional") }})</label>
                 <input v-model.number="form.weight" id="weight" type="number" min="0"/>
                 <p v-if="errors.weight" class="error">{{ errors.weight }}</p>
@@ -62,12 +73,14 @@ import {useI18n} from '../../../lang/useI18n'
 
 const props = defineProps({
     product: Object,
+    categories: Array,
     errors: Object,
 })
 
 const {t} = useI18n()
 
 const form = reactive({
+    category_id: props.product.category_id ?? null,
     name: props.product.name ?? '',
     weight: props.product.weight ?? null,
     price: props.product.price ?? 0,
@@ -78,6 +91,7 @@ const form = reactive({
 
 watch(() => props.product, (newVal) => {
     form.name = newVal.name ?? ''
+    form.category_id = newVal.category_id ?? null
     form.weight = newVal.weight ?? null
     form.price = newVal.price ?? 0
     form.old_price = newVal.old_price ?? null
@@ -87,6 +101,7 @@ watch(() => props.product, (newVal) => {
 
 const submit = () => {
     const formData = new FormData()
+    if (form.category_id !== null) formData.append('category_id', String(form.category_id))
     formData.append('name', String(form.name).trim())
     if (form.weight !== null) formData.append('weight', String(form.weight))
     formData.append('price', String(form.price))
@@ -134,6 +149,7 @@ const submit = () => {
         }
 
         input,
+        select,
         textarea {
             width: 100%;
             padding: 8px;

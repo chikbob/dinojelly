@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\AddressResource;
 use App\Models\CartItem;
 use App\Models\Order;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class ProfileController extends Controller
@@ -14,11 +15,6 @@ class ProfileController extends Controller
     {
         $cartCount = 0;
         $user = Auth::user();
-
-        $orders = Order::where('user_id', $user->id)
-            ->with('items.product')
-            ->orderByDesc('created_at')
-                ->get();
 
         $ordersCount = Order::where('user_id', $user->id)
             ->where('status', 'pending')
@@ -31,7 +27,9 @@ class ProfileController extends Controller
         return Inertia::render('Profile/profile', [
             'user' => $user,
             'cartCount' => $cartCount,
-            'orders' => $orders,
+            'addresses' => AddressResource::collection(
+                $user->addresses()->orderByDesc('is_default')->latest()->get()
+            )->resolve(request()),
             'pendingOrdersCount' => $ordersCount,
         ]);
     }

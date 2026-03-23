@@ -10,6 +10,7 @@
                 <th>{{ t("admin.users.id") }}</th>
                 <th>{{ t("admin.users.name") }}</th>
                 <th>{{ t("admin.users.email") }}</th>
+                <th>{{ t("admin.orders.actions") }}</th>
             </tr>
             </thead>
             <tbody>
@@ -17,6 +18,11 @@
                 <td>{{ user.id }}</td>
                 <td>{{ user.name }}</td>
                 <td>{{ user.email }}</td>
+                <td>
+                    <a :href="route('admin.users.show', user.id)" class="users-index__link">
+                        {{ t("admin.orders.view") }}
+                    </a>
+                </td>
             </tr>
             </tbody>
         </table>
@@ -24,6 +30,7 @@
 </template>
 
 <script setup>
+import { route } from 'ziggy-js'
 import { useI18n } from '../../../lang/useI18n'
 
 const { t } = useI18n()
@@ -58,6 +65,11 @@ const props = defineProps({
         th {
             background-color: #f5f7fa;
         }
+    }
+
+    &__link {
+        color: #29cc5f;
+        text-decoration: none;
     }
 }
 </style>

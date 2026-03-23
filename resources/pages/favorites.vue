@@ -85,8 +85,7 @@ const props = defineProps({
         default: () => ({}),
     },
     cartCount: Number,
-    order: String,
-    orders: Array
+    order: String
 })
 
 const order = ref(props.order || 'created_at_desc');

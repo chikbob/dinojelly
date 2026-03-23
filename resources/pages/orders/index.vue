@@ -58,6 +58,10 @@
                             <span class="orders__label">{{ t("orders.date") }}:</span>
                             <span class="orders__value">{{ formatDate(order.created_at) }}</span>
                         </div>
+                        <div v-if="order.delivery_slot" class="orders__info">
+                            <span class="orders__label">{{ t("checkout.deliveryTitle") }}:</span>
+                            <span class="orders__value">{{ order.delivery_slot.name }}</span>
+                        </div>
                     </div>
                 </div>
             </div>

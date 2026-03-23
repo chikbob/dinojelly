@@ -52,15 +52,13 @@ import {router} from '@inertiajs/vue3'
 import MainLayout from '../layouts/mainLayout.vue'
 import {route} from "ziggy-js"
 import {useI18n} from "../lang/useI18n"
-import {computed} from "vue"
 
 const {t} = useI18n()
 
 const props = defineProps({
     product: Object,
     favorites: Array,
-    cartItems: Object,
-    orders: Array
+    cartItems: Object
 })
 
 // Добавление в корзину

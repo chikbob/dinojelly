@@ -5,6 +5,14 @@
                 <h1 class="order__title">{{ t("order.orderNumber") }} №{{ order.id }}</h1>
 
                 <div class="order__summary">
+                    <div v-if="order.address" class="order__summary-item">
+                        <span class="order__label">{{ t("profile.address") }}:</span>
+                        <span class="order__value">{{ order.address.full_address }}</span>
+                    </div>
+                    <div v-if="order.delivery_slot" class="order__summary-item">
+                        <span class="order__label">{{ t("checkout.deliveryTitle") }}:</span>
+                        <span class="order__value">{{ order.delivery_slot.name }}</span>
+                    </div>
                     <div class="order__summary-item">
                         <span class="order__label">{{ t("order.statusText") }}:</span>
                         <span
@@ -27,6 +35,10 @@
                     <div class="order__summary-item">
                         <span class="order__label">{{ t("order.amount") }}:</span>
                         <span class="order__value">{{ order.total_price }} {{ t("currency.symbol") }}</span>
+                    </div>
+                    <div class="order__summary-item">
+                        <span class="order__label">{{ t("checkout.deliveryPrice") }}:</span>
+                        <span class="order__value">{{ order.delivery_price }} {{ t("currency.symbol") }}</span>
                     </div>
                     <div class="order__summary-item">
                         <span class="order__label">{{ t("order.quantity") }}:</span>

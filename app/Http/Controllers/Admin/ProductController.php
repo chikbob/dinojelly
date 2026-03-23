@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -12,35 +13,68 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::paginate(15);
+        $products = Product::query()
+            ->with('category')
+            ->paginate(15);
         return Inertia::render('admin/Products/Index', ['products' => $products]);
     }
 
     public function create()
     {
-        return Inertia::render('admin/Products/Create');
+        return Inertia::render('admin/Products/Create', [
+            'categories' => Category::query()
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->orderBy('name')
+                ->get(['id', 'name']),
+        ]);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'category_id' => 'nullable|exists:categories,id',
             'name' => 'required|string|max:255',
-            // остальные поля продукта
+            'weight' => 'nullable|numeric|min:0',
+            'price' => 'required|numeric|min:0',
+            'old_price' => 'nullable|numeric|min:0',
+            'description' => 'nullable|string',
+            'image' => 'nullable|image|max:2048',
         ]);
 
-        Product::create($validated);
+        $productData = [
+            'category_id' => $validated['category_id'] ?? null,
+            'name' => $validated['name'],
+            'weight' => $validated['weight'] ?? null,
+            'price' => $validated['price'],
+            'old_price' => $validated['old_price'] ?? null,
+            'description' => $validated['description'] ?? null,
+        ];
+
+        if ($request->hasFile('image')) {
+            $productData['image'] = $request->file('image')->store('products', 'public');
+        }
+
+        Product::create($productData);
 
         return redirect()->route('admin.products.index')->with('success', 'Product created');
     }
 
     public function edit(Product $product)
     {
-        return Inertia::render('admin/Products/Edit', ['product' => $product]);
+        return Inertia::render('admin/Products/Edit', [
+            'product' => $product->load('category'),
+            'categories' => Category::query()
+                ->orderBy('sort_order')
+                ->orderBy('name')
+                ->get(['id', 'name']),
+        ]);
     }
 
     public function update(Request $request, Product $product)
     {
         $validated = $request->validate([
+            'category_id' => 'nullable|exists:categories,id',
             'name' => 'required|string|max:255',
             'weight' => 'nullable|numeric|min:0',
             'price' => 'required|numeric|min:0',
@@ -50,6 +84,7 @@ class ProductController extends Controller
             'image_url' => 'nullable|url',
         ]);
 
+        $product->category_id = $validated['category_id'] ?? null;
         $product->name = $validated['name'];
         $product->weight = $validated['weight'] ?? null;
         $product->price = $validated['price'];
@@ -72,6 +107,10 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
+        if ($product->image && !filter_var($product->image, FILTER_VALIDATE_URL)) {
+            Storage::disk('public')->delete($product->image);
+        }
+
         $product->delete();
 
         return redirect()->route('admin.products.index')->with('success', 'Product deleted');

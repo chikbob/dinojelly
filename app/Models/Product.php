@@ -4,6 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
@@ -11,6 +15,7 @@ class Product extends Model
     use HasFactory;
 
     protected $fillable = [
+        'category_id',
         'name',
         'weight',
         'price',
@@ -21,14 +26,36 @@ class Product extends Model
 
     protected $appends = ['image_url'];
 
-    public function favorites()
+    public function category(): BelongsTo
     {
-        return $this->hasMany(\App\Models\Favorite::class);
+        return $this->belongsTo(Category::class);
     }
 
-    public function favoritedByUsers()
+    public function collections(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\User::class, 'favorites');
+        return $this->belongsToMany(Collection::class)
+            ->withPivot('sort_order')
+            ->withTimestamps();
+    }
+
+    public function favorites(): HasMany
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
+    public function favoritedByUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'favorites');
+    }
+
+    public function stockItem(): HasOne
+    {
+        return $this->hasOne(StockItem::class);
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
     }
 
     public function getImageUrlAttribute(): ?string

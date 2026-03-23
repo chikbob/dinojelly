@@ -10,6 +10,17 @@
             </div>
 
             <div class="form-group">
+                <label for="category_id">{{ t("admin.products.fields.category") }} ({{ t("admin.products.optional") }})</label>
+                <select v-model="form.category_id" id="category_id">
+                    <option :value="null">—</option>
+                    <option v-for="category in categories" :key="category.id" :value="category.id">
+                        {{ category.name }}
+                    </option>
+                </select>
+                <p v-if="errors.category_id" class="error">{{ errors.category_id }}</p>
+            </div>
+
+            <div class="form-group">
                 <label for="weight">{{ t("admin.products.fields.weight") }} ({{ t("admin.products.optional") }})</label>
                 <input v-model.number="form.weight" id="weight" type="number" min="0"/>
                 <p v-if="errors.weight" class="error">{{ errors.weight }}</p>
@@ -56,11 +67,13 @@ import {useI18n} from '../../../lang/useI18n'
 
 const props = defineProps({
     errors: Object,
+    categories: Array,
 })
 
 const {t} = useI18n()
 
 const form = reactive({
+    category_id: null,
     name: '',
     weight: null,
     price: 0,
@@ -79,6 +92,7 @@ const handleFileChange = (event) => {
 
 const submit = () => {
     const formData = new FormData()
+    if (form.category_id !== null) formData.append('category_id', String(form.category_id))
     formData.append('name', form.name)
     if (form.weight !== null) formData.append('weight', form.weight)
     formData.append('price', form.price)
@@ -113,6 +127,7 @@ const submit = () => {
         }
 
         input,
+        select,
         textarea {
             width: 100%;
             padding: 8px;

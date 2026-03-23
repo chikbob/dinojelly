@@ -19,7 +19,28 @@ export default {
     },
     catalog: {
         title: "Каталог мармелада",
-        addToCart: "Добавить в корзину"
+        subtitle: "Подберите вкус по категории, цене и выгоде. Фильтры сохраняются прямо в адресной строке, поэтому каталог можно шарить как готовую подборку.",
+        addToCart: "Добавить в корзину",
+        searchPlaceholder: "Поиск по каталогу",
+        search: "Найти",
+        allCategories: "Все категории",
+        sort: "Сортировка",
+        apply: "Применить",
+        reset: "Сбросить",
+        empty: "По вашему запросу ничего не найдено",
+        filters: {
+            title: "Фильтры",
+            minPrice: "Цена от",
+            maxPrice: "Цена до",
+            onSale: "Только со скидкой",
+        },
+        sortOptions: {
+            new: "Сначала новые",
+            popular: "Популярные",
+            priceAsc: "Цена по возрастанию",
+            priceDesc: "Цена по убыванию",
+            nameAsc: "По названию",
+        }
     },
     cart: {
         title: "Ваша корзина",
@@ -46,6 +67,16 @@ export default {
         notVerified: "Email не подтверждён",
         phone: "Телефон",
         address: "Адрес",
+        addresses: "Адреса доставки",
+        addressLabel: "Название адреса",
+        addressComment: "Комментарий для курьера",
+        city: "Город",
+        street: "Улица",
+        building: "Дом",
+        apartment: "Квартира",
+        postalCode: "Индекс",
+        defaultAddress: "Сделать адресом по умолчанию",
+        addAddress: "Добавить адрес",
         registeredAt: "Дата регистрации",
         edit: "Редактировать",
         notProvided: "Не указано",
@@ -141,6 +172,12 @@ export default {
         title: "Оформление заказа",
         items: "Товары",
         total: "Итого",
+        subtotal: "Товары",
+        deliveryPrice: "Доставка",
+        addressTitle: "Адрес доставки",
+        addressEmpty: "Добавьте адрес в профиле перед оформлением заказа",
+        deliveryTitle: "Слот доставки",
+        deliveryEmpty: "Нет доступных слотов доставки",
         choosePayment: "Выберите способ оплаты",
         payCard: "Оплатить картой",
         payCash: "Оплатить наличными"
@@ -155,6 +192,7 @@ export default {
         sidebar: {
             dashboard: "Дашборд",
             products: "Товары",
+            categories: "Категории",
             orders: "Заказы",
             users: "Пользователи",
         },
@@ -193,6 +231,7 @@ export default {
             id: "ID",
             image: "Изображение",
             name: "Название",
+            category: "Категория",
             weight: "Вес",
             price: "Цена",
             oldPrice: "Старая цена",
@@ -209,6 +248,7 @@ export default {
 
             fields: {
                 name: "Название",
+                category: "Категория",
                 weight: "Вес",
                 price: "Цена",
                 oldPrice: "Старая цена",
@@ -216,6 +256,18 @@ export default {
                 imageUrl: "URL изображения",
                 image: "Изображение",
             }
+        },
+        categories: {
+            title: "Категории",
+            createNew: "Создать категорию",
+            editCategory: "Редактировать категорию",
+            name: "Название",
+            slug: "Slug",
+            status: "Статус",
+            sortOrder: "Порядок",
+            active: "Активна",
+            inactive: "Неактивна",
+            confirmDelete: "Вы уверены, что хотите удалить эту категорию?",
         },
         header: {
             title: "Админ-панель",

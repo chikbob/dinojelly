@@ -2,48 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CartItem;
-use App\Models\Order;
-use App\Models\Product;
 use Illuminate\Http\Request;
+use App\Services\CartService;
+use App\Services\OrderService;
 use Inertia\Inertia;
 
 class CartController extends Controller
 {
+    public function __construct(
+        protected CartService $cartService,
+        protected OrderService $orderService,
+    ) {
+    }
+
     public function index(Request $request)
     {
         $user = $request->user();
 
-        $cartItems = CartItem::where('user_id', $user->id)
-            ->with('product')
-            ->get();
-
-        $cart = $cartItems->mapWithKeys(function ($item) {
-            return [
-                $item->product_id => [
-                    'id' => $item->product->id,
-                    'name' => $item->product->name,
-                    'price' => $item->product->price,
-                    'old_price' => $item->product->old_price,
-                    'quantity' => $item->quantity,
-                    'image_url' => $item->product->image_url,
-                ]
-            ];
-        })->toArray();
-
-        $favorites = $user->favorites()->pluck('product_id')->toArray();
-
-        $user = $request->user();
-
-        $ordersCount = Order::where('user_id', $user->id)
-            ->where('status', 'pending')
-            ->count();
-
         return Inertia::render('cart', [
-            'cart' => $cart,
-            'favorites' => $favorites,
-            'pendingOrdersCount' => $ordersCount,
-            'cartCount' => array_sum(array_column($cart, 'quantity')),
+            'cart' => $this->cartService->getCartMap($user),
+            'favorites' => $user->favorites()->pluck('product_id')->toArray(),
+            'pendingOrdersCount' => $this->orderService->getPendingOrdersCount($user),
+            'cartCount' => $this->cartService->getCartCount($user),
         ]);
     }
 
@@ -53,12 +33,7 @@ class CartController extends Controller
             'product_id' => 'required|integer|exists:products,id',
         ]);
 
-        $cartItem = CartItem::firstOrCreate(
-            ['user_id' => $request->user()->id, 'product_id' => $data['product_id']],
-            ['quantity' => 0]
-        );
-
-        $cartItem->increment('quantity');
+        $this->cartService->addProduct($request->user(), $data['product_id']);
 
         return back();
     }
@@ -66,14 +41,7 @@ class CartController extends Controller
     public function increase(Request $request)
     {
         $request->validate(['product_id' => 'required|exists:products,id']);
-
-        $cartItem = CartItem::where('user_id', $request->user()->id)
-            ->where('product_id', $request->product_id)
-            ->first();
-
-        if ($cartItem) {
-            $cartItem->increment('quantity');
-        }
+        $this->cartService->increaseQuantity($request->user(), (int) $request->product_id);
 
         return back();
     }
@@ -81,18 +49,7 @@ class CartController extends Controller
     public function decrease(Request $request)
     {
         $request->validate(['product_id' => 'required|exists:products,id']);
-
-        $cartItem = CartItem::where('user_id', $request->user()->id)
-            ->where('product_id', $request->product_id)
-            ->first();
-
-        if ($cartItem) {
-            if ($cartItem->quantity > 1) {
-                $cartItem->decrement('quantity');
-            } else {
-                $cartItem->delete();
-            }
-        }
+        $this->cartService->decreaseQuantity($request->user(), (int) $request->product_id);
 
         return back();
     }
@@ -100,17 +57,14 @@ class CartController extends Controller
     public function remove(Request $request)
     {
         $request->validate(['id' => 'required|integer|exists:products,id']);
-
-        CartItem::where('user_id', $request->user()->id)
-            ->where('product_id', $request->id)
-            ->delete();
+        $this->cartService->removeProduct($request->user(), (int) $request->id);
 
         return back();
     }
 
     public function clear(Request $request)
     {
-        CartItem::where('user_id', $request->user()->id)->delete();
+        $this->cartService->clear($request->user());
 
         return back();
     }

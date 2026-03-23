@@ -96,16 +96,16 @@ let showAuth = ref(false)
 
 import { onMounted, onBeforeUnmount } from 'vue'
 
+const handleOpenAuthModal = () => {
+    showAuth.value = true
+}
+
 onMounted(() => {
-    window.addEventListener('openAuthModal', () => {
-        showAuth.value = true
-    })
+    window.addEventListener('openAuthModal', handleOpenAuthModal)
 })
 
 onBeforeUnmount(() => {
-    window.removeEventListener('openAuthModal', () => {
-        showAuth.value = true
-    })
+    window.removeEventListener('openAuthModal', handleOpenAuthModal)
 })
 
 const props = defineProps({

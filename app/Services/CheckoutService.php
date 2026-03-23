@@ -1,0 +1,115 @@
+<?php
+
+namespace App\Services;
+
+use App\Http\Resources\AddressResource;
+use App\Http\Resources\CheckoutItemResource;
+use App\Http\Resources\DeliverySlotResource;
+use App\Models\Address;
+use App\Models\DeliverySlot;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
+
+class CheckoutService
+{
+    public function __construct(
+        protected CartService $cartService,
+        protected OrderService $orderService,
+    ) {
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function getCheckoutPage(User $user): ?array
+    {
+        $cartItems = $this->cartService->getCartItems($user);
+
+        if ($cartItems->isEmpty()) {
+            return null;
+        }
+
+        $items = CheckoutItemResource::collection($cartItems)->resolve(request());
+        $addresses = $user->addresses()->orderByDesc('is_default')->latest()->get();
+        $slots = DeliverySlot::query()
+            ->where('is_active', true)
+            ->where('ends_at', '>', now())
+            ->orderBy('starts_at')
+            ->get();
+        $defaultAddress = $addresses->firstWhere('is_default', true) ?? $addresses->first();
+        $defaultSlot = $slots->first();
+        $subtotal = $cartItems->sum(fn ($item) => $item->product->price * $item->quantity);
+        $deliveryPrice = $defaultSlot?->price ?? 0;
+
+        return [
+            'items' => $items,
+            'totalQuantity' => $cartItems->sum('quantity'),
+            'subtotalPrice' => $subtotal,
+            'deliveryPrice' => $deliveryPrice,
+            'totalPrice' => $subtotal + $deliveryPrice,
+            'addresses' => AddressResource::collection($addresses)->resolve(request()),
+            'deliverySlots' => DeliverySlotResource::collection($slots)->resolve(request()),
+            'defaultAddressId' => $defaultAddress?->id,
+            'defaultDeliverySlotId' => $defaultSlot?->id,
+            'pendingOrdersCount' => $this->orderService->getPendingOrdersCount($user),
+            'cartCount' => $cartItems->sum('quantity'),
+        ];
+    }
+
+    public function createOrder(User $user, string $paymentMethod, int $addressId, int $deliverySlotId): Order
+    {
+        $cartItems = $this->cartService->getCartItems($user);
+
+        if ($cartItems->isEmpty()) {
+            throw new \RuntimeException('Корзина пуста');
+        }
+
+        $address = Address::query()
+            ->where('user_id', $user->id)
+            ->find($addressId);
+
+        if (!$address) {
+            throw new \RuntimeException('Адрес доставки не найден');
+        }
+
+        $deliverySlot = DeliverySlot::query()
+            ->where('is_active', true)
+            ->find($deliverySlotId);
+
+        if (!$deliverySlot) {
+            throw new \RuntimeException('Слот доставки недоступен');
+        }
+
+        return DB::transaction(function () use ($user, $paymentMethod, $cartItems, $address, $deliverySlot) {
+            $totalQuantity = $cartItems->sum('quantity');
+            $subtotal = $cartItems->sum(fn ($item) => $item->product->price * $item->quantity);
+
+            $order = Order::query()->create([
+                'user_id' => $user->id,
+                'address_id' => $address->id,
+                'delivery_slot_id' => $deliverySlot->id,
+                'total_price' => $subtotal + $deliverySlot->price,
+                'delivery_price' => $deliverySlot->price,
+                'discount_amount' => 0,
+                'total_quantity' => $totalQuantity,
+                'payment_method' => $paymentMethod,
+                'status' => 'pending',
+            ]);
+
+            foreach ($cartItems as $item) {
+                OrderItem::query()->create([
+                    'order_id' => $order->id,
+                    'product_id' => $item->product_id,
+                    'quantity' => $item->quantity,
+                    'price' => $item->product->price,
+                ]);
+            }
+
+            $this->cartService->clear($user);
+
+            return $order;
+        });
+    }
+}

@@ -97,8 +97,7 @@ const {t} = useI18n()
 
 const props = defineProps({
     cart: Object,
-    favorites: Array,
-    orders: Array
+    favorites: Array
 })
 
 const cartItems = computed(() => props.cart ? Object.values(props.cart) : [])
