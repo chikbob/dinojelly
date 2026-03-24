@@ -18,6 +18,64 @@
                 </div>
             </div>
 
+            <section class="catalog-ai">
+                <div class="catalog-ai__intro">
+                    <div>
+                        <h2>{{ t("catalog.assistant.title") }}</h2>
+                        <p>{{ t("catalog.assistant.subtitle") }}</p>
+                    </div>
+                    <button class="catalog-ai__cta" @click="requestRecommendations">
+                        {{ t("catalog.assistant.cta") }}
+                    </button>
+                </div>
+
+                <div class="catalog-ai__grid">
+                    <select v-model="assistantForm.occasion">
+                        <option value="gift">{{ t("catalog.assistant.occasions.gift") }}</option>
+                        <option value="party">{{ t("catalog.assistant.occasions.party") }}</option>
+                        <option value="kids">{{ t("catalog.assistant.occasions.kids") }}</option>
+                        <option value="self">{{ t("catalog.assistant.occasions.self") }}</option>
+                    </select>
+                    <select v-model="assistantForm.taste">
+                        <option value="sour">{{ t("catalog.assistant.tastes.sour") }}</option>
+                        <option value="fruity">{{ t("catalog.assistant.tastes.fruity") }}</option>
+                        <option value="light">{{ t("catalog.assistant.tastes.light") }}</option>
+                        <option value="surprise">{{ t("catalog.assistant.tastes.surprise") }}</option>
+                    </select>
+                    <input v-model="assistantForm.budget" type="number" min="0" :placeholder="t('catalog.assistant.budget')" />
+                    <select v-model="assistantForm.format">
+                        <option value="set">{{ t("catalog.assistant.formats.set") }}</option>
+                        <option value="single">{{ t("catalog.assistant.formats.single") }}</option>
+                        <option value="variety">{{ t("catalog.assistant.formats.variety") }}</option>
+                    </select>
+                    <select v-model="assistantForm.priority">
+                        <option value="popular">{{ t("catalog.assistant.priorities.popular") }}</option>
+                        <option value="new">{{ t("catalog.assistant.priorities.new") }}</option>
+                        <option value="value">{{ t("catalog.assistant.priorities.value") }}</option>
+                    </select>
+                </div>
+
+                <p v-if="assistantError" class="catalog-ai__error">{{ assistantError }}</p>
+
+                <div v-if="assistantResult" class="catalog-ai__result">
+                    <p class="catalog-ai__summary">{{ assistantResult.summary }}</p>
+                    <div class="catalog-ai__recommendations">
+                        <article v-for="item in assistantResult.products" :key="item.id" class="catalog-ai__card">
+                            <img :src="item.image_url" :alt="item.name" class="catalog-ai__image" />
+                            <div class="catalog-ai__content">
+                                <strong>{{ item.name }}</strong>
+                                <p>{{ item.recommendation_reason }}</p>
+                                <small>{{ item.price }} {{ t("currency.symbol") }}</small>
+                                <div class="catalog-ai__actions">
+                                    <button @click="goToProduct(item.id)">{{ t("catalog.assistant.open") }}</button>
+                                    <button @click="addToCart(item.id)">{{ t("catalog.addToCart") }}</button>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </section>
+
             <div class="catalog__toolbar">
                 <div class="catalog__categories">
                     <button
@@ -171,6 +229,8 @@ const props = defineProps({
 
 // локальная реактивная корзина
 const cart = ref({...props.cartItems})
+const assistantResult = ref(null)
+const assistantError = ref('')
 const localFilters = reactive({
     q: props.filters?.q ?? '',
     category: props.filters?.category ?? '',
@@ -178,6 +238,13 @@ const localFilters = reactive({
     min_price: props.filters?.min_price ?? '',
     max_price: props.filters?.max_price ?? '',
     on_sale: Boolean(props.filters?.on_sale),
+})
+const assistantForm = reactive({
+    occasion: 'gift',
+    taste: 'fruity',
+    budget: 1500,
+    format: 'set',
+    priority: 'popular',
 })
 
 watch(() => props.filters, (next) => {
@@ -227,6 +294,30 @@ const selectCategory = (slug) => {
 
 const goToProduct = (id) => {
     router.visit(`/products/${id}`)
+}
+
+const requestRecommendations = async () => {
+    assistantError.value = ''
+    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+    const response = await fetch(route('assistant.recommend'), {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': token ?? '',
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+        body: JSON.stringify(assistantForm),
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+        assistantError.value = data.message ?? t('catalog.assistant.error')
+        return
+    }
+
+    assistantResult.value = data
 }
 
 const addToCart = (productId) => {
@@ -421,6 +512,88 @@ const toggleFavorite = (productId) => {
         border: 1px dashed #d1d5db;
         border-radius: 20px;
     }
+}
+
+.catalog-ai {
+    margin-bottom: 28px;
+    padding: 22px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, #fef3c7, #ecfccb);
+    border: 1px solid #d9f99d;
+}
+
+.catalog-ai__intro {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: start;
+    margin-bottom: 18px;
+}
+
+.catalog-ai__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.catalog-ai__grid select,
+.catalog-ai__grid input {
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid #cbd5e1;
+    font-family: inherit;
+}
+
+.catalog-ai__cta,
+.catalog-ai__actions button {
+    border: none;
+    border-radius: 12px;
+    padding: 12px 14px;
+    background: #111827;
+    color: #fff;
+    cursor: pointer;
+    font-family: "Press Start 2P", system-ui;
+    font-size: 10px;
+}
+
+.catalog-ai__summary {
+    margin-bottom: 14px;
+}
+
+.catalog-ai__recommendations {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+}
+
+.catalog-ai__card {
+    background: rgba(255,255,255,0.82);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.catalog-ai__image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.catalog-ai__content {
+    padding: 14px;
+    display: grid;
+    gap: 10px;
+}
+
+.catalog-ai__actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.catalog-ai__error {
+    color: #b91c1c;
 }
 
 .product-card {

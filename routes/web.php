@@ -11,6 +11,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PaymentWebhookController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RecommendationController;
 use App\Http\Controllers\ReferralController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SubscriptionController;
@@ -32,6 +33,7 @@ Route::get('/', [ProductController::class, 'index'])->name('products.index');
 Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
 Route::get('/cart/recover/{token}', [CartRecoveryController::class, 'recover'])->name('cart.recover');
 Route::get('/r/{code}', [ReferralController::class, 'capture'])->name('referrals.capture');
+Route::post('/assistant/recommend', [RecommendationController::class, 'store'])->name('assistant.recommend');
 
 /*
 |--------------------------------------------------------------------------

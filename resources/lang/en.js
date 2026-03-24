@@ -35,6 +35,36 @@ export default {
             maxPrice: "Max price",
             onSale: "Only discounted",
         },
+        assistant: {
+            title: "AI sweets assistant",
+            subtitle: "Describe the occasion, taste and budget, and we will build a focused product shortlist.",
+            cta: "Recommend",
+            budget: "Budget",
+            open: "Open product",
+            error: "Could not generate recommendations",
+            occasions: {
+                gift: "Gift",
+                party: "Party",
+                kids: "For kids",
+                self: "For myself",
+            },
+            tastes: {
+                sour: "Sour",
+                fruity: "Fruity",
+                light: "Light",
+                surprise: "Surprise me",
+            },
+            formats: {
+                set: "Set",
+                single: "Single flavor",
+                variety: "Variety",
+            },
+            priorities: {
+                popular: "Popular",
+                new: "New",
+                value: "Best value",
+            },
+        },
         sortOptions: {
             new: "Newest first",
             popular: "Popular",

@@ -37,6 +37,36 @@ export default {
             maxPrice: "Ціна до",
             onSale: "Лише зі знижкою",
         },
+        assistant: {
+            title: "AI-помічник з підбору",
+            subtitle: "Опишіть привід, смак і бюджет, а ми підберемо товари з каталогу.",
+            cta: "Підібрати",
+            budget: "Бюджет",
+            open: "Відкрити товар",
+            error: "Не вдалося зібрати підбірку",
+            occasions: {
+                gift: "Подарунок",
+                party: "Вечірка",
+                kids: "Для дітей",
+                self: "Для себе",
+            },
+            tastes: {
+                sour: "Кисле",
+                fruity: "Фруктове",
+                light: "Легке",
+                surprise: "Здивуй мене",
+            },
+            formats: {
+                set: "Набір",
+                single: "Один смак",
+                variety: "Різне",
+            },
+            priorities: {
+                popular: "Популярне",
+                new: "Новинки",
+                value: "Вигідно",
+            },
+        },
         sortOptions: {
             new: "Спочатку нові",
             popular: "Популярні",
