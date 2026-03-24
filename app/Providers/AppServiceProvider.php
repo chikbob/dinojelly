@@ -61,6 +61,7 @@ class AppServiceProvider extends ServiceProvider
                         ->count(),
                     'pending_reviews' => (int) \App\Models\Review::where('is_published', false)->count(),
                     'pending_recovery' => (int) \App\Models\CartRecoveryReminder::where('status', 'pending')->count(),
+                    'pending_referrals' => (int) \App\Models\Referral::where('status', 'pending')->count(),
                 ];
             },
         ]);

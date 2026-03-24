@@ -21,6 +21,7 @@ class CheckoutService
         protected OrderEventService $orderEventService,
         protected AbandonedCartService $abandonedCartService,
         protected InventoryService $inventoryService,
+        protected GiftCardService $giftCardService,
     ) {
     }
 
@@ -55,6 +56,8 @@ class CheckoutService
             'subtotalPrice' => $subtotal,
             'deliveryPrice' => $deliveryPrice,
             'totalPrice' => $subtotal + $deliveryPrice,
+            'referralCreditBalance' => (float) $user->referral_credit_balance,
+            'giftCards' => $this->giftCardService->getProfilePayload($user)['giftCards'],
             'addresses' => AddressResource::collection($addresses)->resolve(request()),
             'deliverySlots' => DeliverySlotResource::collection($slots)->resolve(request()),
             'defaultAddressId' => $defaultAddress?->id,
@@ -65,7 +68,14 @@ class CheckoutService
         ];
     }
 
-    public function createOrder(User $user, string $paymentMethod, int $addressId, int $deliverySlotId): Order
+    public function createOrder(
+        User $user,
+        string $paymentMethod,
+        int $addressId,
+        int $deliverySlotId,
+        ?string $giftCardCode = null,
+        bool $useReferralCredit = false,
+    ): Order
     {
         $cartItems = $this->cartService->getCartItems($user);
 
@@ -94,17 +104,28 @@ class CheckoutService
             throw new \RuntimeException('Слот доставки недоступен');
         }
 
-        return DB::transaction(function () use ($user, $paymentMethod, $cartItems, $address, $deliverySlot) {
+        return DB::transaction(function () use ($user, $paymentMethod, $cartItems, $address, $deliverySlot, $giftCardCode, $useReferralCredit) {
             $totalQuantity = $cartItems->sum('quantity');
             $subtotal = $cartItems->sum(fn ($item) => $item->product->price * $item->quantity);
+            $beforeDiscounts = $subtotal + $deliverySlot->price;
+            $giftCardResolution = $this->giftCardService->resolveForOrder($user, $giftCardCode, $beforeDiscounts);
+            $giftCard = $giftCardResolution['gift_card'];
+            $giftCardAmount = $giftCardResolution['amount'];
+            $referralCreditAmount = $useReferralCredit
+                ? min((float) $user->referral_credit_balance, max($beforeDiscounts - $giftCardAmount, 0))
+                : 0;
+            $finalTotal = max($beforeDiscounts - $giftCardAmount - $referralCreditAmount, 0);
 
             $order = Order::query()->create([
                 'user_id' => $user->id,
                 'address_id' => $address->id,
                 'delivery_slot_id' => $deliverySlot->id,
-                'total_price' => $subtotal + $deliverySlot->price,
+                'gift_card_id' => $giftCard?->id,
+                'total_price' => $finalTotal,
                 'delivery_price' => $deliverySlot->price,
                 'discount_amount' => 0,
+                'gift_card_amount' => $giftCardAmount,
+                'referral_credit_amount' => $referralCreditAmount,
                 'total_quantity' => $totalQuantity,
                 'payment_method' => $paymentMethod,
                 'status' => 'pending',
@@ -121,6 +142,12 @@ class CheckoutService
 
             $this->paymentService->createForOrder($order);
             $this->inventoryService->reserveOrderStock($order);
+            if ($giftCard) {
+                $this->giftCardService->applyToOrder($giftCard, $user, $order, $giftCardAmount);
+            }
+            if ($referralCreditAmount > 0) {
+                $user->decrement('referral_credit_balance', $referralCreditAmount);
+            }
             $this->orderEventService->log(
                 $order,
                 'order_created',
@@ -131,6 +158,9 @@ class CheckoutService
                     'payment_method' => $paymentMethod,
                     'address_id' => $address->id,
                     'delivery_slot_id' => $deliverySlot->id,
+                    'gift_card_id' => $giftCard?->id,
+                    'gift_card_amount' => $giftCardAmount,
+                    'referral_credit_amount' => $referralCreditAmount,
                 ],
             );
 

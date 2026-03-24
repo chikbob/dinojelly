@@ -13,6 +13,8 @@ class PaymentService
     public function __construct(
         protected OrderEventService $orderEventService,
         protected InventoryService $inventoryService,
+        protected ReferralService $referralService,
+        protected GiftCardService $giftCardService,
     ) {
     }
 
@@ -170,6 +172,14 @@ class PaymentService
             'canceled', 'failed' => $this->inventoryService->releaseOrderStock($payment->order),
             default => null,
         };
+
+        if ($status === 'paid') {
+            $this->referralService->completeForOrder($payment->order);
+        }
+
+        if (in_array($status, ['failed', 'canceled'], true)) {
+            $this->giftCardService->refundOrderDiscounts($payment->order);
+        }
 
         $this->orderEventService->log(
             $payment->order,

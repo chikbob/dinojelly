@@ -17,6 +17,8 @@ class OrderListResource extends JsonResource
             'total_price' => $this->total_price,
             'delivery_price' => $this->delivery_price,
             'discount_amount' => $this->discount_amount,
+            'gift_card_amount' => $this->gift_card_amount,
+            'referral_credit_amount' => $this->referral_credit_amount,
             'total_quantity' => $this->total_quantity,
             'payment_method' => $this->payment_method,
             'status' => $this->status,

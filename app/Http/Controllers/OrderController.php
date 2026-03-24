@@ -44,6 +44,8 @@ class OrderController extends Controller
             'payment_method' => 'required|in:card,cash',
             'address_id' => 'required|integer|exists:addresses,id',
             'delivery_slot_id' => 'required|integer|exists:delivery_slots,id',
+            'gift_card_code' => 'nullable|string|max:32',
+            'use_referral_credit' => 'nullable|boolean',
         ]);
 
         try {
@@ -52,6 +54,8 @@ class OrderController extends Controller
                 $data['payment_method'],
                 (int) $data['address_id'],
                 (int) $data['delivery_slot_id'],
+                $data['gift_card_code'] ?? null,
+                (bool) ($data['use_referral_credit'] ?? false),
             );
             $payment = $order->latestPayment;
 

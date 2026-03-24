@@ -5,11 +5,13 @@ use App\Http\Controllers\AddressController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CartRecoveryController;
 use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\GiftCardController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PaymentWebhookController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReferralController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\Admin\AdminHomeController;
@@ -29,6 +31,7 @@ require __DIR__.'/health.php';
 Route::get('/', [ProductController::class, 'index'])->name('products.index');
 Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
 Route::get('/cart/recover/{token}', [CartRecoveryController::class, 'recover'])->name('cart.recover');
+Route::get('/r/{code}', [ReferralController::class, 'capture'])->name('referrals.capture');
 
 /*
 |--------------------------------------------------------------------------
@@ -66,6 +69,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/addresses', [AddressController::class, 'store'])->name('addresses.store');
     Route::put('/addresses/{address}', [AddressController::class, 'update'])->name('addresses.update');
     Route::delete('/addresses/{address}', [AddressController::class, 'destroy'])->name('addresses.destroy');
+    Route::post('/gift-cards/claim', [GiftCardController::class, 'claim'])->name('gift-cards.claim');
 });
 
 
@@ -106,6 +110,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/checkout', [OrderController::class, 'create'])->name('checkout.create');
     Route::post('/checkout', [OrderController::class, 'store'])->name('checkout.store');
+    Route::post('/checkout/gift-card-preview', [GiftCardController::class, 'preview'])->name('checkout.gift-card-preview');
     Route::get('/payments/mock/{payment}', [PaymentController::class, 'showMock'])->name('payments.mock.show');
     Route::post('/orders/{order}/payments/retry', [PaymentController::class, 'retry'])->name('payments.retry');
 
@@ -164,6 +169,10 @@ Route::middleware(['auth', 'admin'])
             ->name('reviews.destroy');
         Route::get('recoveries', [\App\Http\Controllers\Admin\CartRecoveryController::class, 'index'])
             ->name('recoveries.index');
+        Route::get('referrals', [\App\Http\Controllers\Admin\ReferralController::class, 'index'])
+            ->name('referrals.index');
+        Route::resource('gift-cards', \App\Http\Controllers\Admin\GiftCardController::class)
+            ->except(['show']);
         Route::resource('promo-codes', \App\Http\Controllers\Admin\PromoCodeController::class)
             ->except(['show']);
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class)

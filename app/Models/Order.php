@@ -15,12 +15,23 @@ class Order extends Model
         'address_id',
         'delivery_slot_id',
         'promo_code_id',
+        'gift_card_id',
+        'referral_id',
         'total_price',
         'delivery_price',
         'discount_amount',
+        'gift_card_amount',
+        'referral_credit_amount',
+        'gift_card_refunded_at',
+        'referral_credit_refunded_at',
         'total_quantity',
         'payment_method',
         'status',
+    ];
+
+    protected $casts = [
+        'gift_card_refunded_at' => 'datetime',
+        'referral_credit_refunded_at' => 'datetime',
     ];
 
     public function user(): BelongsTo
@@ -46,6 +57,16 @@ class Order extends Model
     public function promoCode(): BelongsTo
     {
         return $this->belongsTo(PromoCode::class);
+    }
+
+    public function giftCard(): BelongsTo
+    {
+        return $this->belongsTo(GiftCard::class);
+    }
+
+    public function referral(): BelongsTo
+    {
+        return $this->belongsTo(Referral::class);
     }
 
     public function items(): HasMany

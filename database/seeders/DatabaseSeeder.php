@@ -9,12 +9,14 @@ use App\Models\Category;
 use App\Models\Collection as ProductCollection;
 use App\Models\DeliverySlot;
 use App\Models\Favorite;
+use App\Models\GiftCard;
 use App\Models\Order;
 use App\Models\OrderEvent;
 use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\Product;
 use App\Models\PromoCode;
+use App\Models\Referral;
 use App\Models\Review;
 use App\Models\StockItem;
 use App\Models\Subscription;
@@ -48,6 +50,7 @@ class DatabaseSeeder extends Seeder
 
             $users = User::factory(260)->create();
             $allUsers = User::query()->whereKeyNot($admin->id)->get();
+            $this->seedReferralCodes($allUsers->prepend($admin));
 
             $categories = $this->seedCategories();
             $products = $this->seedProducts($categories);
@@ -57,10 +60,24 @@ class DatabaseSeeder extends Seeder
             $this->seedAddresses($allUsers);
             $this->seedFavorites($allUsers, $products);
             $orders = $this->seedOrders($allUsers, $products, $promoCodes, $deliverySlots);
+            $this->seedReferrals($allUsers, $orders);
+            $this->seedGiftCards($allUsers, $orders);
             $this->seedReviews($orders);
             $this->seedCartsAndRecoveries($allUsers, $products);
             $this->seedSubscriptions($orders);
         });
+    }
+
+    /**
+     * @param Collection<int, User> $users
+     */
+    protected function seedReferralCodes(Collection $users): void
+    {
+        foreach ($users as $user) {
+            $user->update([
+                'referral_code' => 'REF' . str_pad((string) $user->id, 6, '0', STR_PAD_LEFT),
+            ]);
+        }
     }
 
     /**
@@ -524,6 +541,119 @@ class DatabaseSeeder extends Seeder
                     'product_id' => $item->product_id,
                     'quantity' => $item->quantity,
                     'price' => $item->price,
+                ]);
+            }
+        }
+    }
+
+    /**
+     * @param Collection<int, User> $users
+     * @param Collection<int, Order> $orders
+     */
+    protected function seedReferrals(Collection $users, Collection $orders): void
+    {
+        $pairs = collect();
+        $pool = $users->shuffle()->values();
+
+        foreach ($pool as $candidate) {
+            if ($pairs->count() >= 90) {
+                break;
+            }
+
+            $referrer = $users->where('id', '!=', $candidate->id)->random();
+            if (!$referrer || $pairs->contains(fn (array $pair) => $pair['referred']->id === $candidate->id)) {
+                continue;
+            }
+
+            $pairs->push([
+                'referrer' => $referrer,
+                'referred' => $candidate,
+            ]);
+        }
+
+        foreach ($pairs as $pair) {
+            /** @var User $referrer */
+            $referrer = $pair['referrer'];
+            /** @var User $referred */
+            $referred = $pair['referred'];
+            $completedOrder = $orders
+                ->where('user_id', $referred->id)
+                ->where('status', 'completed')
+                ->sortBy('created_at')
+                ->first();
+
+            $status = $completedOrder ? 'rewarded' : 'pending';
+            $reward = fake()->randomElement([250, 300, 350, 500]);
+
+            $referred->update([
+                'referred_by_user_id' => $referrer->id,
+            ]);
+
+            Referral::query()->create([
+                'referrer_user_id' => $referrer->id,
+                'referred_user_id' => $referred->id,
+                'order_id' => $completedOrder?->id,
+                'code' => $referrer->referral_code,
+                'status' => $status,
+                'referred_email' => $referred->email,
+                'reward_amount' => $reward,
+                'rewarded_at' => $completedOrder ? $completedOrder->created_at : null,
+                'meta' => [
+                    'seeded' => true,
+                ],
+                'created_at' => fake()->dateTimeBetween('-6 months', '-1 week'),
+                'updated_at' => now(),
+            ]);
+
+            if ($status === 'rewarded') {
+                $referrer->increment('referral_credit_balance', $reward);
+            }
+        }
+    }
+
+    /**
+     * @param Collection<int, User> $users
+     * @param Collection<int, Order> $orders
+     */
+    protected function seedGiftCards(Collection $users, Collection $orders): void
+    {
+        foreach (range(1, 110) as $index) {
+            $recipient = fake()->boolean(70) ? $users->random() : null;
+            $purchaser = fake()->boolean(60) ? $users->where('id', '!=', $recipient?->id)->random() : null;
+            $initial = fake()->randomElement([500, 1000, 1500, 2000, 3000]);
+            $used = fake()->boolean(55) ? fake()->numberBetween(0, (int) ($initial * 0.85)) : 0;
+            $balance = max($initial - $used, 0);
+            $issuedAt = fake()->dateTimeBetween('-8 months', '-2 days');
+
+            $giftCard = GiftCard::query()->create([
+                'code' => 'DG-SEED-' . str_pad((string) $index, 4, '0', STR_PAD_LEFT),
+                'name' => fake('ru_RU')->randomElement(['Подарочная карта', 'Сладкий подарок', 'Jelly bonus']) . ' #' . $index,
+                'message' => fake('ru_RU')->boolean(40) ? fake('ru_RU')->sentence(8) : null,
+                'purchaser_user_id' => $purchaser?->id,
+                'recipient_user_id' => $recipient?->id,
+                'order_id' => null,
+                'initial_amount' => $initial,
+                'balance' => $balance,
+                'currency' => 'RUB',
+                'issued_at' => $issuedAt,
+                'expires_at' => fake()->boolean(70) ? fake()->dateTimeBetween('+15 days', '+12 months') : null,
+                'is_active' => $balance > 0,
+                'created_at' => $issuedAt,
+                'updated_at' => now(),
+            ]);
+
+            if ($recipient && $used > 0) {
+                $linkedOrder = $orders->where('user_id', $recipient->id)->sortByDesc('created_at')->first();
+
+                \App\Models\GiftCardRedemption::query()->create([
+                    'gift_card_id' => $giftCard->id,
+                    'user_id' => $recipient->id,
+                    'order_id' => $linkedOrder?->id,
+                    'amount' => $used,
+                    'redeemed_at' => fake()->dateTimeBetween($issuedAt, 'now'),
+                    'meta' => ['seeded' => true],
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]);
             }
         }

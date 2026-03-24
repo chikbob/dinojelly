@@ -148,6 +148,67 @@
                 </div>
                 <p v-else class="profile-info__value">{{ t("subscriptions.empty") }}</p>
             </div>
+
+            <div class="profile-addresses">
+                <div class="profile-addresses__header">
+                    <h2>{{ t("profile.referralsTitle") }}</h2>
+                </div>
+
+                <div class="profile-info__item">
+                    <span class="profile-info__label">{{ t("profile.referralCode") }}:</span>
+                    <span class="profile-info__value">{{ referralCode }}</span>
+                </div>
+                <div class="profile-info__item">
+                    <span class="profile-info__label">{{ t("profile.referralBalance") }}:</span>
+                    <span class="profile-info__value">{{ referralCreditBalance }}</span>
+                </div>
+                <div class="profile-edit__actions">
+                    <button class="profile-card__button" @click="copyReferralLink">{{ t("profile.copyReferralLink") }}</button>
+                </div>
+
+                <div class="profile-addresses__list">
+                    <div class="profile-address">
+                        <div>
+                            <strong>{{ t("profile.referralTotal") }}: {{ referralStats?.total ?? 0 }}</strong>
+                            <p>{{ t("profile.referralRewarded") }}: {{ referralStats?.rewarded ?? 0 }}</p>
+                            <small>{{ t("profile.referralPending") }}: {{ referralStats?.pending ?? 0 }}</small>
+                        </div>
+                    </div>
+                    <div v-for="referral in referrals" :key="referral.id" class="profile-address">
+                        <div>
+                            <strong>{{ referral.referred_user?.email || t("profile.referralInvitePending") }}</strong>
+                            <p>{{ t(`profile.referralStatus.${referral.status}`) }}</p>
+                            <small>{{ referral.reward_amount }} {{ t("currency.symbol") }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-addresses">
+                <div class="profile-addresses__header">
+                    <h2>{{ t("profile.giftCardsTitle") }}</h2>
+                </div>
+
+                <form class="profile-addresses__form" @submit.prevent="claimGiftCard">
+                    <div class="profile-addresses__grid">
+                        <input v-model="giftCardClaimForm.code" :placeholder="t('profile.giftCardCode')" />
+                    </div>
+                    <button type="submit" class="profile-card__button">
+                        {{ t("profile.claimGiftCard") }}
+                    </button>
+                </form>
+
+                <div v-if="giftCards.length" class="profile-addresses__list">
+                    <div v-for="giftCard in giftCards" :key="giftCard.id" class="profile-address">
+                        <div>
+                            <strong>{{ giftCard.name }} · {{ giftCard.code }}</strong>
+                            <p>{{ giftCard.balance }} / {{ giftCard.initial_amount }} {{ t("currency.symbol") }}</p>
+                            <small v-if="giftCard.expires_at">{{ formatDate(giftCard.expires_at) }}</small>
+                        </div>
+                    </div>
+                </div>
+                <p v-else class="profile-info__value">{{ t("profile.noGiftCards") }}</p>
+            </div>
         </div>
     </MainLayout>
 </template>
@@ -167,6 +228,18 @@ const props = defineProps({
         default: () => ([]),
     },
     subscriptions: {
+        type: Array,
+        default: () => ([]),
+    },
+    referralCode: String,
+    referralLink: String,
+    referralCreditBalance: Number,
+    referralStats: Object,
+    referrals: {
+        type: Array,
+        default: () => ([]),
+    },
+    giftCards: {
         type: Array,
         default: () => ([]),
     },
@@ -194,6 +267,10 @@ const addressForm = reactive({
     postal_code: '',
     comment: '',
     is_default: props.addresses.length === 0,
+})
+
+const giftCardClaimForm = reactive({
+    code: '',
 })
 
 /* ---------------- I18N ---------------- */
@@ -240,6 +317,23 @@ const removeAddress = (id) => {
     router.delete(`/addresses/${id}`, {
         preserveScroll: true,
     })
+}
+
+const claimGiftCard = () => {
+    router.post('/gift-cards/claim', giftCardClaimForm, {
+        preserveScroll: true,
+        onSuccess: () => {
+            giftCardClaimForm.code = ''
+        },
+    })
+}
+
+const copyReferralLink = async () => {
+    if (!props.referralLink) {
+        return
+    }
+
+    await navigator.clipboard.writeText(props.referralLink)
 }
 
 const formatDate = (dateString) => {

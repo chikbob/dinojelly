@@ -46,6 +46,18 @@
                         <span class="order__label">{{ t("checkout.deliveryPrice") }}:</span>
                         <span class="order__value">{{ order.delivery_price }} {{ t("currency.symbol") }}</span>
                     </div>
+                    <div v-if="order.gift_card_amount" class="order__summary-item">
+                        <span class="order__label">{{ t("checkout.giftCardDiscount") }}:</span>
+                        <span class="order__value">-{{ order.gift_card_amount }} {{ t("currency.symbol") }}</span>
+                    </div>
+                    <div v-if="order.referral_credit_amount" class="order__summary-item">
+                        <span class="order__label">{{ t("checkout.referralCreditDiscount") }}:</span>
+                        <span class="order__value">-{{ order.referral_credit_amount }} {{ t("currency.symbol") }}</span>
+                    </div>
+                    <div v-if="order.gift_card" class="order__summary-item">
+                        <span class="order__label">{{ t("profile.giftCardsTitle") }}:</span>
+                        <span class="order__value">{{ order.gift_card.code }}</span>
+                    </div>
                     <div class="order__summary-item">
                         <span class="order__label">{{ t("order.quantity") }}:</span>
                         <span class="order__value">{{ order.total_quantity }}</span>

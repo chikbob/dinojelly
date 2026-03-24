@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
+use App\Services\ReferralService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -12,6 +13,11 @@ use Inertia\Inertia;
 
 class AuthController extends Controller
 {
+    public function __construct(
+        protected ReferralService $referralService,
+    ) {
+    }
+
     public function showLoginForm()
     {
         return Inertia::render('Auth/Login');
@@ -25,6 +31,8 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             $user = Auth::user();
+            $this->referralService->ensureReferralCode($user);
+            $this->referralService->attachPendingReferral($user, $request);
 
             return redirect()->intended(
                 $user->isAdmin()
@@ -51,6 +59,8 @@ class AuthController extends Controller
         ]);
 
         Auth::login($user);
+        $this->referralService->ensureReferralCode($user);
+        $this->referralService->attachPendingReferral($user, $request);
 
         return redirect()->route('products.index')
             ->with('success', __('auth.register_success')); // <-- локализация

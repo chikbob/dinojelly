@@ -33,6 +33,45 @@
                 <p v-else class="checkout__empty">{{ t("checkout.deliveryEmpty") }}</p>
             </div>
 
+            <div class="checkout__section">
+                <h2>{{ t("checkout.bonusesTitle") }}</h2>
+
+                <div class="checkout__bonus">
+                    <label class="checkout__bonus-label">
+                        <input v-model="useReferralCredit" type="checkbox" />
+                        <span>{{ t("checkout.useReferralCredit") }} ({{ referralCreditBalance }} {{ t("currency.symbol") }})</span>
+                    </label>
+                </div>
+
+                <div class="checkout__bonus checkout__bonus--gift">
+                    <div class="checkout__gift-row">
+                        <input
+                            v-model="giftCardCode"
+                            type="text"
+                            class="checkout__gift-input"
+                            :placeholder="t('checkout.giftCardPlaceholder')"
+                        />
+                        <button class="checkout__gift-preview" @click.prevent="previewGiftCard">
+                            {{ t("checkout.applyGiftCard") }}
+                        </button>
+                    </div>
+                    <p v-if="giftCardError" class="checkout__gift-error">{{ giftCardError }}</p>
+                    <p v-else-if="giftCardPreview" class="checkout__gift-success">
+                        {{ t("checkout.giftCardApplied") }}: -{{ giftCardPreview.applied_amount }} {{ t("currency.symbol") }}
+                    </p>
+                    <div v-if="giftCards?.length" class="checkout__gift-list">
+                        <button
+                            v-for="card in giftCards"
+                            :key="card.id"
+                            class="checkout__gift-chip"
+                            @click.prevent="selectGiftCard(card.code)"
+                        >
+                            {{ card.code }} · {{ card.balance }} {{ t("currency.symbol") }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <div class="checkout__items">
                 <p v-if="stockErrors?.length" class="checkout__stock-error">
                     {{ stockErrors.join(' ') }}
@@ -51,6 +90,8 @@
                 <p>{{ t("cart.items") }}: {{ totalQuantity }}</p>
                 <p>{{ t("checkout.subtotal") }}: <b>{{ subtotalPrice }} {{ t("currency.symbol") }}</b></p>
                 <p>{{ t("checkout.deliveryPrice") }}: <b>{{ currentDeliveryPrice }} {{ t("currency.symbol") }}</b></p>
+                <p v-if="giftCardDiscount">{{ t("checkout.giftCardDiscount") }}: <b>-{{ giftCardDiscount }} {{ t("currency.symbol") }}</b></p>
+                <p v-if="referralCreditDiscount">{{ t("checkout.referralCreditDiscount") }}: <b>-{{ referralCreditDiscount }} {{ t("currency.symbol") }}</b></p>
                 <p>{{ t("cart.finalTotal") }}: <b>{{ finalTotal }} {{ t("currency.symbol") }}</b></p>
             </div>
 
@@ -95,18 +136,32 @@ const props = defineProps({
     defaultAddressId: Number,
     defaultDeliverySlotId: Number,
     stockErrors: Array,
+    referralCreditBalance: Number,
+    giftCards: Array,
 });
 
 const paymentMethod = ref(null);
 const selectedAddressId = ref(props.defaultAddressId ?? null)
 const selectedDeliverySlotId = ref(props.defaultDeliverySlotId ?? null)
+const useReferralCredit = ref(false)
+const giftCardCode = ref('')
+const giftCardPreview = ref(null)
+const giftCardError = ref('')
 
 const selectedSlot = computed(() =>
     props.deliverySlots.find((slot) => slot.id === Number(selectedDeliverySlotId.value))
 )
 
 const currentDeliveryPrice = computed(() => selectedSlot.value?.price ?? 0)
-const finalTotal = computed(() => Number(props.subtotalPrice) + Number(currentDeliveryPrice.value))
+const giftCardDiscount = computed(() => Number(giftCardPreview.value?.applied_amount ?? 0))
+const referralCreditDiscount = computed(() => {
+    if (!useReferralCredit.value) {
+        return 0
+    }
+
+    return Math.min(Number(props.referralCreditBalance ?? 0), Math.max(Number(props.subtotalPrice) + Number(currentDeliveryPrice.value) - giftCardDiscount.value, 0))
+})
+const finalTotal = computed(() => Math.max(Number(props.subtotalPrice) + Number(currentDeliveryPrice.value) - giftCardDiscount.value - referralCreditDiscount.value, 0))
 const isDisabled = computed(() => !selectedAddressId.value || !selectedDeliverySlotId.value || (props.stockErrors?.length ?? 0) > 0)
 
 const formatSlot = (slot) => {
@@ -136,7 +191,47 @@ function submitOrder(method) {
         payment_method: paymentMethod.value,
         address_id: selectedAddressId.value,
         delivery_slot_id: selectedDeliverySlotId.value,
+        gift_card_code: giftCardCode.value || null,
+        use_referral_credit: useReferralCredit.value,
     });
+}
+
+async function previewGiftCard() {
+    giftCardError.value = ''
+    giftCardPreview.value = null
+
+    if (!giftCardCode.value) {
+        return
+    }
+
+    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+    const response = await fetch('/checkout/gift-card-preview', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': token ?? '',
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+        body: JSON.stringify({
+            code: giftCardCode.value,
+            delivery_price: currentDeliveryPrice.value,
+        }),
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+        giftCardError.value = data.message ?? t('checkout.giftCardInvalid')
+        return
+    }
+
+    giftCardPreview.value = data
+}
+
+function selectGiftCard(code) {
+    giftCardCode.value = code
+    previewGiftCard()
 }
 </script>
 
@@ -183,6 +278,66 @@ function submitOrder(method) {
 
 .checkout__empty {
     color: #6b7280;
+}
+
+.checkout__bonus {
+    display: grid;
+    gap: 12px;
+}
+
+.checkout__bonus-label {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.checkout__gift-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.checkout__gift-input {
+    flex: 1;
+    min-width: 240px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+}
+
+.checkout__gift-preview {
+    border: none;
+    border-radius: 10px;
+    padding: 12px 16px;
+    background: #111827;
+    color: #fff;
+    cursor: pointer;
+    font-family: "Press Start 2P", system-ui;
+    font-size: 10px;
+}
+
+.checkout__gift-list {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.checkout__gift-chip {
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    border-radius: 999px;
+    padding: 8px 10px;
+    cursor: pointer;
+    font-family: "Press Start 2P", system-ui;
+    font-size: 9px;
+}
+
+.checkout__gift-error {
+    color: #b91c1c;
+}
+
+.checkout__gift-success {
+    color: #166534;
 }
 
 .checkout__item {

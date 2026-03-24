@@ -115,6 +115,8 @@ const sections = [
         title: 'admin.nav.marketing',
         items: [
             { route: 'admin.promo-codes.index', label: 'admin.sidebar.promoCodes' },
+            { route: 'admin.gift-cards.index', label: 'admin.sidebar.giftCards' },
+            { route: 'admin.referrals.index', label: 'admin.sidebar.referrals', badgeKey: 'pending_referrals' },
         ],
     },
 ]
@@ -149,6 +151,10 @@ const breadcrumbMap = {
     'admin.promo-codes.index': [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }, { route: 'admin.promo-codes.index', label: 'admin.sidebar.promoCodes' }],
     'admin.promo-codes.create': [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }, { route: 'admin.promo-codes.index', label: 'admin.sidebar.promoCodes' }],
     'admin.promo-codes.edit': [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }, { route: 'admin.promo-codes.index', label: 'admin.sidebar.promoCodes' }],
+    'admin.gift-cards.index': [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }, { route: 'admin.gift-cards.index', label: 'admin.sidebar.giftCards' }],
+    'admin.gift-cards.create': [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }, { route: 'admin.gift-cards.index', label: 'admin.sidebar.giftCards' }],
+    'admin.gift-cards.edit': [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }, { route: 'admin.gift-cards.index', label: 'admin.sidebar.giftCards' }],
+    'admin.referrals.index': [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }, { route: 'admin.referrals.index', label: 'admin.sidebar.referrals' }],
     'admin.delivery-slots.create': [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }, { route: 'admin.delivery-slots.index', label: 'admin.sidebar.deliverySlots' }],
     'admin.delivery-slots.edit': [{ route: 'admin.dashboard', label: 'admin.sidebar.dashboard' }, { route: 'admin.delivery-slots.index', label: 'admin.sidebar.deliverySlots' }],
 }

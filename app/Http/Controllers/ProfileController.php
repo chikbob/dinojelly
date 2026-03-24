@@ -6,12 +6,20 @@ use App\Http\Resources\AddressResource;
 use App\Models\CartItem;
 use App\Models\Order;
 use App\Http\Resources\SubscriptionResource;
+use App\Services\GiftCardService;
+use App\Services\ReferralService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class ProfileController extends Controller
 {
+    public function __construct(
+        protected ReferralService $referralService,
+        protected GiftCardService $giftCardService,
+    ) {
+    }
+
     public function index()
     {
         $cartCount = 0;
@@ -39,6 +47,8 @@ class ProfileController extends Controller
                     ->get()
             )->resolve(request()),
             'pendingOrdersCount' => $ordersCount,
+            ...$this->referralService->getProfilePayload($user),
+            ...$this->giftCardService->getProfilePayload($user),
         ]);
     }
 

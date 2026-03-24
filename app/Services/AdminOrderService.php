@@ -13,6 +13,8 @@ class AdminOrderService
     public function __construct(
         protected OrderEventService $orderEventService,
         protected InventoryService $inventoryService,
+        protected ReferralService $referralService,
+        protected GiftCardService $giftCardService,
     ) {
     }
 
@@ -98,10 +100,12 @@ class AdminOrderService
 
         if ($previous !== 'completed' && $status === 'completed') {
             $this->inventoryService->commitOrderStock($order);
+            $this->referralService->completeForOrder($order);
         }
 
         if ($previous !== 'canceled' && $status === 'canceled') {
             $this->inventoryService->releaseOrderStock($order);
+            $this->giftCardService->refundOrderDiscounts($order);
         }
 
         $this->orderEventService->log(

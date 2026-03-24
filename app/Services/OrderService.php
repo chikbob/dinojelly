@@ -14,6 +14,7 @@ class OrderService
         protected PaymentService $paymentService,
         protected OrderEventService $orderEventService,
         protected InventoryService $inventoryService,
+        protected GiftCardService $giftCardService,
     ) {
     }
 
@@ -57,6 +58,7 @@ class OrderService
         $this->assertOwnership($user, $order);
 
         $order->load(['items.product', 'address', 'deliverySlot', 'latestPayment']);
+        $order->load('giftCard');
 
         return OrderDetailResource::make($order)->resolve(request());
     }
@@ -78,6 +80,7 @@ class OrderService
 
         $this->paymentService->cancelPendingPayments($order);
         $this->inventoryService->releaseOrderStock($order);
+        $this->giftCardService->refundOrderDiscounts($order);
         $this->orderEventService->log(
             $order,
             'order_canceled',
