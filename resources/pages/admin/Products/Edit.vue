@@ -2,16 +2,16 @@
     <div class="products-edit">
         <h1 class="products-edit__title">{{ t("admin.products.editProduct") }}</h1>
 
-        <form @submit.prevent="submit" enctype="multipart/form-data">
+        <form @submit.prevent="submit" enctype="multipart/form-data" style="width:100%; max-width:100%; min-width:0;">
             <div class="form-group">
                 <label for="name">{{ t("admin.products.fields.name") }}</label>
-                <input v-model="form.name" id="name" type="text"/>
+                <input v-model="form.name" id="name" type="text" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"/>
                 <p v-if="errors.name" class="error">{{ errors.name }}</p>
             </div>
 
             <div class="form-group">
                 <label for="category_id">{{ t("admin.products.fields.category") }} ({{ t("admin.products.optional") }})</label>
-                <select v-model="form.category_id" id="category_id">
+                <select v-model="form.category_id" id="category_id" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;">
                     <option :value="null">—</option>
                     <option v-for="category in categories" :key="category.id" :value="category.id">
                         {{ category.name }}
@@ -22,13 +22,13 @@
 
             <div class="form-group">
                 <label for="weight">{{ t("admin.products.fields.weight") }} ({{ t("admin.products.optional") }})</label>
-                <input v-model.number="form.weight" id="weight" type="number" min="0"/>
+                <input v-model.number="form.weight" id="weight" type="number" min="0" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"/>
                 <p v-if="errors.weight" class="error">{{ errors.weight }}</p>
             </div>
 
             <div class="form-group">
                 <label for="price">{{ t("admin.products.fields.price") }}</label>
-                <input v-model.number="form.price" id="price" type="number" step="0.01"/>
+                <input v-model.number="form.price" id="price" type="number" step="0.01" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"/>
                 <p v-if="errors.price" class="error">{{ errors.price }}</p>
             </div>
 
@@ -36,7 +36,7 @@
                 <label for="old_price">{{ t("admin.products.fields.oldPrice") }} ({{
                         t("admin.products.optional")
                     }})</label>
-                <input v-model.number="form.old_price" id="old_price" type="number" step="0.01"/>
+                <input v-model.number="form.old_price" id="old_price" type="number" step="0.01" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"/>
                 <p v-if="errors.old_price" class="error">{{ errors.old_price }}</p>
             </div>
 
@@ -44,25 +44,25 @@
                 <label for="description">{{ t("admin.products.fields.description") }} ({{
                         t("admin.products.optional")
                     }})</label>
-                <textarea v-model="form.description" id="description" rows="4"></textarea>
+                <textarea v-model="form.description" id="description" rows="4" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"></textarea>
                 <p v-if="errors.description" class="error">{{ errors.description }}</p>
             </div>
 
             <div class="form-group">
                 <label for="sku">{{ t("admin.products.fields.sku") }}</label>
-                <input v-model="form.sku" id="sku" type="text"/>
+                <input v-model="form.sku" id="sku" type="text" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"/>
                 <p v-if="errors.sku" class="error">{{ errors.sku }}</p>
             </div>
 
             <div class="form-group">
                 <label for="stock_quantity">{{ t("admin.products.fields.stockQuantity") }}</label>
-                <input v-model.number="form.stock_quantity" id="stock_quantity" type="number" min="0"/>
+                <input v-model.number="form.stock_quantity" id="stock_quantity" type="number" min="0" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"/>
                 <p v-if="errors.stock_quantity" class="error">{{ errors.stock_quantity }}</p>
             </div>
 
             <div class="form-group">
                 <label for="low_stock_threshold">{{ t("admin.products.fields.lowStockThreshold") }}</label>
-                <input v-model.number="form.low_stock_threshold" id="low_stock_threshold" type="number" min="0"/>
+                <input v-model.number="form.low_stock_threshold" id="low_stock_threshold" type="number" min="0" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"/>
                 <p v-if="errors.low_stock_threshold" class="error">{{ errors.low_stock_threshold }}</p>
             </div>
 
@@ -77,7 +77,7 @@
                 <label for="image_url">{{ t("admin.products.fields.imageUrl") }} ({{
                         t("admin.products.optional")
                     }})</label>
-                <input v-model="form.image_url" id="image_url" type="text" placeholder="https://example.com/image.jpg"/>
+                <input v-model="form.image_url" id="image_url" type="text" placeholder="https://example.com/image.jpg" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"/>
                 <p v-if="errors.image_url" class="error">{{ errors.image_url }}</p>
             </div>
 
@@ -85,7 +85,7 @@
                 <img :src="form.image_url" :alt="form.name"/>
             </div>
 
-            <button type="submit" class="btn-submit">{{ t("admin.products.save") }}</button>
+            <button type="submit" class="btn-submit" style="width:100%; max-width:100%; box-sizing:border-box;">{{ t("admin.products.save") }}</button>
         </form>
     </div>
 </template>
@@ -161,6 +161,7 @@ const submit = () => {
     margin: 0 auto;
     padding: 40px 20px;
     font-family: 'Press Start 2P', system-ui;
+    min-width: 0;
 
     &__title {
         font-size: 24px;
@@ -189,6 +190,9 @@ const submit = () => {
         select,
         textarea {
             width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
             padding: 8px;
             border-radius: 6px;
             border: 1px solid #ddd;
@@ -208,6 +212,8 @@ const submit = () => {
     }
 
     .btn-submit {
+        width: 100%;
+        max-width: 100%;
         background-color: #3ecf8e;
         color: white;
         padding: 10px 20px;

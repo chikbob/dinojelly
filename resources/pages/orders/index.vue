@@ -3,13 +3,14 @@
         <div class="orders">
             <h1 class="orders__title">{{ t("orders.title") }}</h1>
 
-            <div class="orders__filter">
+            <div class="orders__filter" style="width:100%; max-width:100%; min-width:0;">
                 <label for="status" class="orders__filter-label">{{ t("orders.filterByStatus") }}:</label>
                 <select
                     id="status"
                     v-model="selectedStatus"
                     @change="filterOrders"
                     class="orders__select"
+                    style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"
                 >
                     <option value="">{{ t("orders.all") }}</option>
                     <option value="pending">{{ t("orders.pending") }}</option>
@@ -74,11 +75,11 @@
                             <span class="orders__label">{{ t("checkout.deliveryTitle") }}:</span>
                             <span class="orders__value">{{ order.delivery_slot.name }}</span>
                         </div>
-                        <div class="orders__actions">
-                            <button class="orders__action" @click.stop="reorder(order.id)">
+                        <div class="orders__actions" style="width:100%; max-width:100%; min-width:0;">
+                            <button class="orders__action" @click.stop="reorder(order.id)" style="width:100%; max-width:100%; box-sizing:border-box;">
                                 {{ t("orders.reorder") }}
                             </button>
-                            <button class="orders__action orders__action--secondary" @click.stop="subscribe(order.id)">
+                            <button class="orders__action orders__action--secondary" @click.stop="subscribe(order.id)" style="width:100%; max-width:100%; box-sizing:border-box;">
                                 {{ t("subscriptions.createFromOrder") }}
                             </button>
                         </div>
@@ -158,6 +159,7 @@ const subscribe = (orderId) => {
         justify-content: center;
         gap: 10px;
         margin-bottom: 30px;
+        min-width: 0;
     }
 
     &__filter-label {
@@ -167,6 +169,10 @@ const subscribe = (orderId) => {
     }
 
     &__select {
+        width: min(100%, 320px);
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
         padding: 6px 10px;
         font-size: 10px;
         border-radius: 8px;
@@ -330,6 +336,22 @@ const subscribe = (orderId) => {
         &__status {
             font-size: 9px;
             padding: 4px 10px;
+        }
+    }
+}
+
+@media (max-width: 640px) {
+    .orders {
+        &__filter,
+        &__actions,
+        &__header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        &__action,
+        &__select {
+            width: 100%;
         }
     }
 }

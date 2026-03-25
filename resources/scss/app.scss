@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
 body {
     border: 0;
     margin: 0;
@@ -26,8 +38,186 @@ main {
 
 button {
     font-family: "Press Start 2P", system-ui;
+    box-sizing: border-box;
+    max-width: 100%;
+    min-width: 0;
+    white-space: normal;
 }
 
-input {
+input,
+select,
+textarea {
     font-family: "Press Start 2P", system-ui;
+    box-sizing: border-box;
+    max-width: 100%;
+    min-width: 0;
+}
+
+input:not([type='checkbox']):not([type='radio']):not([type='hidden']),
+select,
+textarea {
+    width: 100%;
+}
+
+input[type='file'] {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+}
+
+textarea {
+    resize: vertical;
+}
+
+img,
+svg,
+video,
+canvas {
+    display: block;
+    max-width: 100%;
+}
+
+form,
+.form-group,
+.form-grid,
+.admin-form,
+.admin-form__grid,
+.profile-addresses__form,
+.profile-addresses__grid,
+.catalog__search,
+.catalog-ai__grid,
+.catalog-filter,
+.checkout__gift-row,
+.checkout__payment-methods,
+.checkout__options,
+.orders-show__grid,
+.orders-show__row,
+.orders-show__hero,
+.orders-show__hero-actions,
+.admin-list__actions,
+.profile-edit__actions,
+.catalog-filter__actions,
+.orders-show__payments,
+.orders-show__items,
+.orders-show__timeline,
+.admin__content,
+.admin__main,
+.admin__header,
+.admin__header-main,
+.admin__actions,
+.admin__breadcrumbs,
+.auth-card,
+.modal__content {
+    min-width: 0;
+}
+
+.form-grid > *,
+.admin-form__grid > *,
+.profile-addresses__grid > *,
+.catalog-ai__grid > *,
+.checkout__gift-row > *,
+.checkout__payment-methods > *,
+.orders-show__grid > *,
+.orders-show__row > *,
+.orders-show__hero > *,
+.admin-list__actions > *,
+.profile-edit__actions > *,
+.catalog-filter__actions > *,
+.admin__actions > * {
+    min-width: 0;
+}
+
+.modal__content,
+.auth-card,
+.profile-card,
+.profile-addresses,
+.checkout__section,
+.catalog-filter,
+.orders-show__panel,
+.admin-form__grid {
+    max-width: 100%;
+}
+
+@media (max-width: 960px) {
+    .admin {
+        flex-direction: column;
+    }
+
+    .admin__sidebar {
+        width: 100%;
+    }
+
+    .admin__header {
+        height: auto;
+        padding: 16px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .admin__actions,
+    .catalog__search,
+    .orders-show__hero,
+    .checkout__payment-methods,
+    .admin-list__actions,
+    .profile-edit__actions,
+    .catalog-filter__actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .catalog__body,
+    .orders-show__grid,
+    .form-grid,
+    .profile-addresses__grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .checkout__gift-row {
+        flex-direction: column;
+    }
+
+    .checkout__gift-input,
+    .checkout__gift-preview,
+    .checkout__btn,
+    .profile-card__button,
+    .btn-submit,
+    .btn-save,
+    .btn-cancel,
+    .orders-show__note-button,
+    .catalog-filter__actions button,
+    .catalog__search button,
+    .catalog-ai__cta,
+    .admin__logout {
+        width: 100%;
+    }
+}
+
+@media (max-width: 640px) {
+    .modal {
+        padding: 16px;
+    }
+
+    .modal__content {
+        padding: 24px 18px;
+        max-height: calc(100dvh - 32px);
+        overflow-y: auto;
+    }
+
+    .profile-edit__actions,
+    .orders-show__hero-actions,
+    .catalog-filter__actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .orders-show__row {
+        grid-template-columns: 1fr !important;
+        gap: 8px;
+    }
+
+    .profile-address,
+    .checkout__item {
+        flex-direction: column;
+    }
 }

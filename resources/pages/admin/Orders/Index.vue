@@ -7,23 +7,24 @@
             </div>
         </div>
 
-        <section class="orders-index__filters">
+        <section class="orders-index__filters" style="width:100%; max-width:100%; min-width:0; overflow:hidden;">
             <input
                 v-model="localFilters.search"
                 type="text"
                 :placeholder="t('admin.orders.searchPlaceholder')"
                 class="orders-index__input"
+                style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"
                 @keyup.enter="applyFilters"
             />
 
-            <select v-model="localFilters.status" class="orders-index__select" @change="applyFilters">
+            <select v-model="localFilters.status" class="orders-index__select" @change="applyFilters" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;">
                 <option value="">{{ t("orders.all") }}</option>
                 <option value="pending">{{ t("admin.orders.statuses.pending") }}</option>
                 <option value="completed">{{ t("admin.orders.statuses.completed") }}</option>
                 <option value="canceled">{{ t("admin.orders.statuses.canceled") }}</option>
             </select>
 
-            <select v-model="localFilters.payment_status" class="orders-index__select" @change="applyFilters">
+            <select v-model="localFilters.payment_status" class="orders-index__select" @change="applyFilters" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;">
                 <option value="">{{ t("admin.orders.paymentStatuses.all") }}</option>
                 <option value="pending">{{ t("payments.status.pending") }}</option>
                 <option value="paid">{{ t("payments.status.paid") }}</option>
@@ -31,10 +32,10 @@
                 <option value="canceled">{{ t("payments.status.canceled") }}</option>
             </select>
 
-            <button class="orders-index__button orders-index__button--apply" @click="applyFilters">
+            <button class="orders-index__button orders-index__button--apply" @click="applyFilters" style="width:100%; max-width:100%; box-sizing:border-box;">
                 {{ t("catalog.apply") }}
             </button>
-            <button class="orders-index__button orders-index__button--ghost" @click="resetFilters">
+            <button class="orders-index__button orders-index__button--ghost" @click="resetFilters" style="width:100%; max-width:100%; box-sizing:border-box;">
                 {{ t("catalog.reset") }}
             </button>
         </section>
@@ -67,6 +68,7 @@
                                 v-model="order.status"
                                 @change="updateStatus(order.id, order.status)"
                                 class="orders-index__status-select"
+                                style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"
                             >
                                 <option value="pending">{{ t("admin.orders.statuses.pending") }}</option>
                                 <option value="completed">{{ t("admin.orders.statuses.completed") }}</option>
@@ -87,7 +89,7 @@
                     <td>{{ order.total_price }} {{ t("currency.symbol") }}</td>
                     <td>{{ formatDateTime(order.created_at) }}</td>
                     <td>
-                        <a :href="route('admin.orders.show', order.id)" class="orders-index__link">
+                        <a :href="route('admin.orders.show', order.id)" class="orders-index__link" style="width:100%; max-width:100%; box-sizing:border-box;">
                             {{ t("admin.orders.view") }}
                         </a>
                     </td>
@@ -173,6 +175,7 @@ const updateStatus = (orderId, status) => {
     margin: 0 auto;
     padding: 24px 8px 40px;
     font-family: "Press Start 2P", system-ui;
+    min-width: 0;
 
     &__head {
         display: flex;
@@ -202,12 +205,16 @@ const updateStatus = (orderId, status) => {
         background: #fff;
         border: 1px solid #e2e8f0;
         border-radius: 16px;
+        min-width: 0;
     }
 
     &__input,
     &__select,
     &__status-select {
         width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
         border: 1px solid #cbd5e1;
         border-radius: 10px;
         background: #fff;
@@ -217,6 +224,7 @@ const updateStatus = (orderId, status) => {
     }
 
     &__button {
+        max-width: 100%;
         border: none;
         border-radius: 10px;
         padding: 10px 14px;
@@ -319,11 +327,25 @@ const updateStatus = (orderId, status) => {
     &__link {
         display: inline-flex;
         align-items: center;
+        justify-content: center;
         padding: 10px 12px;
         border-radius: 10px;
         text-decoration: none;
         background: #2563eb;
         color: #fff;
+    }
+}
+
+@media (max-width: 960px) {
+    .orders-index {
+        &__filters {
+            grid-template-columns: 1fr;
+        }
+
+        &__button,
+        &__link {
+            width: 100%;
+        }
     }
 }
 </style>

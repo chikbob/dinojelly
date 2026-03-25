@@ -32,7 +32,7 @@
                     </div>
                     <div class="orders-show__row">
                         <span>{{ t("admin.orders.status") }}</span>
-                        <select v-model="status" class="orders-show__select" @change="updateStatus">
+                        <select v-model="status" class="orders-show__select" @change="updateStatus" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;">
                             <option value="pending">{{ t("admin.orders.statuses.pending") }}</option>
                             <option value="completed">{{ t("admin.orders.statuses.completed") }}</option>
                             <option value="canceled">{{ t("admin.orders.statuses.canceled") }}</option>
@@ -119,13 +119,14 @@
                     <h2>{{ t("admin.orders.timelineTitle") }}</h2>
                 </div>
 
-                <form class="orders-show__note-form" @submit.prevent="submitNote">
+                <form class="orders-show__note-form" @submit.prevent="submitNote" style="width:100%; max-width:100%; min-width:0;">
                     <textarea
                         v-model="noteForm.note"
                         class="orders-show__textarea"
+                        style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"
                         :placeholder="t('admin.orders.notePlaceholder')"
                     />
-                    <button type="submit" class="orders-show__note-button" :disabled="noteForm.processing">
+                    <button type="submit" class="orders-show__note-button" :disabled="noteForm.processing" style="width:100%; max-width:100%; box-sizing:border-box;">
                         {{ noteForm.processing ? t("auth.wait") : t("admin.orders.addNote") }}
                     </button>
                 </form>
@@ -200,6 +201,7 @@ const submitNote = () => {
     margin: 0 auto;
     padding: 24px 8px 40px;
     font-family: "Press Start 2P", system-ui;
+    min-width: 0;
 
     &__hero {
         display: flex;
@@ -251,6 +253,7 @@ const submitNote = () => {
         border: 1px solid #e2e8f0;
         border-radius: 20px;
         padding: 24px;
+        min-width: 0;
     }
 
     &__rows {
@@ -278,12 +281,14 @@ const submitNote = () => {
     &__select,
     &__textarea {
         width: 100%;
+        max-width: 100%;
         border: 1px solid #cbd5e1;
         border-radius: 12px;
         background: #fff;
         padding: 12px;
         font-family: inherit;
         font-size: 11px;
+        box-sizing: border-box;
     }
 
     &__items,
@@ -320,6 +325,7 @@ const submitNote = () => {
         display: grid;
         gap: 8px;
         font-size: 11px;
+        min-width: 0;
     }
 
     &__subheading {
@@ -376,6 +382,44 @@ const submitNote = () => {
     &__event-actor {
         color: #64748b;
         font-size: 10px;
+    }
+}
+
+@media (max-width: 960px) {
+    .orders-show {
+        &__hero {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        &__grid {
+            grid-template-columns: 1fr;
+        }
+    }
+}
+
+@media (max-width: 640px) {
+    .orders-show {
+        &__row {
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+
+        &__item {
+            grid-template-columns: 1fr;
+        }
+
+        &__event-top,
+        &__hero-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        &__note-button,
+        &__link {
+            width: 100%;
+            justify-content: center;
+        }
     }
 }
 </style>

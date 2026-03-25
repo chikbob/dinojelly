@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     build:
@@ -7,12 +5,13 @@ services:
       dockerfile: Dockerfile.dev
     ports:
       - "8000:80"
-      - "5173:5173"
     volumes:
       - .:/var/www/html
       - /var/www/html/vendor
       - /var/www/html/node_modules
     environment:
+      APP_KEY: ${APP_KEY}
+      APP_URL: http://localhost:8000
       APP_ENV: local
       APP_DEBUG: "true"
       DB_CONNECTION: mysql
@@ -21,9 +20,32 @@ services:
       DB_DATABASE: laravel
       DB_USERNAME: laravel
       DB_PASSWORD: secret
+      CACHE_DRIVER: redis
+      SESSION_DRIVER: redis
+      QUEUE_CONNECTION: redis
+      REDIS_HOST: redis
     depends_on:
       - db
       - redis
+    networks:
+      - app-network
+
+  vite:
+    image: node:20-alpine
+    working_dir: /var/www/html
+    command: sh -lc "npm ci && npm run dev"
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/var/www/html
+      - /var/www/html/node_modules
+    environment:
+      VITE_DEV_SERVER_HOST: localhost
+      VITE_DEV_SERVER_PORT: 5173
+      VITE_DEV_SERVER_PROTOCOL: ws
+      VITE_USE_POLLING: "true"
+    depends_on:
+      - app
     networks:
       - app-network
 

@@ -59,7 +59,7 @@
                     </div>
                 </div>
 
-                <form v-if="canReview" class="product-reviews__form" @submit.prevent="submitReview">
+                <form v-if="canReview" class="product-reviews__form" @submit.prevent="submitReview" style="width:100%; max-width:100%; min-width:0; overflow:hidden;">
                     <div class="product-reviews__rating">
                         <button
                             v-for="star in 5"
@@ -76,21 +76,24 @@
                         v-model="reviewForm.title"
                         type="text"
                         class="product-reviews__input"
+                        style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"
                         :placeholder="t('reviews.titlePlaceholder')"
                     />
                     <textarea
                         v-model="reviewForm.body"
                         class="product-reviews__textarea"
+                        style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"
                         :placeholder="t('reviews.bodyPlaceholder')"
                     />
-                    <div class="product-reviews__form-actions">
-                        <button class="product-reviews__submit" type="submit">
+                    <div class="product-reviews__form-actions" style="width:100%; max-width:100%; min-width:0;">
+                        <button class="product-reviews__submit" type="submit" style="width:100%; max-width:100%; box-sizing:border-box;">
                             {{ userReview ? t("reviews.update") : t("reviews.submit") }}
                         </button>
                         <button
                             v-if="userReview"
                             type="button"
                             class="product-reviews__delete"
+                            style="width:100%; max-width:100%; box-sizing:border-box;"
                             @click="deleteReview"
                         >
                             {{ t("reviews.delete") }}
@@ -248,6 +251,8 @@ function deleteReview() {
     align-items: center;
     gap: 16px;
     margin-top: 20px;
+    flex-wrap: wrap;
+    min-width: 0;
 }
 
 .product__favorite {
@@ -273,6 +278,7 @@ function deleteReview() {
 }
 
 .product__add-to-cart {
+    max-width: 100%;
     padding: 12px 16px;
     background-color: #3ecf8e;
     color: white;
@@ -369,6 +375,9 @@ function deleteReview() {
 .product-reviews__input,
 .product-reviews__textarea {
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
     border: 1px solid #cbd5e1;
     border-radius: 12px;
     padding: 12px 14px;
@@ -384,12 +393,14 @@ function deleteReview() {
 .product-reviews__form-actions {
     display: flex;
     gap: 12px;
+    flex-wrap: wrap;
 }
 
 .product-reviews__submit,
 .product-reviews__delete {
     border: none;
     border-radius: 12px;
+    max-width: 100%;
     padding: 12px 16px;
     cursor: pointer;
     font-family: "Press Start 2P", system-ui;
@@ -422,5 +433,20 @@ function deleteReview() {
     display: block;
     margin-top: 6px;
     color: #16a34a;
+}
+
+@media (max-width: 640px) {
+    .product__actions,
+    .product-reviews__form-actions,
+    .product-reviews__card-top {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .product__add-to-cart,
+    .product-reviews__submit,
+    .product-reviews__delete {
+        width: 100%;
+    }
 }
 </style>

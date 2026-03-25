@@ -41,6 +41,7 @@
                         v-model="currentLang"
                         @change="setLang(currentLang)"
                         class="admin__lang"
+                        style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"
                     >
                         <option value="ru">RU</option>
                         <!-- <option value="uk">UA</option> -->
@@ -52,6 +53,7 @@
                         as="button"
                         href="/logout"
                         class="admin__logout"
+                        style="width:100%; max-width:100%; box-sizing:border-box;"
                     >
                         {{ t("admin.header.logout") }}
                     </Link>
@@ -171,10 +173,12 @@ const breadcrumbs = computed(() => {
     min-height: 100vh;
     background: #f5f7fa;
     font-family: "Press Start 2P", system-ui;
+    min-width: 0;
 }
 
 .admin__sidebar {
     width: 240px;
+    min-width: 0;
     background: #0f172a;
     color: #fff;
     display: flex;
@@ -242,6 +246,7 @@ const breadcrumbs = computed(() => {
     flex: 1;
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 
 .admin__header {
@@ -252,11 +257,14 @@ const breadcrumbs = computed(() => {
     align-items: center;
     justify-content: space-between;
     padding: 0 24px;
+    gap: 16px;
+    min-width: 0;
 }
 
 .admin__header-main {
     display: grid;
     gap: 6px;
+    min-width: 0;
 }
 
 .admin__breadcrumbs {
@@ -275,6 +283,7 @@ const breadcrumbs = computed(() => {
     display: flex;
     align-items: center;
     gap: 12px;
+    min-width: 0;
 }
 
 .admin__lang {
@@ -298,5 +307,34 @@ const breadcrumbs = computed(() => {
 
 .admin__main {
     padding: 24px;
+    min-width: 0;
+}
+
+@media (max-width: 960px) {
+    .admin {
+        flex-direction: column;
+    }
+
+    .admin__sidebar {
+        width: 100%;
+    }
+
+    .admin__header {
+        height: auto;
+        padding: 16px;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .admin__actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+@media (max-width: 640px) {
+    .admin__main {
+        padding: 16px;
+    }
 }
 </style>

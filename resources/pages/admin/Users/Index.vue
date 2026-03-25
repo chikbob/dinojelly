@@ -4,7 +4,8 @@
             {{ t("admin.users.title") }}
         </h1>
 
-        <table class="users-index__table">
+        <div style="width:100%; max-width:100%; overflow-x:auto;">
+        <table class="users-index__table" style="min-width:640px;">
             <thead>
             <tr>
                 <th>{{ t("admin.users.id") }}</th>
@@ -26,6 +27,7 @@
             </tr>
             </tbody>
         </table>
+        </div>
     </div>
 </template>
 

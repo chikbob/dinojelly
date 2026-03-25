@@ -1,7 +1,7 @@
 <template>
-    <div class="layout">
+    <div class="layout" style="width:100%; max-width:100%; min-width:0; overflow-x:hidden;">
         <Header />
-        <main class="layout__content">
+        <main class="layout__content" style="width:100%; max-width:100%; min-width:0; overflow:hidden;">
             <slot/>
         </main>
         <Footer />

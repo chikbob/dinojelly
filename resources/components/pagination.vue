@@ -1,10 +1,15 @@
 <template>
-    <div v-if="links.length > 3" class="pagination">
-        <template v-for="(link, i) in links" :key="i">
+    <div
+        v-if="visibleLinks.length > 3"
+        class="pagination"
+        style="display:flex; justify-content:center; align-items:center; gap:6px; flex-wrap:nowrap; width:100%; max-width:100%; min-width:0; overflow:hidden;"
+    >
+        <template v-for="(link, i) in visibleLinks" :key="`${i}-${link.label}`">
             <span
                 v-if="!link.url"
                 v-html="sanitizeLabel(link.label)"
                 class="pagination__link pagination__link--disabled"
+                style="display:inline-flex; align-items:center; justify-content:center; min-height:36px; min-width:40px; max-width:100%; padding:8px 10px; box-sizing:border-box; white-space:nowrap;"
             />
 
             <Link
@@ -13,19 +18,65 @@
                 v-html="sanitizeLabel(link.label)"
                 class="pagination__link"
                 :class="{ 'pagination__link--active': link.active }"
+                style="display:inline-flex; align-items:center; justify-content:center; min-height:36px; min-width:40px; max-width:100%; padding:8px 10px; box-sizing:border-box; white-space:nowrap;"
             />
         </template>
     </div>
 </template>
 
 <script setup>
+import {computed} from 'vue'
 import {Link} from "@inertiajs/vue3"
 import {useI18n} from "../lang/useI18n"
 
 const {t} = useI18n()
 
-defineProps({
+const props = defineProps({
     links: Array,
+})
+
+const visibleLinks = computed(() => {
+    const items = props.links ?? []
+
+    if (items.length <= 9) {
+        return items
+    }
+
+    const previous = items[0]
+    const next = items[items.length - 1]
+    const pages = items.slice(1, -1)
+    const activeIndex = pages.findIndex((item) => item.active)
+
+    if (activeIndex === -1) {
+        return items
+    }
+
+    const start = Math.max(0, activeIndex - 1)
+    const end = Math.min(pages.length, activeIndex + 2)
+    const compactPages = pages.slice(start, end)
+    const result = [previous]
+
+    if (start > 0) {
+        result.push(pages[0])
+    }
+
+    if (start > 1) {
+        result.push({url: null, label: '...'})
+    }
+
+    result.push(...compactPages)
+
+    if (end < pages.length - 1) {
+        result.push({url: null, label: '...'})
+    }
+
+    if (end < pages.length) {
+        result.push(pages[pages.length - 1])
+    }
+
+    result.push(next)
+
+    return result
 })
 
 const sanitizeLabel = (label) => {
@@ -42,11 +93,13 @@ const sanitizeLabel = (label) => {
     justify-content: center;
     margin-top: 35px;
     gap: 4px;
-    font-size: 13px;
+    font-size: 11px;
     color: #333;
+    flex-wrap: nowrap;
+    overflow: hidden;
 
     &__link {
-        padding: 6px 12px;
+        padding: 6px 10px;
         border: 1px solid #dcdcdc;
         border-radius: 4px;
         cursor: pointer;
@@ -54,6 +107,7 @@ const sanitizeLabel = (label) => {
         color: #333;
         background: #fff;
         transition: background 0.2s ease, color 0.2s ease;
+        white-space: nowrap;
 
         &:hover {
             background: #35b67c;

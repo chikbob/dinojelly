@@ -2,7 +2,7 @@
     <div v-if="isOpen" class="modal modal--active">
         <div class="modal__overlay" @click="closeModal"></div>
 
-        <div class="modal__content">
+        <div class="modal__content" style="width:100%; max-width:420px; box-sizing:border-box; overflow:hidden;">
             <button class="modal__close" @click="closeModal">&times;</button>
 
             <!-- Заголовок DinoJelly -->
@@ -12,17 +12,19 @@
             </h1>
 
             <!-- Форма входа -->
-            <form v-if="activeTab === 'login' || showAuth === true" @submit.prevent="submitLogin" class="auth-form">
+            <form v-if="activeTab === 'login' || showAuth === true" @submit.prevent="submitLogin" class="auth-form" style="width:100%; max-width:100%; min-width:0;">
                 <div class="auth-form__title">{{ t("auth.loginTitle") }}</div>
 
                 <div class="auth-form__group">
                     <input v-model="loginForm.email" type="email" class="auth-form__input"
+                           style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"
                            :placeholder="t('auth.email')" required>
                     <div v-if="errors.email" class="auth-form__error">{{ t(errors.email) }}</div>
                 </div>
 
                 <div class="auth-form__group">
                     <input v-model="loginForm.password" type="password" class="auth-form__input"
+                           style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"
                            :placeholder="t('auth.password')" required>
                     <div v-if="errors.password" class="auth-form__error">{{ t(errors.password) }}</div>
                 </div>
@@ -32,42 +34,47 @@
                     <a href="#" @click.prevent="switchToRegister">{{ t("auth.register") }}?</a>
                 </p>
 
-                <button type="submit" class="auth-form__submit" :disabled="processing">
+                <button type="submit" class="auth-form__submit" :disabled="processing" style="width:100%; max-width:100%; box-sizing:border-box;">
                     <span v-if="processing">{{ t("auth.wait") }}</span>
                     <span v-else>{{ t("auth.login") }}</span>
                 </button>
             </form>
 
             <!-- Форма регистрации -->
-            <form v-else @submit.prevent="submitRegister" class="auth-form">
+            <form v-else @submit.prevent="submitRegister" class="auth-form" style="width:100%; max-width:100%; min-width:0;">
                 <div class="auth-form__title">{{ t("auth.registerTitle") }}</div>
 
                 <div class="auth-form__group">
                     <input v-model="registerForm.name" type="text" class="auth-form__input"
+                           style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"
                            :placeholder="t('auth.name')" required>
                     <div v-if="errors.name" class="auth-form__error">{{ t(errors.name) }}</div>
                 </div>
 
                 <div class="auth-form__group">
                     <input v-model="registerForm.phone" type="tel" class="auth-form__input"
+                           style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"
                            :placeholder="t('auth.phone')" required>
                     <div v-if="errors.phone" class="auth-form__error">{{ t(errors.phone) }}</div>
                 </div>
 
                 <div class="auth-form__group">
                     <input v-model="registerForm.email" type="email" class="auth-form__input"
+                           style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"
                            :placeholder="t('auth.email')" required>
                     <div v-if="errors.email" class="auth-form__error">{{ t(errors.email) }}</div>
                 </div>
 
                 <div class="auth-form__group">
                     <input v-model="registerForm.password" type="password" class="auth-form__input"
+                           style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"
                            :placeholder="t('auth.password')" required>
                     <div v-if="errors.password" class="auth-form__error">{{ t(errors.password) }}</div>
                 </div>
 
                 <div class="auth-form__group">
                     <input v-model="registerForm.password_confirmation" type="password" class="auth-form__input"
+                           style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"
                            :placeholder="t('auth.passwordConfirm')" required>
                 </div>
 
@@ -76,7 +83,7 @@
                     <a href="#" @click.prevent="switchToLogin">{{ t("auth.login") }}?</a>
                 </p>
 
-                <button type="submit" class="auth-form__submit" :disabled="processing">
+                <button type="submit" class="auth-form__submit" :disabled="processing" style="width:100%; max-width:100%; box-sizing:border-box;">
                     <span v-if="processing">{{ t("auth.wait") }}</span>
                     <span v-else>{{ t("auth.register") }}</span>
                 </button>
@@ -203,6 +210,8 @@ const submitRegister = () => {
         padding: 40px 32px;
         width: 100%;
         max-width: 420px;
+        max-height: calc(100dvh - 32px);
+        overflow-y: auto;
         z-index: 1001;
     }
 
@@ -261,10 +270,13 @@ const submitRegister = () => {
 
     &__input {
         display: block;
-        max-width: 388px;
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
         padding: 14px;
         border: 2px solid #333;
         border-radius: 8px;
+        box-sizing: border-box;
         font-size: 16px;
         font-family: inherit;
         background: #fff;
@@ -284,7 +296,7 @@ const submitRegister = () => {
         margin: 16px 0 20px auto; // больше отступ сверху и снизу
         font-size: 12px; // чуть меньше
         text-align: right;
-        max-width: 360px;
+        max-width: 100%;
 
         a {
             color: #777;
@@ -327,9 +339,19 @@ const submitRegister = () => {
         color: #b90000;
         border-radius: 4px;
         font-size: 13px;
-        max-width: 360px;
+        max-width: 100%;
         margin-left: auto;
         margin-right: auto;
+    }
+}
+
+@media (max-width: 640px) {
+    .modal {
+        padding: 16px;
+    }
+
+    .modal__content {
+        padding: 24px 18px;
     }
 }
 

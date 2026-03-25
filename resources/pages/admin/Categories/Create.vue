@@ -2,27 +2,27 @@
     <div class="category-form">
         <h1 class="category-form__title">{{ t("admin.categories.createNew") }}</h1>
 
-        <form @submit.prevent="submit">
+        <form @submit.prevent="submit" style="width:100%; max-width:100%; min-width:0;">
             <div class="form-group">
                 <label for="name">{{ t("admin.categories.name") }}</label>
-                <input id="name" v-model="form.name" type="text" />
+                <input id="name" v-model="form.name" type="text" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;" />
                 <p v-if="errors.name" class="error">{{ errors.name }}</p>
             </div>
 
             <div class="form-group">
                 <label for="slug">{{ t("admin.categories.slug") }}</label>
-                <input id="slug" v-model="form.slug" type="text" />
+                <input id="slug" v-model="form.slug" type="text" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;" />
                 <p v-if="errors.slug" class="error">{{ errors.slug }}</p>
             </div>
 
             <div class="form-group">
                 <label for="description">{{ t("admin.products.fields.description") }}</label>
-                <textarea id="description" v-model="form.description" rows="4"></textarea>
+                <textarea id="description" v-model="form.description" rows="4" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"></textarea>
             </div>
 
             <div class="form-group">
                 <label for="sort_order">{{ t("admin.categories.sortOrder") }}</label>
-                <input id="sort_order" v-model.number="form.sort_order" type="number" min="0" />
+                <input id="sort_order" v-model.number="form.sort_order" type="number" min="0" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;" />
             </div>
 
             <label class="checkbox">
@@ -30,7 +30,7 @@
                 <span>{{ t("admin.categories.active") }}</span>
             </label>
 
-            <button type="submit" class="btn-submit">{{ t("admin.products.create") }}</button>
+            <button type="submit" class="btn-submit" style="width:100%; max-width:100%; box-sizing:border-box;">{{ t("admin.products.create") }}</button>
         </form>
     </div>
 </template>
@@ -76,6 +76,7 @@ const submit = () => {
     margin: 0 auto;
     padding: 40px 20px;
     font-family: "Press Start 2P", system-ui;
+    min-width: 0;
 
     &__title {
         font-size: 24px;
@@ -94,6 +95,9 @@ const submit = () => {
     input,
     textarea {
         width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
         padding: 8px;
         border-radius: 6px;
         border: 1px solid #ddd;
@@ -112,10 +116,13 @@ const submit = () => {
     display: flex;
     gap: 10px;
     align-items: center;
+    flex-wrap: wrap;
     margin-bottom: 20px;
 }
 
 .btn-submit {
+    width: 100%;
+    max-width: 100%;
     background-color: #29cc5f;
     color: white;
     padding: 10px 20px;

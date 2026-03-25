@@ -1,9 +1,9 @@
 <template>
-    <header class="header">
+    <header class="header" style="width:100%; max-width:100%; overflow:hidden; box-sizing:border-box;">
         <!-- Верхний ряд: адрес и навигация -->
-        <div class="header__top">
-            <div class="header__address">{{ t("header.address") }}</div>
-            <nav class="header__nav">
+        <div class="header__top" style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; width:100%; max-width:100%; min-width:0;">
+            <div class="header__address" style="max-width:100%; min-width:0;">{{ t("header.address") }}</div>
+            <nav class="header__nav" style="display:flex; gap:12px; flex-wrap:wrap; max-width:100%; min-width:0;">
                 <a href="#" class="header__link">{{ t("header.return") }}</a>
                 <a href="#" class="header__link">{{ t("header.payment") }}</a>
                 <a href="#" class="header__link">{{ t("header.gift") }}</a>
@@ -11,18 +11,18 @@
         </div>
 
         <!-- Нижний ряд: логотип, дом, пользовательские элементы -->
-        <div class="header__bottom">
-            <div class="header__logo-block">
+        <div class="header__bottom" style="display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:nowrap; width:100%; max-width:100%; min-width:0;">
+            <div class="header__logo-block" style="display:flex; align-items:center; flex:0 0 auto; max-width:100%; min-width:0;">
                 <a href="/" class="header__auth-link">
                     <img src="/logo.png" alt="Dino Jelly" class="header__logo-img"/>
                 </a>
             </div>
 
-            <div class="header__actions">
+            <div class="header__actions" style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; justify-content:flex-end; flex:1 1 auto; width:auto; max-width:100%; min-width:0;">
                 <!-- Переключение языка -->
-                <div class="header__lang-wrapper">
+                <div class="header__lang-wrapper" style="width:100%; max-width:120px; min-width:0;">
                     <span class="header__icon">🌐</span>
-                    <select v-model="currentLang" @change="setLang(currentLang)" class="header__lang">
+                    <select v-model="currentLang" @change="setLang(currentLang)" class="header__lang" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;">
                         <option value="ru">RU</option>
                         <!-- <option value="uk">UA</option> -->
                         <option value="en">EN</option>
@@ -31,17 +31,17 @@
 
                 <!-- Пользователь -->
                 <template v-if="user">
-                    <div class="header__user-wrapper">
+                    <div class="header__user-wrapper" style="max-width:100%; min-width:0;">
                         <span class="header__icon">👤</span>
                         <a href="/profile" class="header__user-name">{{ user.name }}</a>
                     </div>
-                    <button @click="logout" class="header__logout-btn">
+                    <button @click="logout" class="header__logout-btn" style="max-width:100%; box-sizing:border-box;">
                         <span class="header__icon">🚪</span>
                         {{ t("header.logout") }}
                     </button>
                 </template>
                 <template v-else>
-                    <button @click="showAuth = true" class="header__login-btn">
+                    <button @click="showAuth = true" class="header__login-btn" style="max-width:100%; box-sizing:border-box;">
                         <span class="header__icon">🔑</span>
                         {{ t("header.login") }}
                     </button>
@@ -50,26 +50,26 @@
                 <AuthModal :isOpen="showAuth" @close="showAuth = false"/>
 
                 <!-- Избранное -->
-                <button @click="handleFavoritesClick" class="header__favorites">
+                <button @click="handleFavoritesClick" class="header__favorites" style="max-width:100%; box-sizing:border-box;">
                     <span class="header__icon">❤️</span>
                     <span>{{ t("header.favorites") }}</span>
                     <span v-if="favoritesCount" class="header__badge">{{ favoritesCount }}</span>
                 </button>
 
                 <!-- Заказы -->
-                <button @click="handleOrdersClick" class="header__orders">
+                <button @click="handleOrdersClick" class="header__orders" style="max-width:100%; box-sizing:border-box;">
                     <span class="header__icon">📦</span>
                     <span>{{ t("header.orders") }}</span>
                     <span v-if="ordersCount" class="header__badge">{{ ordersCount }}</span>
                 </button>
 
-                <button @click="handleSubscriptionsClick" class="header__orders">
+                <button @click="handleSubscriptionsClick" class="header__orders" style="max-width:100%; box-sizing:border-box;">
                     <span class="header__icon">🔁</span>
                     <span>{{ t("header.subscriptions") }}</span>
                 </button>
 
                 <!-- Корзина -->
-                <button @click="handleCartClick" class="header__cart">
+                <button @click="handleCartClick" class="header__cart" style="max-width:100%; box-sizing:border-box;">
                     <span class="header__icon">🛒</span>
                     <span>{{ t("header.cart") }}</span>
                     <span v-if="cartCount" class="header__badge">{{ cartCount }}</span>
@@ -194,12 +194,15 @@ const handleCartClick = () => {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 16px;
+    flex-wrap: nowrap;
 }
 
 .header__logo-block {
     display: flex;
     align-items: center;
     gap: 10px;
+    flex: 0 0 auto;
 }
 
 .header__logo-img {
@@ -209,7 +212,10 @@ const handleCartClick = () => {
 .header__actions {
     display: flex;
     align-items: center;
-    gap: 20px;
+    justify-content: flex-end;
+    gap: 12px;
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 /* Стили для иконок */
@@ -327,7 +333,13 @@ const handleCartClick = () => {
 
 /* Адаптивность */
 @media (max-width: 768px) {
+    .header__bottom {
+        flex-wrap: wrap;
+    }
+
     .header__actions {
+        width: 100%;
+        justify-content: flex-start;
         gap: 10px;
     }
 

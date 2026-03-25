@@ -7,48 +7,49 @@
                     <p class="catalog__subtitle">{{ t("catalog.subtitle") }}</p>
                 </div>
 
-                <div class="catalog__search">
+                <div class="catalog__search" style="width:100%; max-width:100%; min-width:0;">
                     <input
                         v-model="localFilters.q"
                         type="search"
+                        style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"
                         :placeholder="t('catalog.searchPlaceholder')"
                         @keyup.enter="applyFilters"
                     />
-                    <button @click="applyFilters">{{ t("catalog.search") }}</button>
+                    <button @click="applyFilters" style="width:auto; min-width:96px; max-width:100%; box-sizing:border-box;">{{ t("catalog.search") }}</button>
                 </div>
             </div>
 
-            <section class="catalog-ai">
-                <div class="catalog-ai__intro">
+            <section class="catalog-ai" style="width:100%; max-width:100%; overflow:hidden;">
+                <div class="catalog-ai__intro" style="width:100%; max-width:100%; min-width:0;">
                     <div>
                         <h2>{{ t("catalog.assistant.title") }}</h2>
                         <p>{{ t("catalog.assistant.subtitle") }}</p>
                     </div>
-                    <button class="catalog-ai__cta" @click="requestRecommendations">
+                    <button class="catalog-ai__cta" @click="requestRecommendations" style="width:auto; min-width:132px; max-width:100%; box-sizing:border-box;">
                         {{ t("catalog.assistant.cta") }}
                     </button>
                 </div>
 
-                <div class="catalog-ai__grid">
-                    <select v-model="assistantForm.occasion">
+                <div class="catalog-ai__grid" style="width:100%; max-width:100%; min-width:0;">
+                    <select v-model="assistantForm.occasion" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;">
                         <option value="gift">{{ t("catalog.assistant.occasions.gift") }}</option>
                         <option value="party">{{ t("catalog.assistant.occasions.party") }}</option>
                         <option value="kids">{{ t("catalog.assistant.occasions.kids") }}</option>
                         <option value="self">{{ t("catalog.assistant.occasions.self") }}</option>
                     </select>
-                    <select v-model="assistantForm.taste">
+                    <select v-model="assistantForm.taste" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;">
                         <option value="sour">{{ t("catalog.assistant.tastes.sour") }}</option>
                         <option value="fruity">{{ t("catalog.assistant.tastes.fruity") }}</option>
                         <option value="light">{{ t("catalog.assistant.tastes.light") }}</option>
                         <option value="surprise">{{ t("catalog.assistant.tastes.surprise") }}</option>
                     </select>
-                    <input v-model="assistantForm.budget" type="number" min="0" :placeholder="t('catalog.assistant.budget')" />
-                    <select v-model="assistantForm.format">
+                    <input v-model="assistantForm.budget" type="number" min="0" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;" :placeholder="t('catalog.assistant.budget')" />
+                    <select v-model="assistantForm.format" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;">
                         <option value="set">{{ t("catalog.assistant.formats.set") }}</option>
                         <option value="single">{{ t("catalog.assistant.formats.single") }}</option>
                         <option value="variety">{{ t("catalog.assistant.formats.variety") }}</option>
                     </select>
-                    <select v-model="assistantForm.priority">
+                    <select v-model="assistantForm.priority" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;">
                         <option value="popular">{{ t("catalog.assistant.priorities.popular") }}</option>
                         <option value="new">{{ t("catalog.assistant.priorities.new") }}</option>
                         <option value="value">{{ t("catalog.assistant.priorities.value") }}</option>
@@ -59,7 +60,7 @@
 
                 <div v-if="assistantResult" class="catalog-ai__result">
                     <p class="catalog-ai__summary">{{ assistantResult.summary }}</p>
-                    <div class="catalog-ai__recommendations">
+                    <div class="catalog-ai__recommendations" style="width:100%; max-width:100%; min-width:0;">
                         <article v-for="item in assistantResult.products" :key="item.id" class="catalog-ai__card">
                             <img :src="item.image_url" :alt="item.name" class="catalog-ai__image" />
                             <div class="catalog-ai__content">
@@ -67,8 +68,8 @@
                                 <p>{{ item.recommendation_reason }}</p>
                                 <small>{{ item.price }} {{ t("currency.symbol") }}</small>
                                 <div class="catalog-ai__actions">
-                                    <button @click="goToProduct(item.id)">{{ t("catalog.assistant.open") }}</button>
-                                    <button @click="addToCart(item.id)">{{ t("catalog.addToCart") }}</button>
+                                    <button @click="goToProduct(item.id)" style="width:100%; max-width:100%; box-sizing:border-box;">{{ t("catalog.assistant.open") }}</button>
+                                    <button @click="addToCart(item.id)" style="width:100%; max-width:100%; box-sizing:border-box;">{{ t("catalog.addToCart") }}</button>
                                 </div>
                             </div>
                         </article>
@@ -108,35 +109,48 @@
                 </div>
             </div>
 
-            <div class="catalog__body">
-                <aside class="catalog__filters">
-                    <div class="catalog-filter">
+            <div class="catalog__body" :style="catalogBodyStyle">
+                <aside
+                    class="catalog__filters"
+                    style="width:100%; max-width:100%; min-width:0; align-self:start; overflow:hidden; box-sizing:border-box;"
+                >
+                    <div
+                        class="catalog-filter"
+                        style="width:100%; max-width:100%; min-width:0; overflow:hidden; box-sizing:border-box;"
+                    >
                         <h2>{{ t("catalog.filters.title") }}</h2>
 
-                        <label>
+                        <label style="display:grid; width:100%; max-width:100%; min-width:0;">
                             <span>{{ t("catalog.filters.minPrice") }}</span>
-                            <input v-model="localFilters.min_price" type="number" min="0" />
+                            <input v-model="localFilters.min_price" type="number" min="0" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;" />
                         </label>
 
-                        <label>
+                        <label style="display:grid; width:100%; max-width:100%; min-width:0;">
                             <span>{{ t("catalog.filters.maxPrice") }}</span>
-                            <input v-model="localFilters.max_price" type="number" min="0" />
+                            <input v-model="localFilters.max_price" type="number" min="0" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;" />
                         </label>
 
-                        <label class="catalog-filter__checkbox">
+                        <label class="catalog-filter__checkbox" style="width:100%; max-width:100%; min-width:0;">
                             <input v-model="localFilters.on_sale" type="checkbox" />
                             <span>{{ t("catalog.filters.onSale") }}</span>
                         </label>
 
-                        <div class="catalog-filter__actions">
-                            <button @click="applyFilters">{{ t("catalog.apply") }}</button>
-                            <button class="catalog-filter__reset" @click="resetFilters">{{ t("catalog.reset") }}</button>
+                        <div class="catalog-filter__actions" style="width:100%; max-width:100%; min-width:0;">
+                            <button @click="applyFilters" style="width:100%; max-width:100%; box-sizing:border-box;">{{ t("catalog.apply") }}</button>
+                            <button class="catalog-filter__reset" @click="resetFilters" style="width:100%; max-width:100%; box-sizing:border-box;">{{ t("catalog.reset") }}</button>
                         </div>
                     </div>
                 </aside>
 
-                <div class="catalog__content">
-                    <div v-if="products.data.length" class="catalog__grid">
+                <div
+                    class="catalog__content"
+                    style="width:100%; max-width:100%; min-width:0; overflow:hidden; box-sizing:border-box;"
+                >
+                    <div
+                        v-if="products.data.length"
+                        class="catalog__grid"
+                        style="width:100%; max-width:100%; min-width:0;"
+                    >
                         <div
                             v-for="product in products.data"
                             :key="product.id"
@@ -211,7 +225,7 @@ import {router} from '@inertiajs/vue3'
 import MainLayout from '../layouts/mainLayout.vue'
 import {route} from 'ziggy-js'
 import {useI18n} from "../lang/useI18n"
-import {reactive, ref, watch} from 'vue'
+import {computed, onBeforeUnmount, onMounted, reactive, ref, watch} from 'vue'
 import Pagination from "../components/pagination.vue";
 
 const {t} = useI18n()
@@ -231,6 +245,7 @@ const props = defineProps({
 const cart = ref({...props.cartItems})
 const assistantResult = ref(null)
 const assistantError = ref('')
+const isNarrowViewport = ref(false)
 const localFilters = reactive({
     q: props.filters?.q ?? '',
     category: props.filters?.category ?? '',
@@ -246,6 +261,29 @@ const assistantForm = reactive({
     format: 'set',
     priority: 'popular',
 })
+
+const syncViewport = () => {
+    isNarrowViewport.value = window.innerWidth <= 960
+}
+
+onMounted(() => {
+    syncViewport()
+    window.addEventListener('resize', syncViewport)
+})
+
+onBeforeUnmount(() => {
+    window.removeEventListener('resize', syncViewport)
+})
+
+const catalogBodyStyle = computed(() => ({
+    display: 'grid',
+    gridTemplateColumns: isNarrowViewport.value ? 'minmax(0, 1fr)' : 'minmax(0, 340px) minmax(0, 1fr)',
+    gap: '28px',
+    alignItems: 'start',
+    width: '100%',
+    maxWidth: '100%',
+    minWidth: '0',
+}))
 
 watch(() => props.filters, (next) => {
     localFilters.q = next?.q ?? ''
@@ -375,7 +413,7 @@ const toggleFavorite = (productId) => {
 <style lang="scss" scoped>
 .catalog {
     padding: 40px 20px;
-    max-width: 1200px;
+    width: min(100%, 1480px);
     margin: 0 auto;
     font-family: "Press Start 2P", system-ui;
 
@@ -416,20 +454,22 @@ const toggleFavorite = (productId) => {
         }
 
         button {
-            padding: 12px 16px;
+            padding: 10px 14px;
             border: none;
             border-radius: 12px;
             background: #29cc5f;
             color: #fff;
             cursor: pointer;
+            font-size: 10px;
+            line-height: 1.2;
         }
     }
 
     &__toolbar {
         display: flex;
         justify-content: space-between;
-        gap: 20px;
-        align-items: center;
+        gap: 16px;
+        align-items: flex-end;
         margin-bottom: 24px;
         flex-wrap: wrap;
     }
@@ -444,10 +484,11 @@ const toggleFavorite = (productId) => {
         border: 1px solid #d1d5db;
         background: #fff;
         border-radius: 999px;
-        padding: 10px 14px;
+        padding: 8px 12px;
         cursor: pointer;
         font-family: inherit;
-        font-size: 10px;
+        font-size: 9px;
+        line-height: 1.35;
 
         &--active {
             background: #111827;
@@ -459,14 +500,15 @@ const toggleFavorite = (productId) => {
     &__sort {
         display: flex;
         align-items: center;
-        gap: 10px;
-        font-size: 10px;
+        gap: 8px;
+        font-size: 9px;
 
         select {
-            padding: 10px 12px;
+            padding: 8px 10px;
             border-radius: 10px;
             border: 1px solid #d1d5db;
             font-family: inherit;
+            font-size: 9px;
         }
     }
 
@@ -477,13 +519,18 @@ const toggleFavorite = (productId) => {
         align-items: start;
     }
 
+    &__filters {
+        width: 100%;
+        min-width: 0;
+    }
+
     &__content {
         min-width: 0;
     }
 
     &__grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         gap: 28px;
     }
 
@@ -539,22 +586,33 @@ const toggleFavorite = (productId) => {
 
 .catalog-ai__grid select,
 .catalog-ai__grid input {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    min-height: 48px;
     padding: 12px 14px;
     border-radius: 12px;
     border: 1px solid #cbd5e1;
     font-family: inherit;
+    font-size: 10px;
+    line-height: 1.4;
+    background: #fff;
+    color: #111827;
+    appearance: none;
 }
 
 .catalog-ai__cta,
 .catalog-ai__actions button {
     border: none;
     border-radius: 12px;
-    padding: 12px 14px;
+    padding: 10px 12px;
     background: #111827;
     color: #fff;
     cursor: pointer;
     font-family: "Press Start 2P", system-ui;
-    font-size: 10px;
+    font-size: 9px;
+    line-height: 1.4;
+    text-align: center;
 }
 
 .catalog-ai__summary {
@@ -750,6 +808,10 @@ const toggleFavorite = (productId) => {
 .catalog-filter {
     position: sticky;
     top: 24px;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
     background: #fff;
     border: 1px solid #e5e7eb;
     border-radius: 20px;
@@ -764,21 +826,46 @@ const toggleFavorite = (productId) => {
 
     label {
         display: grid;
+        width: 100%;
+        min-width: 0;
         gap: 8px;
         font-size: 10px;
     }
 
     input {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+        min-height: 44px;
         padding: 10px 12px;
         border: 1px solid #d1d5db;
-        border-radius: 10px;
+        border-radius: 12px;
         font-family: inherit;
+        font-size: 10px;
+        line-height: 1.4;
+        background: #fff;
+        color: #111827;
+        appearance: none;
     }
 
     &__checkbox {
-        display: flex !important;
-        align-items: center;
+        display: grid !important;
+        grid-template-columns: 20px 1fr;
         gap: 10px;
+
+        input {
+            width: 18px;
+            min-height: 18px;
+            margin: 0;
+            align-self: center;
+        }
+
+        span {
+            align-self: center;
+            line-height: 1.5;
+        }
     }
 
     &__actions {
@@ -786,13 +873,19 @@ const toggleFavorite = (productId) => {
         gap: 10px;
 
         button {
+            width: 100%;
+            box-sizing: border-box;
+            min-height: 48px;
             padding: 12px;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             background: #29cc5f;
             color: #fff;
             cursor: pointer;
             font-family: inherit;
+            font-size: 10px;
+            line-height: 1.4;
+            text-align: center;
         }
     }
 

@@ -5,8 +5,8 @@
 
             <div class="checkout__section">
                 <h2>{{ t("checkout.addressTitle") }}</h2>
-                <div v-if="addresses.length" class="checkout__options">
-                    <label v-for="address in addresses" :key="address.id" class="checkout-option">
+                <div v-if="addresses.length" class="checkout__options" style="width:100%; max-width:100%; min-width:0;">
+                    <label v-for="address in addresses" :key="address.id" class="checkout-option" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box; overflow:hidden;">
                         <input v-model="selectedAddressId" type="radio" :value="address.id" />
                         <div>
                             <strong>{{ address.label || address.recipient_name }}</strong>
@@ -20,8 +20,8 @@
 
             <div class="checkout__section">
                 <h2>{{ t("checkout.deliveryTitle") }}</h2>
-                <div v-if="deliverySlots.length" class="checkout__options">
-                    <label v-for="slot in deliverySlots" :key="slot.id" class="checkout-option">
+                <div v-if="deliverySlots.length" class="checkout__options" style="width:100%; max-width:100%; min-width:0;">
+                    <label v-for="slot in deliverySlots" :key="slot.id" class="checkout-option" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box; overflow:hidden;">
                         <input v-model="selectedDeliverySlotId" type="radio" :value="slot.id" />
                         <div>
                             <strong>{{ slot.name }}</strong>
@@ -37,21 +37,22 @@
                 <h2>{{ t("checkout.bonusesTitle") }}</h2>
 
                 <div class="checkout__bonus">
-                    <label class="checkout__bonus-label">
+                    <label class="checkout__bonus-label" style="width:100%; max-width:100%; min-width:0;">
                         <input v-model="useReferralCredit" type="checkbox" />
                         <span>{{ t("checkout.useReferralCredit") }} ({{ referralCreditBalance }} {{ t("currency.symbol") }})</span>
                     </label>
                 </div>
 
                 <div class="checkout__bonus checkout__bonus--gift">
-                    <div class="checkout__gift-row">
+                    <div class="checkout__gift-row" style="width:100%; max-width:100%; min-width:0;">
                         <input
                             v-model="giftCardCode"
                             type="text"
                             class="checkout__gift-input"
+                            style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"
                             :placeholder="t('checkout.giftCardPlaceholder')"
                         />
-                        <button class="checkout__gift-preview" @click.prevent="previewGiftCard">
+                        <button class="checkout__gift-preview" @click.prevent="previewGiftCard" style="width:100%; max-width:100%; box-sizing:border-box;">
                             {{ t("checkout.applyGiftCard") }}
                         </button>
                     </div>
@@ -59,11 +60,12 @@
                     <p v-else-if="giftCardPreview" class="checkout__gift-success">
                         {{ t("checkout.giftCardApplied") }}: -{{ giftCardPreview.applied_amount }} {{ t("currency.symbol") }}
                     </p>
-                    <div v-if="giftCards?.length" class="checkout__gift-list">
+                    <div v-if="giftCards?.length" class="checkout__gift-list" style="width:100%; max-width:100%; min-width:0;">
                         <button
                             v-for="card in giftCards"
                             :key="card.id"
                             class="checkout__gift-chip"
+                            style="max-width:100%; box-sizing:border-box;"
                             @click.prevent="selectGiftCard(card.code)"
                         >
                             {{ card.code }} · {{ card.balance }} {{ t("currency.symbol") }}
@@ -95,10 +97,11 @@
                 <p>{{ t("cart.finalTotal") }}: <b>{{ finalTotal }} {{ t("currency.symbol") }}</b></p>
             </div>
 
-            <div class="checkout__payment-methods">
+            <div class="checkout__payment-methods" style="width:100%; max-width:100%; min-width:0;">
                 <button
                     class="checkout__btn checkout__btn--card"
                     :disabled="isDisabled"
+                    style="width:100%; max-width:100%; box-sizing:border-box;"
                     @click.prevent="submitOrder('card')"
                 >
                     {{ t("payments.payCard") }}
@@ -107,6 +110,7 @@
                 <button
                     class="checkout__btn checkout__btn--cash"
                     :disabled="isDisabled"
+                    style="width:100%; max-width:100%; box-sizing:border-box;"
                     @click.prevent="submitOrder('cash')"
                 >
                     {{ t("payments.payCash") }}
@@ -240,6 +244,7 @@ function selectGiftCard(code) {
     max-width: 960px;
     margin: auto;
     padding: 24px;
+    min-width: 0;
 }
 
 .checkout__title {
@@ -259,6 +264,7 @@ function selectGiftCard(code) {
     border-radius: 16px;
     background: #fff;
     border: 1px solid #e5e7eb;
+    min-width: 0;
 }
 
 .checkout__options {
@@ -299,13 +305,15 @@ function selectGiftCard(code) {
 
 .checkout__gift-input {
     flex: 1;
-    min-width: 240px;
+    min-width: 0;
+    width: 100%;
     padding: 12px 14px;
     border-radius: 10px;
     border: 1px solid #cbd5e1;
 }
 
 .checkout__gift-preview {
+    max-width: 100%;
     border: none;
     border-radius: 10px;
     padding: 12px 16px;
@@ -345,6 +353,7 @@ function selectGiftCard(code) {
     gap: 16px;
     padding: 12px;
     border-bottom: 1px solid #ddd;
+    min-width: 0;
 }
 
 .checkout__stock-error {
@@ -384,6 +393,7 @@ function selectGiftCard(code) {
     justify-content: center;
     gap: 20px;
     margin-top: 30px;
+    flex-wrap: wrap;
 }
 
 .checkout__payment-hint {
@@ -416,5 +426,24 @@ function selectGiftCard(code) {
 .checkout__btn:disabled {
     background: #9ca3af;
     cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+    .checkout {
+        padding: 16px;
+    }
+
+    .checkout__gift-row,
+    .checkout__payment-methods,
+    .checkout-option,
+    .checkout__item {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .checkout__btn,
+    .checkout__gift-preview {
+        width: 100%;
+    }
 }
 </style>

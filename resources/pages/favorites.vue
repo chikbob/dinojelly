@@ -4,8 +4,8 @@
             <h1 class="favorites__title">{{ t("favorites.title") }}</h1>
 
             <div class="favorites__controls">
-                <label>
-                    <select v-model="order" @change="changeOrder">
+                <label style="width:100%; max-width:320px; min-width:0;">
+                    <select v-model="order" @change="changeOrder" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;">
                         <option value="created_at_desc">{{ t("favorites.newFirst") }}</option>
                         <option value="created_at_asc">{{ t("favorites.oldFirst") }}</option>
                         <option value="price_asc">{{ t("favorites.cheapFirst") }}</option>
@@ -173,9 +173,19 @@ const decreaseQty = (productId) => {
         display: flex;
         justify-content: flex-end;
         font-size: 12px;
+        min-width: 0;
+
+        label {
+            width: min(100%, 320px);
+            max-width: 100%;
+            min-width: 0;
+        }
 
         select {
-            margin-left: 8px;
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
             padding: 8px 12px;
             font-size: 12px;
             font-family: "Press Start 2P", system-ui;
@@ -341,6 +351,14 @@ const decreaseQty = (productId) => {
             color: #333;
             min-width: 20px;
             text-align: center;
+        }
+    }
+}
+
+@media (max-width: 640px) {
+    .favorites {
+        &__controls {
+            justify-content: stretch;
         }
     }
 }

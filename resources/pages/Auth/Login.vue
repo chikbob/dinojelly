@@ -1,22 +1,22 @@
 <template>
     <div class="auth-page">
-        <div class="auth-card">
+        <div class="auth-card" style="width:100%; max-width:420px; box-sizing:border-box; overflow:hidden;">
             <h1 class="auth-card__title">{{ t("auth.loginTitle") }}</h1>
 
-            <form class="auth-form" @submit.prevent="submit">
-                <label class="auth-form__label">
+            <form class="auth-form" @submit.prevent="submit" style="width:100%; max-width:100%; min-width:0;">
+                <label class="auth-form__label" style="display:grid; width:100%; max-width:100%; min-width:0;">
                     <span>{{ t("auth.email") }}</span>
-                    <input v-model="form.email" type="email" required />
+                    <input v-model="form.email" type="email" required style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;" />
                 </label>
                 <p v-if="form.errors.email" class="auth-form__error">{{ form.errors.email }}</p>
 
-                <label class="auth-form__label">
+                <label class="auth-form__label" style="display:grid; width:100%; max-width:100%; min-width:0;">
                     <span>{{ t("auth.password") }}</span>
-                    <input v-model="form.password" type="password" required />
+                    <input v-model="form.password" type="password" required style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;" />
                 </label>
                 <p v-if="form.errors.password" class="auth-form__error">{{ form.errors.password }}</p>
 
-                <button class="auth-form__submit" type="submit" :disabled="form.processing">
+                <button class="auth-form__submit" type="submit" :disabled="form.processing" style="width:100%; max-width:100%; box-sizing:border-box;">
                     {{ form.processing ? t("auth.wait") : t("auth.login") }}
                 </button>
             </form>
@@ -56,6 +56,7 @@ const submit = () => {
 
 .auth-card {
     width: min(100%, 420px);
+    max-width: 100%;
     padding: 32px;
     border-radius: 20px;
     background: #fff;
@@ -79,14 +80,21 @@ const submit = () => {
 .auth-form {
     display: grid;
     gap: 14px;
+    min-width: 0;
 
     &__label {
         display: grid;
         gap: 8px;
         font-size: 12px;
+        min-width: 0;
     }
 
     input {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
         padding: 12px;
         border: 1px solid #d8e4da;
         border-radius: 10px;
@@ -95,6 +103,8 @@ const submit = () => {
 
     &__submit {
         margin-top: 8px;
+        width: 100%;
+        max-width: 100%;
         padding: 12px;
         border: none;
         border-radius: 10px;
@@ -108,6 +118,12 @@ const submit = () => {
         margin: -6px 0 0;
         color: #dc2626;
         font-size: 11px;
+    }
+}
+
+@media (max-width: 640px) {
+    .auth-card {
+        padding: 24px 18px;
     }
 }
 </style>

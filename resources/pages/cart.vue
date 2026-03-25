@@ -10,10 +10,14 @@
                 {{ t("cart.recovered") }}
             </div>
 
-            <div v-if="cartItems.length" class="cart__layout">
+            <div
+                v-if="cartItems.length"
+                class="cart__layout"
+                style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap:24px; width:100%; max-width:100%; min-width:0;"
+            >
                 <!-- Левая колонка -->
-                <div class="cart__items">
-                    <div v-for="item in cartItems" :key="item.id" class="cart__item">
+                <div class="cart__items" style="width:100%; max-width:100%; min-width:0;">
+                    <div v-for="item in cartItems" :key="item.id" class="cart__item" style="width:100%; max-width:100%; min-width:0; overflow:hidden; box-sizing:border-box;">
                         <!-- ✅ картинка и название ведут на страницу товара -->
                         <img
                             :src="item.image_url"
@@ -22,7 +26,7 @@
                             @click="goToProduct(item.id)"
                         />
 
-                        <div class="cart__item-info">
+                        <div class="cart__item-info" style="width:100%; max-width:100%; min-width:0;">
                             <h2
                                 class="cart__item-name"
                                 @click="goToProduct(item.id)"
@@ -35,7 +39,7 @@
                                         item.old_price
                                     }} {{ t("currency.symbol") }}</span>
                             </div>
-                            <div class="cart__item-actions">
+                            <div class="cart__item-actions" style="width:100%; max-width:100%; min-width:0; flex-wrap:wrap;">
                                 <!-- ✅ toggle избранное -->
                                 <button class="cart__icon" @click="toggleFavorite(item.id)">
                                     <img
@@ -43,10 +47,10 @@
                                         alt="favorite" width="20"
                                     />
                                 </button>
-                                <button @click="removeFromCart(item.id)" class="cart__delete">
+                                <button @click="removeFromCart(item.id)" class="cart__delete" style="max-width:100%; box-sizing:border-box;">
                                     {{ t("cart.delete") }}
                                 </button>
-                                <div class="cart__quantity">
+                                <div class="cart__quantity" style="max-width:100%; min-width:0;">
                                     <button @click="decreaseQuantity(item.id)" class="cart__qty-btn">−</button>
                                     <span>{{ item.quantity }}</span>
                                     <button @click="increaseQuantity(item.id)" class="cart__qty-btn">+</button>
@@ -57,8 +61,8 @@
                 </div>
 
                 <!-- Правая колонка -->
-                <div class="cart__summary">
-                    <button class="cart__checkout" @click="goToCheckout">{{ t("cart.checkout") }}</button>
+                <div class="cart__summary" style="width:100%; max-width:100%; min-width:0; overflow:hidden; box-sizing:border-box;">
+                    <button class="cart__checkout" @click="goToCheckout" style="width:100%; max-width:100%; box-sizing:border-box;">{{ t("cart.checkout") }}</button>
                     <p class="cart__hint">
                         {{ t("cart.deliveryHint") }}
                     </p>

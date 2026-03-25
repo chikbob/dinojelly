@@ -1,4 +1,4 @@
-.PHONY: help install build up down restart logs test lint clean deploy-staging deploy-production backup health-check
+.PHONY: help install build up down restart logs test lint clean deploy-staging deploy-production backup health-check dev-up dev-down dev-logs dev-fresh dev-shell
 
 # Default target
 .DEFAULT_GOAL := help
@@ -36,6 +36,27 @@ restart: down up ## Restart containers
 
 logs: ## View container logs
 	docker compose logs -f app
+
+dev-up: ## Start local development stack with Vite HMR
+	@echo "Starting development stack..."
+	docker compose -f docker-compose.dev.yml up -d
+	@echo "✅ Dev stack started: app=http://localhost:8000 vite=http://localhost:5173"
+
+dev-down: ## Stop local development stack
+	@echo "Stopping development stack..."
+	docker compose -f docker-compose.dev.yml down
+	@echo "✅ Dev stack stopped"
+
+dev-logs: ## View development logs for app and Vite
+	docker compose -f docker-compose.dev.yml logs -f app vite
+
+dev-fresh: ## Fresh install with migrations and seeds in dev stack
+	@echo "Running fresh development installation..."
+	docker compose -f docker-compose.dev.yml exec app php artisan migrate:fresh --seed
+	@echo "✅ Dev database refreshed"
+
+dev-shell: ## Open shell in development app container
+	docker compose -f docker-compose.dev.yml exec app sh
 
 test: ## Run tests
 	@echo "Running tests..."

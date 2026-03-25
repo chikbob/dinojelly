@@ -45,30 +45,31 @@
                 <div v-else class="profile-edit">
                     <h2 class="profile-edit__title">{{ t("profile.edit") }}</h2>
 
-                    <form @submit.prevent="submit">
+                    <form @submit.prevent="submit" style="width:100%; max-width:100%; min-width:0;">
                         <div class="form-group">
                             <label>{{ t("profile.name") }}</label>
-                            <input v-model="form.name" type="text"/>
+                            <input v-model="form.name" type="text" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"/>
                         </div>
 
                         <div class="form-group">
                             <label>{{ t("profile.phone") }}</label>
-                            <input v-model="form.phone" type="text"/>
+                            <input v-model="form.phone" type="text" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"/>
                         </div>
 
                         <div class="form-group">
                             <label>{{ t("profile.address") }}</label>
-                            <textarea v-model="form.address" rows="3"></textarea>
+                            <textarea v-model="form.address" rows="3" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"></textarea>
                         </div>
 
                         <div class="profile-edit__actions">
-                            <button type="submit" class="btn-save">
+                            <button type="submit" class="btn-save" style="width:100%; max-width:100%; box-sizing:border-box;">
                                 {{ t("profile.save") }}
                             </button>
 
                             <button
                                 type="button"
                                 class="btn-cancel"
+                                style="width:100%; max-width:100%; box-sizing:border-box;"
                                 @click="cancelEdit"
                             >
                                 {{ t("profile.cancel") }}
@@ -105,23 +106,23 @@
                     </div>
                 </div>
 
-                <form class="profile-addresses__form" @submit.prevent="submitAddress">
-                    <div class="profile-addresses__grid">
-                        <input v-model="addressForm.label" :placeholder="t('profile.addressLabel')" />
-                        <input v-model="addressForm.recipient_name" :placeholder="t('profile.name')" />
-                        <input v-model="addressForm.phone" :placeholder="t('profile.phone')" />
-                        <input v-model="addressForm.city" :placeholder="t('profile.city')" />
-                        <input v-model="addressForm.street" :placeholder="t('profile.street')" />
-                        <input v-model="addressForm.building" :placeholder="t('profile.building')" />
-                        <input v-model="addressForm.apartment" :placeholder="t('profile.apartment')" />
-                        <input v-model="addressForm.postal_code" :placeholder="t('profile.postalCode')" />
+                <form class="profile-addresses__form" @submit.prevent="submitAddress" style="width:100%; max-width:100%; min-width:0;">
+                    <div class="profile-addresses__grid" style="width:100%; max-width:100%; min-width:0;">
+                        <input v-model="addressForm.label" :placeholder="t('profile.addressLabel')" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;" />
+                        <input v-model="addressForm.recipient_name" :placeholder="t('profile.name')" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;" />
+                        <input v-model="addressForm.phone" :placeholder="t('profile.phone')" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;" />
+                        <input v-model="addressForm.city" :placeholder="t('profile.city')" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;" />
+                        <input v-model="addressForm.street" :placeholder="t('profile.street')" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;" />
+                        <input v-model="addressForm.building" :placeholder="t('profile.building')" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;" />
+                        <input v-model="addressForm.apartment" :placeholder="t('profile.apartment')" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;" />
+                        <input v-model="addressForm.postal_code" :placeholder="t('profile.postalCode')" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;" />
                     </div>
-                    <textarea v-model="addressForm.comment" :placeholder="t('profile.addressComment')" rows="3"></textarea>
-                    <label class="profile-addresses__checkbox">
+                    <textarea v-model="addressForm.comment" :placeholder="t('profile.addressComment')" rows="3" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"></textarea>
+                    <label class="profile-addresses__checkbox" style="width:100%; max-width:100%; min-width:0;">
                         <input v-model="addressForm.is_default" type="checkbox" />
                         <span>{{ t("profile.defaultAddress") }}</span>
                     </label>
-                    <button type="submit" class="profile-card__button">
+                    <button type="submit" class="profile-card__button" style="width:100%; max-width:100%; box-sizing:border-box;">
                         {{ t("profile.addAddress") }}
                     </button>
                 </form>
@@ -189,11 +190,11 @@
                     <h2>{{ t("profile.giftCardsTitle") }}</h2>
                 </div>
 
-                <form class="profile-addresses__form" @submit.prevent="claimGiftCard">
-                    <div class="profile-addresses__grid">
-                        <input v-model="giftCardClaimForm.code" :placeholder="t('profile.giftCardCode')" />
+                <form class="profile-addresses__form" @submit.prevent="claimGiftCard" style="width:100%; max-width:100%; min-width:0;">
+                    <div class="profile-addresses__grid" style="width:100%; max-width:100%; min-width:0;">
+                        <input v-model="giftCardClaimForm.code" :placeholder="t('profile.giftCardCode')" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;" />
                     </div>
-                    <button type="submit" class="profile-card__button">
+                    <button type="submit" class="profile-card__button" style="width:100%; max-width:100%; box-sizing:border-box;">
                         {{ t("profile.claimGiftCard") }}
                     </button>
                 </form>
@@ -398,6 +399,7 @@ const formatPhoneNumber = (phone) => {
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
     margin: 0 auto;
     border: 1px solid #3acb6d;
+    min-width: 0;
 
     &__header {
         text-align: center;
@@ -454,6 +456,7 @@ const formatPhoneNumber = (phone) => {
         transition: all 0.3s ease;
         font-size: 1rem;
         font-family: "Press Start 2P", system-ui;
+        max-width: 100%;
 
         &:hover {
             background: #29CC5F;
@@ -475,6 +478,7 @@ const formatPhoneNumber = (phone) => {
     padding: 24px;
     border: 1px solid #e5e7eb;
     border-radius: 12px;
+    min-width: 0;
 
     &__header {
         margin-bottom: 16px;
@@ -489,6 +493,7 @@ const formatPhoneNumber = (phone) => {
     &__form {
         display: grid;
         gap: 14px;
+        min-width: 0;
     }
 
     &__grid {
@@ -501,11 +506,13 @@ const formatPhoneNumber = (phone) => {
         display: flex;
         align-items: center;
         gap: 10px;
+        flex-wrap: wrap;
     }
 
     input,
     textarea {
         width: 100%;
+        max-width: 100%;
         padding: 10px;
         border: 1px solid #d1d5db;
         border-radius: 8px;
@@ -520,6 +527,7 @@ const formatPhoneNumber = (phone) => {
     padding: 14px;
     border-radius: 10px;
     background: #f8fafc;
+    min-width: 0;
 
     &__delete {
         border: none;
@@ -545,6 +553,7 @@ const formatPhoneNumber = (phone) => {
 
     .form-group {
         margin-bottom: 1rem;
+        min-width: 0;
 
         label {
             display: block;
@@ -555,6 +564,7 @@ const formatPhoneNumber = (phone) => {
         input,
         textarea {
             width: 100%;
+            max-width: 100%;
             padding: 0.6rem;
             border-radius: 6px;
             border: 1px solid #ccc;
@@ -639,6 +649,25 @@ const formatPhoneNumber = (phone) => {
             text-align: left;
             color: #777;
         }
+    }
+
+    .profile-addresses {
+        padding: 18px;
+
+        &__grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .profile-address,
+    .profile-edit__actions {
+        flex-direction: column;
+    }
+
+    .profile-card__button,
+    .profile-edit .btn-save,
+    .profile-edit .btn-cancel {
+        width: 100%;
     }
 }
 </style>

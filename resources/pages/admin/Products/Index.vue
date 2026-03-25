@@ -6,7 +6,8 @@
             {{ t("admin.products.createNew") }}
         </a>
 
-        <table class="products-index__table">
+        <div style="width:100%; max-width:100%; overflow-x:auto;">
+        <table class="products-index__table" style="min-width:1080px;">
             <thead>
             <tr>
                 <th>{{ t("admin.products.id") }}</th>
@@ -55,6 +56,7 @@
             </tr>
             </tbody>
         </table>
+        </div>
 
         <Paginate :links="products.links"/>
     </div>

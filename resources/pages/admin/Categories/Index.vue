@@ -6,7 +6,8 @@
             {{ t("admin.categories.createNew") }}
         </a>
 
-        <table class="categories-index__table">
+        <div style="width:100%; max-width:100%; overflow-x:auto;">
+        <table class="categories-index__table" style="min-width:720px;">
             <thead>
             <tr>
                 <th>ID</th>
@@ -35,6 +36,7 @@
             </tr>
             </tbody>
         </table>
+        </div>
 
         <Paginate :links="categories.links" />
     </div>

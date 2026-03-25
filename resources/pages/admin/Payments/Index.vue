@@ -22,7 +22,7 @@
                 <td>{{ payment.amount }} {{ payment.currency }}</td>
                 <td>{{ formatDate(payment.created_at) }}</td>
                 <td>
-                    <select class="admin-list__select" :value="payment.status" @change="updateStatus(payment.id, $event.target.value)">
+                    <select class="admin-list__select" :value="payment.status" @change="updateStatus(payment.id, $event.target.value)" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;">
                         <option value="pending">{{ t("payments.status.pending") }}</option>
                         <option value="paid">{{ t("payments.status.paid") }}</option>
                         <option value="failed">{{ t("payments.status.failed") }}</option>
@@ -49,10 +49,10 @@ const updateStatus = (id, status) => router.put(route('admin.payments.update', i
 </script>
 
 <style scoped lang="scss">
-.admin-list { max-width: 1200px; margin: 0 auto; }
+.admin-list { max-width: 1200px; margin: 0 auto; min-width: 0; }
 .admin-list__title { margin-bottom: 20px; font-size: 24px; }
 .admin-list__table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 16px; overflow: hidden; }
 .admin-list__table th, .admin-list__table td { padding: 14px; border-bottom: 1px solid #e2e8f0; text-align: left; font-size: 11px; }
 .admin-list__table th { background: #f8fafc; }
-.admin-list__select { width: 100%; min-width: 140px; padding: 8px; border-radius: 8px; border: 1px solid #cbd5e1; font-family: inherit; font-size: 11px; }
+.admin-list__select { width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; padding: 8px; border-radius: 8px; border: 1px solid #cbd5e1; font-family: inherit; font-size: 11px; }
 </style>
