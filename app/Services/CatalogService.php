@@ -32,6 +32,8 @@ class CatalogService
             ->get();
 
         $productsQuery = Product::query()
+            ->leftJoin('stock_items', 'stock_items.product_id', '=', 'products.id')
+            ->select('products.*')
             ->with(['category', 'stockItem'])
             ->withCount(['reviews' => fn ($query) => $query->where('is_published', true)])
             ->withAvg(['reviews as average_rating' => fn ($query) => $query->where('is_published', true)], 'rating');
@@ -62,6 +64,15 @@ class CatalogService
             $productsQuery->whereNotNull('old_price')
                 ->whereColumn('old_price', '>', 'price');
         }
+
+        $productsQuery->orderByRaw("
+            CASE
+                WHEN stock_items.is_active = 1
+                    AND COALESCE(stock_items.quantity, 0) - COALESCE(stock_items.reserved_quantity, 0) > 0
+                THEN 0
+                ELSE 1
+            END ASC
+        ");
 
         match ($filters['sort'] ?? 'new') {
             'popular' => $productsQuery

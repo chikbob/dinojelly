@@ -10,7 +10,7 @@
                     v-model="selectedStatus"
                     @change="filterOrders"
                     class="orders__select"
-                    style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"
+                    style="width:auto; max-width:none; min-width:0; box-sizing:border-box;"
                 >
                     <option value="">{{ t("orders.all") }}</option>
                     <option value="pending">{{ t("orders.pending") }}</option>
@@ -18,6 +18,8 @@
                     <option value="canceled">{{ t("orders.canceled") }}</option>
                 </select>
             </div>
+
+            <p v-if="subscriptionError" class="orders__error">{{ subscriptionError }}</p>
 
             <div v-if="orders.length" class="orders__list">
                 <div
@@ -79,8 +81,13 @@
                             <button class="orders__action" @click.stop="reorder(order.id)" style="width:100%; max-width:100%; box-sizing:border-box;">
                                 {{ t("orders.reorder") }}
                             </button>
-                            <button class="orders__action orders__action--secondary" @click.stop="subscribe(order.id)" style="width:100%; max-width:100%; box-sizing:border-box;">
-                                {{ t("subscriptions.createFromOrder") }}
+                            <button
+                                class="orders__action orders__action--secondary"
+                                :disabled="order.source_subscription?.status === 'active'"
+                                @click.stop="subscribe(order.id)"
+                                style="width:100%; max-width:100%; box-sizing:border-box;"
+                            >
+                                {{ subscriptionLabel(order) }}
                             </button>
                         </div>
                     </div>
@@ -107,6 +114,7 @@ const props = defineProps({
 })
 
 const selectedStatus = ref(props.filters?.status || '')
+const subscriptionError = ref('')
 
 const formatDate = (date) => {
     if (!date) return t("orders.date_unknown") || "Не указана";
@@ -136,13 +144,35 @@ const filterOrders = () => {
 }
 
 const reorder = (orderId) => {
-    router.post(`/orders/${orderId}/reorder`, {}, { preserveScroll: true })
+    router.post(`/orders/${orderId}/reorder`, {})
 }
 
 const subscribe = (orderId) => {
+    subscriptionError.value = ''
+
     router.post(`/orders/${orderId}/subscriptions`, {
         interval_days: 30,
-    }, { preserveScroll: true })
+    }, {
+        preserveScroll: true,
+        onError: (errors) => {
+            subscriptionError.value = errors.subscription ?? 'Не удалось создать подписку для заказа'
+        },
+        onSuccess: () => {
+            router.visit('/subscriptions')
+        },
+    })
+}
+
+const subscriptionLabel = (order) => {
+    if (order.source_subscription?.status === 'active') {
+        return t('subscriptions.alreadyActive')
+    }
+
+    if (['paused', 'canceled'].includes(order.source_subscription?.status)) {
+        return t('subscriptions.resume')
+    }
+
+    return t('subscriptions.createFromOrder')
 }
 </script>
 
@@ -169,8 +199,8 @@ const subscribe = (orderId) => {
     }
 
     &__select {
-        width: min(100%, 320px);
-        max-width: 100%;
+        width: fit-content;
+        max-width: fit-content;
         min-width: 0;
         box-sizing: border-box;
         padding: 6px 10px;
@@ -206,6 +236,14 @@ const subscribe = (orderId) => {
             margin: 0.5rem auto 0;
             border-radius: 2px;
         }
+    }
+
+    &__error {
+        margin: 0 0 20px;
+        text-align: center;
+        color: #b91c1c;
+        font-size: 10px;
+        line-height: 1.8;
     }
 
     &__list {

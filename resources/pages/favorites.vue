@@ -19,6 +19,7 @@
                     v-for="product in favorites.data"
                     :key="product.id"
                     class="favorites__card product-card"
+                    :class="{ 'product-card--out-of-stock': !product.is_in_stock }"
                     @click="goToProduct(product.id)"
                 >
                     <img :src="product.image_url" :alt="product.name" class="product-card__image"/>
@@ -34,6 +35,9 @@
                     <div class="product-card__content">
                         <div class="product-card__name">{{ product.name }}</div>
                         <div class="product-card__weight">{{ product.weight }} г</div>
+                        <div v-if="!product.is_in_stock" class="product-card__stock product-card__stock--out">
+                            {{ t("catalog.outOfStock") }}
+                        </div>
 
                         <div class="product-card__prices">
                             <span class="product-card__price">{{ product.price }}{{ t("currency.symbol") }}</span>
@@ -47,15 +51,17 @@
                             v-if="!cartItems[product.id]"
                             @click.stop="addToCart(product.id)"
                             class="product-card__button"
+                            :class="{ 'product-card__button--disabled': !product.is_in_stock }"
+                            :disabled="!product.is_in_stock"
                         >
-                            {{ t("catalog.addToCart") }}
+                            {{ product.is_in_stock ? t("catalog.addToCart") : t("catalog.outOfStock") }}
                         </button>
 
                         <!-- ЕСЛИ ТОВАР УЖЕ В КОРЗИНЕ -->
-                        <div v-else class="cart-counter">
+                        <div v-else class="cart-counter" :class="{ 'cart-counter--out': !product.is_in_stock }">
                             <button @click.stop="decreaseQty(product.id)" class="counter-btn">-</button>
                             <span class="counter-value">{{ cartItems[product.id].quantity }}</span>
-                            <button @click.stop="increaseQty(product.id)" class="counter-btn">+</button>
+                            <button @click.stop="increaseQty(product.id)" class="counter-btn" :disabled="!product.is_in_stock">+</button>
                         </div>
                     </div>
                 </div>
@@ -227,6 +233,18 @@ const decreaseQty = (productId) => {
             border-color: #3ecf8e;
         }
 
+        &--out-of-stock {
+            opacity: 0.75;
+            border-color: #d1d5db;
+            background: linear-gradient(180deg, #f8fafc 0%, #f3f4f6 100%);
+
+            &:hover {
+                transform: none;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+                border-color: #d1d5db;
+            }
+        }
+
         &__favorite {
             position: absolute;
             top: 10px;
@@ -275,6 +293,16 @@ const decreaseQty = (productId) => {
             color: #777;
         }
 
+        &__stock {
+            font-size: 9px;
+            line-height: 1.4;
+            text-transform: uppercase;
+        }
+
+        &__stock--out {
+            color: #6b7280;
+        }
+
         &__prices {
             display: flex;
             align-items: center;
@@ -317,6 +345,16 @@ const decreaseQty = (productId) => {
                 transform: translateY(0);
             }
         }
+
+        &__button--disabled,
+        &__button:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+    }
+
+    .product-card--out-of-stock .product-card__image {
+        filter: grayscale(1);
     }
 
     /* Красивый блок с +/- */
@@ -343,6 +381,12 @@ const decreaseQty = (productId) => {
                 background-color: #2ebd7d;
                 transform: scale(1.05);
             }
+
+            &:disabled {
+                background-color: #9ca3af;
+                cursor: not-allowed;
+                transform: none;
+            }
         }
 
         .counter-value {
@@ -352,6 +396,10 @@ const decreaseQty = (productId) => {
             min-width: 20px;
             text-align: center;
         }
+    }
+
+    .cart-counter--out .counter-value {
+        color: #6b7280;
     }
 }
 

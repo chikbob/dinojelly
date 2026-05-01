@@ -5,7 +5,16 @@ import laravel from 'laravel-vite-plugin'
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd(), '')
     const devHost = env.VITE_DEV_SERVER_HOST || 'localhost'
+    const hasExplicitDevPort = Boolean(env.VITE_DEV_SERVER_PORT)
     const devPort = Number(env.VITE_DEV_SERVER_PORT || 5173)
+    const hmr = {
+        host: devHost,
+        protocol: env.VITE_DEV_SERVER_PROTOCOL || 'ws',
+    }
+
+    if (hasExplicitDevPort) {
+        hmr.port = devPort
+    }
 
     return {
         plugins: [
@@ -32,12 +41,8 @@ export default defineConfig(({ mode }) => {
         server: {
             host: '0.0.0.0',
             port: devPort,
-            strictPort: true,
-            hmr: {
-                host: devHost,
-                port: devPort,
-                protocol: env.VITE_DEV_SERVER_PROTOCOL || 'ws',
-            },
+            strictPort: hasExplicitDevPort,
+            hmr,
             watch: {
                 usePolling: env.VITE_USE_POLLING === 'true',
             },

@@ -16,6 +16,7 @@ class Subscription extends Model
         'address_id',
         'delivery_slot_id',
         'last_order_id',
+        'source_order_id',
         'name',
         'payment_method',
         'status',
@@ -49,6 +50,11 @@ class Subscription extends Model
     public function lastOrder(): BelongsTo
     {
         return $this->belongsTo(Order::class, 'last_order_id');
+    }
+
+    public function sourceOrder(): BelongsTo
+    {
+        return $this->belongsTo(Order::class, 'source_order_id');
     }
 
     public function items(): HasMany

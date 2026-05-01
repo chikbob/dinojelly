@@ -40,10 +40,20 @@ class SubscriptionController extends Controller
         ]);
 
         try {
-            $this->subscriptionService->createFromOrder($request->user(), $order, $data);
+            $result = $this->subscriptionService->createFromOrder($request->user(), $order, $data);
+
+            $message = match ($result['action']) {
+                'resumed' => 'Подписка возобновлена',
+                'existing_active' => 'Подписка уже активна',
+                default => 'Подписка создана',
+            };
+
+            if ($request->header('X-Inertia')) {
+                return Inertia::location(route('subscriptions.index'));
+            }
 
             return redirect()->route('subscriptions.index')
-                ->with('success', 'Подписка создана');
+                ->with('success', $message);
         } catch (\Throwable $e) {
             return back()->withErrors(['subscription' => $e->getMessage()]);
         }

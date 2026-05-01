@@ -1,7 +1,7 @@
 <template>
     <div class="admin">
         <aside class="admin__sidebar">
-            <div class="admin__logo">Admin</div>
+            <div class="admin__logo">{{ t("admin.header.shortTitle") }}</div>
 
             <nav class="admin__nav">
                 <section v-for="section in sections" :key="section.key" class="admin__section">
@@ -41,10 +41,10 @@
                         v-model="currentLang"
                         @change="setLang(currentLang)"
                         class="admin__lang"
-                        style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"
+                        style="width:auto; min-width:84px; box-sizing:border-box;"
                     >
                         <option value="ru">RU</option>
-                        <!-- <option value="uk">UA</option> -->
+                        <option value="uk">UA</option>
                         <option value="en">EN</option>
                     </select>
 
@@ -53,7 +53,7 @@
                         as="button"
                         href="/logout"
                         class="admin__logout"
-                        style="width:100%; max-width:100%; box-sizing:border-box;"
+                        style="width:auto; min-width:100px; box-sizing:border-box; display: inline-flex; justify-content: center"
                     >
                         {{ t("admin.header.logout") }}
                     </Link>
@@ -177,13 +177,14 @@ const breadcrumbs = computed(() => {
 }
 
 .admin__sidebar {
-    width: 240px;
+    width: clamp(280px, 22vw, 340px);
     min-width: 0;
     background: #0f172a;
     color: #fff;
     display: flex;
     flex-direction: column;
-    padding: 20px;
+    padding: 24px 18px 24px 20px;
+    overflow-y: auto;
 }
 
 .admin__logo {
@@ -196,12 +197,14 @@ const breadcrumbs = computed(() => {
 .admin__nav {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 24px;
+    min-width: 0;
 }
 
 .admin__section {
     display: grid;
     gap: 8px;
+    min-width: 0;
 }
 
 .admin__section-title {
@@ -209,13 +212,17 @@ const breadcrumbs = computed(() => {
     color: #64748b;
     font-size: 10px;
     text-transform: uppercase;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
 }
 
 .admin__link {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 12px;
+    align-items: flex-start;
+    gap: 12px;
+    min-width: 0;
+    padding: 12px 14px;
     border-radius: 8px;
     color: #cbd5e1;
     text-decoration: none;
@@ -232,6 +239,13 @@ const breadcrumbs = computed(() => {
     }
 }
 
+.admin__link span {
+    flex: 1;
+    min-width: 0;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
 .admin__badge {
     min-width: 20px;
     padding: 4px 6px;
@@ -240,6 +254,8 @@ const breadcrumbs = computed(() => {
     color: inherit;
     font-size: 10px;
     text-align: center;
+    flex-shrink: 0;
+    margin-top: 2px;
 }
 
 .admin__content {
@@ -265,6 +281,11 @@ const breadcrumbs = computed(() => {
     display: grid;
     gap: 6px;
     min-width: 0;
+
+    > span {
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+    }
 }
 
 .admin__breadcrumbs {
@@ -277,6 +298,8 @@ const breadcrumbs = computed(() => {
     color: #64748b;
     text-decoration: none;
     font-size: 10px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
 }
 
 .admin__actions {
@@ -284,6 +307,7 @@ const breadcrumbs = computed(() => {
     align-items: center;
     gap: 12px;
     min-width: 0;
+    flex-wrap: wrap;
 }
 
 .admin__lang {
@@ -299,15 +323,186 @@ const breadcrumbs = computed(() => {
     background: #ef4444;
     border: none;
     color: #fff;
-    padding: 8px 14px;
+    padding: 8px 18px;
     border-radius: 6px;
     cursor: pointer;
     font-family: "Press Start 2P", system-ui;
+    line-height: 1.5;
+    white-space: normal;
 }
 
 .admin__main {
     padding: 24px;
     min-width: 0;
+}
+
+:deep(.admin-list) {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 24px 8px 40px;
+    font-family: "Press Start 2P", system-ui;
+    min-width: 0;
+}
+
+:deep(.admin-list__head) {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+:deep(.admin-list__title) {
+    margin: 0 0 8px;
+    font-size: 24px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+:deep(.admin-list__subtitle) {
+    margin: 0;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+:deep(.admin-list__create),
+:deep(.admin-action-link) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    text-decoration: none;
+    background: #2563eb;
+    color: #fff;
+}
+
+:deep(.admin-table-card) {
+    margin-bottom: 24px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+:deep(.admin-table-wrap) {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+}
+
+:deep(.admin-table) {
+    width: 100%;
+    min-width: 720px;
+    border-collapse: collapse;
+}
+
+:deep(.admin-table th),
+:deep(.admin-table td) {
+    padding: 14px;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+    vertical-align: top;
+    font-size: 11px;
+    overflow-wrap: anywhere;
+}
+
+:deep(.admin-table th) {
+    background: #f8fafc;
+}
+
+:deep(.admin-table tbody tr:hover) {
+    background: #f8fafc;
+}
+
+:deep(.admin-table__actions) {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-width: 0;
+}
+
+:deep(.admin-button) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    padding: 10px 12px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 11px;
+    text-decoration: none;
+}
+
+:deep(.admin-button--primary) {
+    background: #2563eb;
+    color: #fff;
+}
+
+:deep(.admin-button--success) {
+    background: #16a34a;
+    color: #fff;
+}
+
+:deep(.admin-button--ghost) {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+:deep(.admin-button--danger) {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+:deep(.admin-input),
+:deep(.admin-select) {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    background: #fff;
+    padding: 10px 12px;
+    font-family: inherit;
+    font-size: 11px;
+}
+
+:deep(.admin-status-pill) {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: 999px;
+    font-size: 10px;
+}
+
+:deep(.admin-status-pill--success) {
+    background: #dcfce7;
+    color: #166534;
+}
+
+:deep(.admin-status-pill--warning) {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+:deep(.admin-status-pill--danger) {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+:deep(.admin-status-pill--info) {
+    background: #dbeafe;
+    color: #1d4ed8;
 }
 
 @media (max-width: 960px) {
@@ -329,6 +524,22 @@ const breadcrumbs = computed(() => {
     .admin__actions {
         flex-direction: column;
         align-items: stretch;
+    }
+
+    :deep(.admin-list) {
+        padding: 20px 0 32px;
+    }
+
+    :deep(.admin-list__head) {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    :deep(.admin-list__create),
+    :deep(.admin-button),
+    :deep(.admin-action-link) {
+        width: 100%;
+        max-width: 100%;
     }
 }
 

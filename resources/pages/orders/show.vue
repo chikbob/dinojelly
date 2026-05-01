@@ -82,10 +82,16 @@
                     <button @click="reorderOrder" class="order__retry-btn">
                         {{ t("orders.reorder") }}
                     </button>
-                    <button @click="subscribeToOrder" class="order__retry-btn order__retry-btn--dark">
-                        {{ t("subscriptions.createFromOrder") }}
+                    <button
+                        @click="subscribeToOrder"
+                        class="order__retry-btn order__retry-btn--dark"
+                        :disabled="order.source_subscription?.status === 'active'"
+                    >
+                        {{ subscriptionLabel }}
                     </button>
                 </div>
+
+                <p v-if="subscriptionError" class="order__subscription-error">{{ subscriptionError }}</p>
 
                 <div class="order__items">
                     <h2 class="order__subtitle">{{ t("order.items") }}</h2>
@@ -130,6 +136,7 @@ const props = defineProps({
 
 const isCanceling = ref(false);
 const isRetrying = ref(false);
+const subscriptionError = ref('');
 
 const canRetryPayment = computed(() => {
     if (props.order.payment_method !== 'card' || !props.order.latest_payment) {
@@ -145,6 +152,18 @@ const retryLabel = computed(() => {
     }
 
     return isRetrying.value ? t("payments.redirecting") : t("payments.retryPayment")
+})
+
+const subscriptionLabel = computed(() => {
+    if (props.order.source_subscription?.status === 'active') {
+        return t('subscriptions.alreadyActive')
+    }
+
+    if (['paused', 'canceled'].includes(props.order.source_subscription?.status)) {
+        return t('subscriptions.resume')
+    }
+
+    return t('subscriptions.createFromOrder')
 })
 
 const formatStatus = (status) => {
@@ -196,13 +215,23 @@ const retryPayment = () => {
 };
 
 const reorderOrder = () => {
-    router.post(`/orders/${props.order.id}/reorder`, {}, { preserveScroll: true })
+    router.post(`/orders/${props.order.id}/reorder`, {})
 }
 
 const subscribeToOrder = () => {
+    subscriptionError.value = '';
+
     router.post(`/orders/${props.order.id}/subscriptions`, {
         interval_days: 30,
-    }, { preserveScroll: true })
+    }, {
+        preserveScroll: true,
+        onError: (errors) => {
+            subscriptionError.value = errors.subscription ?? 'Не удалось создать подписку для заказа';
+        },
+        onSuccess: () => {
+            router.visit('/subscriptions');
+        },
+    })
 }
 </script>
 
@@ -244,6 +273,14 @@ const subscribeToOrder = () => {
         gap: 12px;
         margin-bottom: 30px;
         border: 1px solid #e5e7eb;
+    }
+
+    &__subscription-error {
+        margin: -8px 0 20px;
+        color: #b91c1c;
+        font-size: 10px;
+        line-height: 1.8;
+        text-align: center;
     }
 
     &__summary-item {
@@ -335,6 +372,20 @@ const subscribeToOrder = () => {
         &:hover {
             background: #1d4ed8;
             transform: translateY(-2px);
+        }
+
+        &:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
+    }
+
+    &__retry-btn--dark {
+        background: #0f172a;
+
+        &:hover:not(:disabled) {
+            background: #1e293b;
         }
     }
 

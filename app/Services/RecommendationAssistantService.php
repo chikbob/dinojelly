@@ -40,7 +40,7 @@ class RecommendationAssistantService
                     StorefrontProductResource::make($product)->resolve(request()),
                     [
                         'is_favorite' => in_array($product->id, $favoriteProductIds, true),
-                        'recommendation_reason' => $item['reason'],
+                        'recommendation_reason_keys' => $item['reason_keys'],
                         'recommendation_score' => $item['score'],
                     ],
                 );
@@ -62,7 +62,7 @@ class RecommendationAssistantService
 
     /**
      * @param array{occasion: string, taste: string, budget: float|int, format: string, priority: string} $input
-     * @return array{product: Product, score: int, reason: string}
+     * @return array{product: Product, score: int, reason_keys: array<int, string>}
      */
     protected function scoreProduct(Product $product, array $input, array $signals): array
     {
@@ -76,105 +76,115 @@ class RecommendationAssistantService
             $score += max(0, 40 - (int) floor($delta / 50));
 
             if ($product->price <= $budget) {
-                $reasons[] = 'вписывается в бюджет';
+                $reasons[] = 'catalog.assistant.reasons.fitsBudget';
             }
         }
 
         if ($input['occasion'] === 'gift' && ($categorySlug === 'gift-sets' || $product->weight >= 600)) {
             $score += 45;
-            $reasons[] = 'подходит для подарка';
+            $reasons[] = 'catalog.assistant.reasons.goodForGift';
         }
 
         if ($input['occasion'] === 'party' && $product->weight >= 500) {
             $score += 35;
-            $reasons[] = 'хорош для компании';
+            $reasons[] = 'catalog.assistant.reasons.goodForCompany';
         }
 
         if ($input['occasion'] === 'kids' && in_array($categorySlug, ['fruit', 'best-sellers'], true)) {
             $score += 35;
-            $reasons[] = 'обычно нравится детям';
+            $reasons[] = 'catalog.assistant.reasons.kidsLike';
         }
 
         if ($input['taste'] === 'sour' && $categorySlug === 'sour') {
             $score += 50;
-            $reasons[] = 'совпадает с запросом на кислый вкус';
+            $reasons[] = 'catalog.assistant.reasons.matchesSourTaste';
         }
 
         if ($input['taste'] === 'fruity' && in_array($categorySlug, ['fruit', 'new-arrivals'], true)) {
             $score += 45;
-            $reasons[] = 'совпадает с запросом на фруктовый вкус';
+            $reasons[] = 'catalog.assistant.reasons.matchesFruityTaste';
         }
 
         if ($input['taste'] === 'light' && in_array($categorySlug, ['sugar-free', 'fruit'], true)) {
             $score += 40;
-            $reasons[] = 'выглядит как более легкий вариант';
+            $reasons[] = 'catalog.assistant.reasons.lighterOption';
         }
 
         if ($input['format'] === 'set' && ($categorySlug === 'gift-sets' || $product->weight >= 700)) {
             $score += 40;
-            $reasons[] = 'формат набора';
+            $reasons[] = 'catalog.assistant.reasons.setFormat';
         }
 
         if ($input['format'] === 'single' && $product->weight <= 350) {
             $score += 30;
-            $reasons[] = 'удобный единичный формат';
+            $reasons[] = 'catalog.assistant.reasons.singleFormat';
         }
 
         if ($input['format'] === 'variety' && $product->old_price) {
             $score += 20;
-            $reasons[] = 'интересный вариант для пробного выбора';
+            $reasons[] = 'catalog.assistant.reasons.varietyTrial';
         }
 
         if ($input['priority'] === 'value' && $product->old_price && $product->old_price > $product->price) {
             $score += 35;
-            $reasons[] = 'есть скидка';
+            $reasons[] = 'catalog.assistant.reasons.hasDiscount';
         }
 
         if ($input['priority'] === 'popular') {
             $score += (int) min(30, ($product->favorites_count ?? 0) * 2);
             $score += (int) min(20, round((float) ($product->average_rating ?? 0) * 4));
-            $reasons[] = 'высокий social proof';
+            $reasons[] = 'catalog.assistant.reasons.socialProof';
         }
 
         if ($input['priority'] === 'new' && $product->created_at?->gt(now()->subMonths(2))) {
             $score += 35;
-            $reasons[] = 'свежая новинка';
+            $reasons[] = 'catalog.assistant.reasons.freshNew';
         }
 
         if ($product->category_id && in_array($product->category_id, $signals['favorite_category_ids'], true)) {
             $score += 25;
-            $reasons[] = 'похож на ваши избранные товары';
+            $reasons[] = 'catalog.assistant.reasons.similarToFavorites';
         }
 
         if ($product->category_id && in_array($product->category_id, $signals['ordered_category_ids'], true)) {
             $score += 18;
-            $reasons[] = 'опирается на ваши прошлые покупки';
+            $reasons[] = 'catalog.assistant.reasons.basedOnOrders';
         }
 
         if ($reasons === []) {
-            $reasons[] = 'сбалансированный универсальный вариант';
+            $reasons[] = 'catalog.assistant.reasons.balanced';
         }
 
         return [
             'product' => $product,
             'score' => $score,
-            'reason' => collect($reasons)->unique()->take(2)->implode(', '),
+            'reason_keys' => collect($reasons)->unique()->take(2)->values()->all(),
         ];
     }
 
     /**
-     * @param Collection<int, array{product: Product, score: int, reason: string}> $products
+     * @param Collection<int, array{product: Product, score: int, reason_keys: array<int, string>}> $products
      */
-    protected function buildSummary(Collection $products, array $input): string
+    protected function buildSummary(Collection $products, array $input): array
     {
         if ($products->isEmpty()) {
-            return 'Сейчас не удалось подобрать товары под ваш сценарий. Попробуйте смягчить фильтры или увеличить бюджет.';
+            return [
+                'key' => 'catalog.assistant.summary.empty',
+                'params' => [],
+            ];
         }
 
         $top = $products->first();
         $names = $products->pluck('product.name')->take(3)->implode(', ');
 
-        return "Подборка для сценария \"{$input['occasion']}\" собрана вокруг товара \"{$top['product']->name}\". В топ попали: {$names}.";
+        return [
+            'key' => 'catalog.assistant.summary.found',
+            'params' => [
+                'occasion' => $input['occasion'],
+                'top' => $top['product']->name,
+                'names' => $names,
+            ],
+        ];
     }
 
     /**

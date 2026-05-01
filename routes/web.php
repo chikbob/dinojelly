@@ -34,6 +34,10 @@ Route::get('/products/{product}', [ProductController::class, 'show'])->name('pro
 Route::get('/cart/recover/{token}', [CartRecoveryController::class, 'recover'])->name('cart.recover');
 Route::get('/r/{code}', [ReferralController::class, 'capture'])->name('referrals.capture');
 Route::post('/assistant/recommend', [RecommendationController::class, 'store'])->name('assistant.recommend');
+Route::get('/returns', fn () => Inertia::render('info/StaticPage', ['pageKey' => 'returns']))->name('pages.returns');
+Route::get('/payment', fn () => Inertia::render('info/StaticPage', ['pageKey' => 'payment']))->name('pages.payment');
+Route::get('/gift-certificate', fn () => Inertia::render('info/StaticPage', ['pageKey' => 'gift']))->name('pages.gift');
+Route::get('/help', fn () => Inertia::render('info/StaticPage', ['pageKey' => 'help']))->name('pages.help');
 
 /*
 |--------------------------------------------------------------------------

@@ -8,13 +8,13 @@ class AddressFactory extends Factory
 {
     public function definition(): array
     {
-        $faker = fake('ru_RU');
+        $faker = fake(FactoryLocale::fakerLocale());
 
         return [
-            'label' => $faker->randomElement(['Дом', 'Работа', 'Родители', 'Офис']),
+            'label' => $faker->randomElement(FactoryLocale::addressLabels()),
             'recipient_name' => $faker->name(),
-            'phone' => '+79' . $faker->numerify('#########'),
-            'city' => $faker->randomElement(['Москва', 'Санкт-Петербург', 'Казань', 'Екатеринбург', 'Новосибирск']),
+            'phone' => FactoryLocale::phoneNumber(),
+            'city' => $faker->randomElement(FactoryLocale::cities()),
             'street' => $faker->streetName(),
             'building' => (string) $faker->buildingNumber(),
             'apartment' => (string) $faker->numberBetween(1, 250),

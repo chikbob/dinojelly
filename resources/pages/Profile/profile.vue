@@ -119,8 +119,8 @@
                     </div>
                     <textarea v-model="addressForm.comment" :placeholder="t('profile.addressComment')" rows="3" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"></textarea>
                     <label class="profile-addresses__checkbox" style="width:100%; max-width:100%; min-width:0;">
-                        <input v-model="addressForm.is_default" type="checkbox" />
                         <span>{{ t("profile.defaultAddress") }}</span>
+                        <input v-model="addressForm.is_default" type="checkbox" class="profile-addresses__checkbox-input" />
                     </label>
                     <button type="submit" class="profile-card__button" style="width:100%; max-width:100%; box-sizing:border-box;">
                         {{ t("profile.addAddress") }}
@@ -139,7 +139,7 @@
                 <div v-if="subscriptions.length" class="profile-addresses__list">
                     <div v-for="subscription in subscriptions" :key="subscription.id" class="profile-address">
                         <div>
-                            <strong>{{ subscription.name }}</strong>
+                            <strong>{{ getSubscriptionName(subscription) }}</strong>
                             <p>{{ t(`subscriptions.status.${subscription.status}`) }}</p>
                             <small v-if="subscription.next_run_at">
                                 {{ t("subscriptions.nextRun") }}: {{ formatDate(subscription.next_run_at) }}
@@ -163,7 +163,7 @@
                     <span class="profile-info__label">{{ t("profile.referralBalance") }}:</span>
                     <span class="profile-info__value">{{ referralCreditBalance }}</span>
                 </div>
-                <div class="profile-edit__actions">
+                <div class="profile-edit__actions profile-edit__actions--with-bottom-margin">
                     <button class="profile-card__button" @click="copyReferralLink">{{ t("profile.copyReferralLink") }}</button>
                 </div>
 
@@ -194,7 +194,7 @@
                     <div class="profile-addresses__grid" style="width:100%; max-width:100%; min-width:0;">
                         <input v-model="giftCardClaimForm.code" :placeholder="t('profile.giftCardCode')" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;" />
                     </div>
-                    <button type="submit" class="profile-card__button" style="width:100%; max-width:100%; box-sizing:border-box;">
+                    <button type="submit" class="profile-card__button">
                         {{ t("profile.claimGiftCard") }}
                     </button>
                 </form>
@@ -208,7 +208,7 @@
                         </div>
                     </div>
                 </div>
-                <p v-else class="profile-info__value">{{ t("profile.noGiftCards") }}</p>
+                <p v-else class="profile-info__value profile-info__value--left">{{ t("profile.noGiftCards") }}</p>
             </div>
         </div>
     </MainLayout>
@@ -353,6 +353,24 @@ const formatDate = (dateString) => {
         month: "long",
         day: "numeric",
     })
+}
+
+const getSubscriptionName = (subscription) => {
+    const name = subscription.name ?? ""
+    const orderId = subscription.source_order_id ?? subscription.last_order?.id
+    const legacyPattern = /^(subscription-order-|Подписка на заказ #|Підписка на замовлення #|Subscription for order #)(\d+)$/i
+    const matchedOrderId = name.match(legacyPattern)?.[2]
+    const resolvedOrderId = orderId ?? matchedOrderId
+
+    if (!resolvedOrderId) {
+        return name
+    }
+
+    if (!name || legacyPattern.test(name)) {
+        return t("subscriptions.defaultName").replace(":order", resolvedOrderId)
+    }
+
+    return name
 }
 
 const formatPhoneNumber = (phone) => {
@@ -538,6 +556,36 @@ const formatPhoneNumber = (phone) => {
     }
 }
 
+.profile-addresses__checkbox {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    margin: 12px 0 0;
+    width: 100%;
+
+    span {
+        line-height: 1.4;
+        flex: 0 1 auto;
+    }
+}
+
+.profile-addresses__checkbox-input {
+    width: auto !important;
+    max-width: none !important;
+    min-width: 18px !important;
+    height: 18px;
+    margin: 0;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    flex: 0 0 auto;
+    appearance: auto;
+    -webkit-appearance: checkbox;
+    background: transparent !important;
+}
+
 .profile-edit {
     margin-top: 2rem;
     background: #f9f9f9;
@@ -579,6 +627,10 @@ const formatPhoneNumber = (phone) => {
         margin-top: 1.5rem;
     }
 
+    &__actions--with-bottom-margin {
+        margin-bottom: 1.5rem;
+    }
+
     .btn-save {
         background: #29CC5F;
         color: white;
@@ -618,6 +670,10 @@ const formatPhoneNumber = (phone) => {
     &__value {
         color: #555;
         text-align: right;
+    }
+
+    &__value--left {
+        text-align: left;
     }
 }
 

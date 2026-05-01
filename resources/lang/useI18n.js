@@ -4,25 +4,35 @@ import uk from "./uk"
 import en from "./en"
 
 const messages = { ru, uk, en }
+const defaultLang = "ru"
+const resolveLang = (lang) => (lang && messages[lang] ? lang : defaultLang)
 
 // Загружаем язык из localStorage или ставим ru по умолчанию
-const currentLang = ref(localStorage.getItem("lang") || "ru")
+const currentLang = ref(resolveLang(localStorage.getItem("lang")))
 
 export function useI18n() {
-    const t = (key) => {
+    const t = (key, params = {}) => {
         const parts = key.split(".")
-        let value = messages[currentLang.value]
+        let value = messages[resolveLang(currentLang.value)]
 
         for (const p of parts) {
             value = value[p]
             if (!value) return key
         }
-        return value
+
+        if (typeof value !== "string") {
+            return value
+        }
+
+        return Object.entries(params).reduce((result, [paramKey, paramValue]) => {
+            return result.replaceAll(`:${paramKey}`, String(paramValue))
+        }, value)
     }
 
     const setLang = (lang) => {
-        currentLang.value = lang
-        localStorage.setItem("lang", lang)
+        const nextLang = resolveLang(lang)
+        currentLang.value = nextLang
+        localStorage.setItem("lang", nextLang)
     }
 
     return {

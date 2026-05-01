@@ -49,6 +49,11 @@ class Order extends Model
         return $this->belongsTo(Subscription::class);
     }
 
+    public function sourceSubscriptions(): HasMany
+    {
+        return $this->hasMany(Subscription::class, 'source_order_id');
+    }
+
     public function deliverySlot(): BelongsTo
     {
         return $this->belongsTo(DeliverySlot::class);

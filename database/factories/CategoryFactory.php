@@ -9,12 +9,12 @@ class CategoryFactory extends Factory
 {
     public function definition(): array
     {
-        $name = fake('ru_RU')->unique()->words(2, true);
+        $name = LocalizedTextFactory::categoryName();
 
         return [
-            'name' => Str::title($name),
+            'name' => $name,
             'slug' => Str::slug($name),
-            'description' => fake('ru_RU')->sentence(),
+            'description' => LocalizedTextFactory::categoryDescription(),
             'is_active' => true,
             'sort_order' => fake()->numberBetween(0, 20),
         ];

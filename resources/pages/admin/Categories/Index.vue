@@ -1,41 +1,44 @@
 <template>
-    <div class="categories-index">
-        <h1 class="categories-index__title">{{ t("admin.categories.title") }}</h1>
+    <div class="categories-index admin-list">
+        <div class="admin-list__head">
+            <h1 class="admin-list__title">{{ t("admin.categories.title") }}</h1>
+            <a :href="route('admin.categories.create')" class="admin-list__create">
+                {{ t("admin.categories.createNew") }}
+            </a>
+        </div>
 
-        <a :href="route('admin.categories.create')" class="btn btn-create">
-            {{ t("admin.categories.createNew") }}
-        </a>
-
-        <div style="width:100%; max-width:100%; overflow-x:auto;">
-        <table class="categories-index__table" style="min-width:720px;">
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>{{ t("admin.categories.name") }}</th>
-                <th>{{ t("admin.categories.slug") }}</th>
-                <th>{{ t("admin.categories.status") }}</th>
-                <th>{{ t("admin.products.actions") }}</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-for="category in categories.data" :key="category.id">
-                <td>{{ category.id }}</td>
-                <td>{{ category.name }}</td>
-                <td>{{ category.slug }}</td>
-                <td>{{ category.is_active ? t("admin.categories.active") : t("admin.categories.inactive") }}</td>
-                <td>
-                    <div class="actions">
-                        <a :href="route('admin.categories.edit', category.id)" class="btn btn-edit">
-                            {{ t("admin.products.edit") }}
-                        </a>
-                        <button class="btn btn-delete" @click="destroy(category.id)">
-                            {{ t("admin.products.delete") }}
-                        </button>
-                    </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+        <div class="admin-table-card">
+            <div class="admin-table-wrap">
+                <table class="admin-table" style="min-width:720px;">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>{{ t("admin.categories.name") }}</th>
+                        <th>{{ t("admin.categories.slug") }}</th>
+                        <th>{{ t("admin.categories.status") }}</th>
+                        <th>{{ t("admin.products.actions") }}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="category in categories.data" :key="category.id">
+                        <td>{{ category.id }}</td>
+                        <td>{{ category.name }}</td>
+                        <td>{{ category.slug }}</td>
+                        <td>{{ category.is_active ? t("admin.categories.active") : t("admin.categories.inactive") }}</td>
+                        <td>
+                            <div class="admin-table__actions">
+                                <a :href="route('admin.categories.edit', category.id)" class="admin-action-link">
+                                    {{ t("admin.products.edit") }}
+                                </a>
+                                <button class="admin-button admin-button--danger" @click="destroy(category.id)">
+                                    {{ t("admin.products.delete") }}
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <Paginate :links="categories.links" />
@@ -62,61 +65,4 @@ const destroy = (id) => {
 </script>
 
 <style scoped lang="scss">
-.categories-index {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 40px 20px;
-    font-family: "Press Start 2P", system-ui;
-
-    &__title {
-        font-size: 24px;
-        margin-bottom: 24px;
-    }
-
-    &__table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 24px;
-
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f5f7fa;
-        }
-    }
-}
-
-.btn {
-    cursor: pointer;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 14px;
-    text-decoration: none;
-    color: white;
-
-    &-edit {
-        background-color: #3ecf8e;
-        margin-right: 10px;
-    }
-
-    &-delete {
-        background-color: #ef4444;
-        border: none;
-    }
-
-    &-create {
-        background-color: #29cc5f;
-        display: inline-block;
-        margin-bottom: 18px;
-    }
-}
-
-.actions {
-    display: flex;
-    align-items: center;
-}
 </style>

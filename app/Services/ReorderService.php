@@ -6,6 +6,7 @@ use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Support\Facades\DB;
 
 class ReorderService
 {
@@ -30,6 +31,7 @@ class ReorderService
 
         $added = 0;
         $skipped = 0;
+        $targetItems = [];
 
         foreach ($order->items as $item) {
             if (!$item->product) {
@@ -44,31 +46,40 @@ class ReorderService
                 $skipped++;
                 continue;
             }
+            $targetQuantity = min($item->quantity, $available);
 
-            $cartItem = CartItem::query()->firstOrCreate(
-                ['user_id' => $user->id, 'product_id' => $item->product_id],
-                ['quantity' => 0]
-            );
-
-            $targetQuantity = min($cartItem->quantity + $item->quantity, $available);
-
-            if ($targetQuantity <= $cartItem->quantity) {
+            if ($targetQuantity < 1) {
                 $skipped++;
                 continue;
             }
 
-            $cartItem->update([
+            $targetItems[] = [
+                'user_id' => $user->id,
+                'product_id' => $item->product_id,
                 'quantity' => $targetQuantity,
-            ]);
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+            $added += $targetQuantity;
 
-            $added += $targetQuantity - $cartItem->getOriginal('quantity');
+            if ($targetQuantity < $item->quantity) {
+                $skipped++;
+            }
         }
 
         if ($added < 1) {
             throw new \RuntimeException('Не удалось добавить товары из прошлого заказа в корзину');
         }
 
-        $this->abandonedCartService->markRecovered($user, 'reorder_to_cart');
+        DB::transaction(function () use ($user, $targetItems) {
+            CartItem::query()
+                ->where('user_id', $user->id)
+                ->delete();
+
+            CartItem::query()->insert($targetItems);
+        });
+
+        $this->abandonedCartService->markRecovered($user, 'reorder_to_checkout');
 
         return [
             'added' => $added,

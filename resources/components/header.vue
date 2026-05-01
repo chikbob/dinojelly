@@ -4,9 +4,10 @@
         <div class="header__top" style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; width:100%; max-width:100%; min-width:0;">
             <div class="header__address" style="max-width:100%; min-width:0;">{{ t("header.address") }}</div>
             <nav class="header__nav" style="display:flex; gap:12px; flex-wrap:wrap; max-width:100%; min-width:0;">
-                <a href="#" class="header__link">{{ t("header.return") }}</a>
-                <a href="#" class="header__link">{{ t("header.payment") }}</a>
-                <a href="#" class="header__link">{{ t("header.gift") }}</a>
+                <a href="/returns" class="header__link">{{ t("header.return") }}</a>
+                <a href="/payment" class="header__link">{{ t("header.payment") }}</a>
+                <a href="/gift-certificate" class="header__link">{{ t("header.gift") }}</a>
+                <a href="/help" class="header__link">{{ t("header.help") }}</a>
             </nav>
         </div>
 
@@ -20,11 +21,11 @@
 
             <div class="header__actions" style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; justify-content:flex-end; flex:1 1 auto; width:auto; max-width:100%; min-width:0;">
                 <!-- Переключение языка -->
-                <div class="header__lang-wrapper" style="width:100%; max-width:120px; min-width:0;">
+                <div class="header__lang-wrapper" style="width:100%; max-width:70px; min-width:0;">
                     <span class="header__icon">🌐</span>
                     <select v-model="currentLang" @change="setLang(currentLang)" class="header__lang" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;">
                         <option value="ru">RU</option>
-                        <!-- <option value="uk">UA</option> -->
+                        <option value="uk">UA</option>
                         <option value="en">EN</option>
                     </select>
                 </div>
@@ -66,6 +67,7 @@
                 <button @click="handleSubscriptionsClick" class="header__orders" style="max-width:100%; box-sizing:border-box;">
                     <span class="header__icon">🔁</span>
                     <span>{{ t("header.subscriptions") }}</span>
+                    <span v-if="activeSubscriptionsCount" class="header__badge">{{ activeSubscriptionsCount }}</span>
                 </button>
 
                 <!-- Корзина -->
@@ -101,6 +103,10 @@ const favoritesCount = computed(() => {
 
 const ordersCount = computed(() => {
     return page.props.pendingOrdersCount ?? 0;
+});
+
+const activeSubscriptionsCount = computed(() => {
+    return Number(page.props.activeSubscriptionsCount ?? 0) || 0
 });
 
 const handleOrdersClick = () => {

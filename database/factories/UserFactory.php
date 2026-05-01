@@ -15,12 +15,12 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
-        $faker = fake('ru_RU');
+        $faker = fake(FactoryLocale::fakerLocale());
 
         return [
             'name' => $faker->firstName . ' ' . $faker->lastName,
             'email' => $faker->unique()->safeEmail,
-            'phone' => '+79' . $faker->unique()->numerify('#########'),
+            'phone' => FactoryLocale::phoneNumber(),
             'address' => $faker->address,
             'role' => 'user',
             'password' => Hash::make('password'),

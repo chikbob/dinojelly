@@ -15,7 +15,7 @@ class PromoCodeFactory extends Factory
 
         return [
             'code' => strtoupper(Str::random(8)),
-            'name' => fake('ru_RU')->words(2, true),
+            'name' => LocalizedTextFactory::promoName(),
             'type' => $type,
             'value' => $type === 'percent'
                 ? fake()->numberBetween(5, 30)

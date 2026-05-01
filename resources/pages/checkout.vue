@@ -20,15 +20,37 @@
 
             <div class="checkout__section">
                 <h2>{{ t("checkout.deliveryTitle") }}</h2>
-                <div v-if="deliverySlots.length" class="checkout__options" style="width:100%; max-width:100%; min-width:0;">
-                    <label v-for="slot in deliverySlots" :key="slot.id" class="checkout-option" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box; overflow:hidden;">
-                        <input v-model="selectedDeliverySlotId" type="radio" :value="slot.id" />
-                        <div>
-                            <strong>{{ slot.name }}</strong>
-                            <p>{{ formatSlot(slot) }}</p>
-                            <small>+{{ slot.price }} {{ t("currency.symbol") }}</small>
-                        </div>
-                    </label>
+                <div v-if="deliverySlots.length" class="checkout__delivery" style="width:100%; max-width:100%; min-width:0;">
+                    <div class="checkout__date-picker" style="width:100%; max-width:100%; min-width:0;">
+                        <button
+                            v-for="date in deliveryDates"
+                            :key="date.key"
+                            type="button"
+                            class="checkout__date-chip"
+                            :class="{ 'checkout__date-chip--active': selectedDateKey === date.key }"
+                            style="max-width:100%; box-sizing:border-box;"
+                            @click="selectDeliveryDate(date.key)"
+                        >
+                            <strong>{{ date.label }}</strong>
+                            <span>{{ date.count }} {{ t("checkout.deliveryWindowsLabel") }}</span>
+                        </button>
+                    </div>
+
+                    <div class="checkout__options" style="width:100%; max-width:100%; min-width:0;">
+                        <label
+                            v-for="slot in visibleDeliverySlots"
+                            :key="slot.id"
+                            class="checkout-option"
+                            style="width:100%; max-width:100%; min-width:0; box-sizing:border-box; overflow:hidden;"
+                        >
+                            <input v-model="selectedDeliverySlotId" type="radio" :value="slot.id" />
+                            <div>
+                                <strong>{{ formatSlotTime(slot) }}</strong>
+                                <p>{{ formatSlotDate(slot) }}</p>
+                                <small>+{{ slot.price }} {{ t("currency.symbol") }}</small>
+                            </div>
+                        </label>
+                    </div>
                 </div>
                 <p v-else class="checkout__empty">{{ t("checkout.deliveryEmpty") }}</p>
             </div>
@@ -37,7 +59,7 @@
                 <h2>{{ t("checkout.bonusesTitle") }}</h2>
 
                 <div class="checkout__bonus">
-                    <label class="checkout__bonus-label" style="width:100%; max-width:100%; min-width:0;">
+                    <label class="checkout__bonus-label" style="width:100%; margin: 5px 0 0 0; max-width:100%; min-width:0;">
                         <input v-model="useReferralCredit" type="checkbox" />
                         <span>{{ t("checkout.useReferralCredit") }} ({{ referralCreditBalance }} {{ t("currency.symbol") }})</span>
                     </label>
@@ -49,7 +71,7 @@
                             v-model="giftCardCode"
                             type="text"
                             class="checkout__gift-input"
-                            style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"
+                            style="width:100%; max-width:100%; min-width:0; box-sizing:border-box; margin: 20px 0; padding-left: 18px; padding-right: 18px;"
                             :placeholder="t('checkout.giftCardPlaceholder')"
                         />
                         <button class="checkout__gift-preview" @click.prevent="previewGiftCard" style="width:100%; max-width:100%; box-sizing:border-box;">
@@ -101,7 +123,7 @@
                 <button
                     class="checkout__btn checkout__btn--card"
                     :disabled="isDisabled"
-                    style="width:100%; max-width:100%; box-sizing:border-box;"
+                    style="width:auto; max-width:100%; box-sizing:border-box;"
                     @click.prevent="submitOrder('card')"
                 >
                     {{ t("payments.payCard") }}
@@ -110,7 +132,7 @@
                 <button
                     class="checkout__btn checkout__btn--cash"
                     :disabled="isDisabled"
-                    style="width:100%; max-width:100%; box-sizing:border-box;"
+                    style="width:auto; max-width:100%; box-sizing:border-box;"
                     @click.prevent="submitOrder('cash')"
                 >
                     {{ t("payments.payCash") }}
@@ -122,7 +144,8 @@
 </template>
 
 <script setup>
-import {computed, ref} from "vue";
+import axios from 'axios'
+import {computed, ref, watch} from "vue";
 import {router} from "@inertiajs/vue3";
 import MainLayout from "../layouts/mainLayout.vue";
 import {useI18n} from "../lang/useI18n.js";
@@ -151,9 +174,70 @@ const useReferralCredit = ref(false)
 const giftCardCode = ref('')
 const giftCardPreview = ref(null)
 const giftCardError = ref('')
+const selectedDateKey = ref(null)
 
 const selectedSlot = computed(() =>
     props.deliverySlots.find((slot) => slot.id === Number(selectedDeliverySlotId.value))
+)
+
+const locale = computed(() => {
+    const localeMap = { ru: "ru-RU", uk: "uk-UA", en: "en-US" }
+    return localeMap[currentLang?.value ?? 'ru']
+})
+
+const getSlotDateKey = (slot) => {
+    const startsAt = new Date(slot.starts_at)
+    return `${startsAt.getFullYear()}-${String(startsAt.getMonth() + 1).padStart(2, '0')}-${String(startsAt.getDate()).padStart(2, '0')}`
+}
+
+const deliveryDates = computed(() => {
+    const grouped = new Map()
+
+    for (const slot of props.deliverySlots) {
+        const key = getSlotDateKey(slot)
+
+        if (!grouped.has(key)) {
+            grouped.set(key, {
+                key,
+                label: new Date(slot.starts_at).toLocaleDateString(locale.value, {
+                    weekday: 'short',
+                    day: 'numeric',
+                    month: 'long',
+                }),
+                count: 0,
+            })
+        }
+
+        grouped.get(key).count += 1
+    }
+
+    return Array.from(grouped.values())
+})
+
+const visibleDeliverySlots = computed(() => {
+    if (!selectedDateKey.value) {
+        return []
+    }
+
+    return props.deliverySlots.filter((slot) => getSlotDateKey(slot) === selectedDateKey.value)
+})
+
+const syncSelectedDate = () => {
+    if (selectedSlot.value) {
+        selectedDateKey.value = getSlotDateKey(selectedSlot.value)
+        return
+    }
+
+    if (!selectedDateKey.value && props.deliverySlots.length) {
+        selectedDateKey.value = getSlotDateKey(props.deliverySlots[0])
+        selectedDeliverySlotId.value = props.deliverySlots[0].id
+    }
+}
+
+watch(
+    () => [selectedDeliverySlotId.value, props.deliverySlots.length],
+    () => syncSelectedDate(),
+    { immediate: true }
 )
 
 const currentDeliveryPrice = computed(() => selectedSlot.value?.price ?? 0)
@@ -168,20 +252,33 @@ const referralCreditDiscount = computed(() => {
 const finalTotal = computed(() => Math.max(Number(props.subtotalPrice) + Number(currentDeliveryPrice.value) - giftCardDiscount.value - referralCreditDiscount.value, 0))
 const isDisabled = computed(() => !selectedAddressId.value || !selectedDeliverySlotId.value || (props.stockErrors?.length ?? 0) > 0)
 
-const formatSlot = (slot) => {
-    const localeMap = { ru: "ru-RU", uk: "uk-UA", en: "en-US" }
-    const locale = localeMap[currentLang?.value ?? 'ru']
-    const starts = new Date(slot.starts_at).toLocaleString(locale, {
+const formatSlotDate = (slot) => {
+    return new Date(slot.starts_at).toLocaleDateString(locale.value, {
         day: 'numeric',
         month: 'long',
+        weekday: 'long',
+    })
+}
+
+const formatSlotTime = (slot) => {
+    const starts = new Date(slot.starts_at).toLocaleTimeString(locale.value, {
         hour: '2-digit',
         minute: '2-digit',
     })
-    const ends = new Date(slot.ends_at).toLocaleString(locale, {
+    const ends = new Date(slot.ends_at).toLocaleTimeString(locale.value, {
         hour: '2-digit',
         minute: '2-digit',
     })
     return `${starts} - ${ends}`
+}
+
+function selectDeliveryDate(dateKey) {
+    selectedDateKey.value = dateKey
+
+    const firstSlot = props.deliverySlots.find((slot) => getSlotDateKey(slot) === dateKey)
+    if (firstSlot) {
+        selectedDeliverySlotId.value = firstSlot.id
+    }
 }
 
 function submitOrder(method) {
@@ -208,29 +305,20 @@ async function previewGiftCard() {
         return
     }
 
-    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
-    const response = await fetch('/checkout/gift-card-preview', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'X-CSRF-TOKEN': token ?? '',
-            'X-Requested-With': 'XMLHttpRequest',
-        },
-        body: JSON.stringify({
+    try {
+        const { data } = await axios.post('/checkout/gift-card-preview', {
             code: giftCardCode.value,
             delivery_price: currentDeliveryPrice.value,
-        }),
-    })
+        }, {
+            headers: {
+                Accept: 'application/json',
+            },
+        })
 
-    const data = await response.json()
-
-    if (!response.ok) {
-        giftCardError.value = data.message ?? t('checkout.giftCardInvalid')
-        return
+        giftCardPreview.value = data
+    } catch (error) {
+        giftCardError.value = error.response?.data?.message ?? t('checkout.giftCardInvalid')
     }
-
-    giftCardPreview.value = data
 }
 
 function selectGiftCard(code) {
@@ -265,6 +353,41 @@ function selectGiftCard(code) {
     background: #fff;
     border: 1px solid #e5e7eb;
     min-width: 0;
+}
+
+.checkout__delivery {
+    display: grid;
+    gap: 16px;
+}
+
+.checkout__date-picker {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+
+.checkout__date-chip {
+    display: grid;
+    gap: 6px;
+    min-width: 150px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    cursor: pointer;
+    text-align: left;
+    font-family: "Press Start 2P", system-ui;
+    font-size: 9px;
+    line-height: 1.4;
+    color: #0f172a;
+    flex: 0 0 auto;
+}
+
+.checkout__date-chip--active {
+    background: #111827;
+    border-color: #111827;
+    color: #fff;
 }
 
 .checkout__options {
@@ -391,7 +514,7 @@ function selectGiftCard(code) {
 .checkout__payment-methods {
     display: flex;
     justify-content: center;
-    gap: 20px;
+    gap: 10px;
     margin-top: 30px;
     flex-wrap: wrap;
 }

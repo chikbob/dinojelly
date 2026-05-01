@@ -33,7 +33,7 @@ class OrderService
     {
         $ordersQuery = Order::query()
             ->where('user_id', $user->id)
-            ->with(['items.product', 'address', 'deliverySlot', 'latestPayment'])
+            ->with(['items.product', 'address', 'deliverySlot', 'latestPayment', 'sourceSubscriptions'])
             ->orderByDesc('created_at');
 
         if ($status) {
@@ -57,7 +57,7 @@ class OrderService
     {
         $this->assertOwnership($user, $order);
 
-        $order->load(['items.product', 'address', 'deliverySlot', 'latestPayment']);
+        $order->load(['items.product', 'address', 'deliverySlot', 'latestPayment', 'sourceSubscriptions']);
         $order->load('giftCard');
 
         return OrderDetailResource::make($order)->resolve(request());

@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\DB;
 
 class SubscriptionService
 {
+    protected const GENERATED_NAME_PREFIX = 'subscription-order-';
+
     public function __construct(
         protected PaymentService $paymentService,
         protected InventoryService $inventoryService,
@@ -45,7 +47,7 @@ class SubscriptionService
     /**
      * @param array{name?: ?string, interval_days:int} $data
      */
-    public function createFromOrder(User $user, Order $order, array $data): Subscription
+    public function createFromOrder(User $user, Order $order, array $data): array
     {
         $this->assertOrderOwnership($user, $order);
 
@@ -59,13 +61,52 @@ class SubscriptionService
             throw new \RuntimeException('Для подписки нужен адрес и слот доставки');
         }
 
+        $existingSubscription = $this->findExistingForOrder($user, $order);
+
+        if ($existingSubscription) {
+            if ($existingSubscription->source_order_id !== $order->id) {
+                $existingSubscription->update([
+                    'source_order_id' => $order->id,
+                ]);
+            }
+
+            if ($existingSubscription->status === 'active') {
+                return [
+                    'subscription' => $existingSubscription->refresh()->load(['address', 'deliverySlot', 'items.product', 'lastOrder.latestPayment']),
+                    'action' => 'existing_active',
+                ];
+            }
+
+            $intervalDays = (int) ($data['interval_days'] ?? $existingSubscription->interval_days);
+
+            $existingSubscription->update([
+                'address_id' => $order->address_id,
+                'delivery_slot_id' => $order->delivery_slot_id,
+                'last_order_id' => $order->id,
+                'source_order_id' => $order->id,
+                'payment_method' => $order->payment_method,
+                'status' => 'active',
+                'interval_days' => $intervalDays,
+                'next_run_at' => now()->addDays($intervalDays),
+                'canceled_at' => null,
+            ]);
+
+            return [
+                'subscription' => $existingSubscription->refresh()->load(['address', 'deliverySlot', 'items.product', 'lastOrder.latestPayment']),
+                'action' => 'resumed',
+            ];
+        }
+
         return DB::transaction(function () use ($order, $data) {
+            $subscriptionName = $data['name'] ?? null;
+
             $subscription = Subscription::query()->create([
                 'user_id' => $order->user_id,
                 'address_id' => $order->address_id,
                 'delivery_slot_id' => $order->delivery_slot_id,
                 'last_order_id' => $order->id,
-                'name' => $data['name'] ?: 'Подписка на заказ #' . $order->id,
+                'source_order_id' => $order->id,
+                'name' => $subscriptionName ?: $this->generatedSubscriptionName($order->id),
                 'payment_method' => $order->payment_method,
                 'status' => 'active',
                 'interval_days' => $data['interval_days'],
@@ -81,8 +122,52 @@ class SubscriptionService
                 ]);
             }
 
-            return $subscription->load(['address', 'deliverySlot', 'items.product', 'lastOrder.latestPayment']);
+            return [
+                'subscription' => $subscription->load(['address', 'deliverySlot', 'items.product', 'lastOrder.latestPayment']),
+                'action' => 'created',
+            ];
         });
+    }
+
+    protected function findExistingForOrder(User $user, Order $order): ?Subscription
+    {
+        $defaultNames = $this->generatedSubscriptionNameCandidates($order->id);
+
+        return Subscription::query()
+            ->where('user_id', $user->id)
+            ->where(function ($query) use ($order, $defaultNames) {
+                $query->where('source_order_id', $order->id)
+                    ->orWhere(function ($legacyQuery) use ($order, $defaultNames) {
+                        $legacyQuery
+                            ->whereNull('source_order_id')
+                            ->where(function ($fallbackQuery) use ($order, $defaultNames) {
+                                $fallbackQuery->where('last_order_id', $order->id)
+                                    ->orWhereIn('name', $defaultNames);
+                            });
+                    });
+            })
+            ->orderByRaw("CASE status WHEN 'active' THEN 0 WHEN 'paused' THEN 1 WHEN 'canceled' THEN 2 ELSE 3 END")
+            ->orderByDesc('updated_at')
+            ->orderByDesc('id')
+            ->first();
+    }
+
+    protected function generatedSubscriptionName(int $orderId): string
+    {
+        return self::GENERATED_NAME_PREFIX . $orderId;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function generatedSubscriptionNameCandidates(int $orderId): array
+    {
+        return [
+            $this->generatedSubscriptionName($orderId),
+            'Подписка на заказ #' . $orderId,
+            'Підписка на замовлення #' . $orderId,
+            'Subscription for order #' . $orderId,
+        ];
     }
 
     /**

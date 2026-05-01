@@ -98,24 +98,26 @@
 
         <section class="panel">
             <h2>{{ t("admin.dashboard.topProducts") }}</h2>
-            <table class="top-products">
-                <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>{{ t("admin.products.name") }}</th>
-                    <th>{{ t("admin.dashboard.topProductsQty") }}</th>
-                    <th>{{ t("admin.dashboard.topProductsRevenue") }}</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="product in topProducts" :key="product.id">
-                    <td>#{{ product.id }}</td>
-                    <td>{{ product.name }}</td>
-                    <td>{{ product.total_quantity }}</td>
-                    <td>{{ formatMoney(product.revenue) }}</td>
-                </tr>
-                </tbody>
-            </table>
+            <div class="top-products__wrap">
+                <table class="top-products">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>{{ t("admin.products.name") }}</th>
+                        <th>{{ t("admin.dashboard.topProductsQty") }}</th>
+                        <th>{{ t("admin.dashboard.topProductsRevenue") }}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="product in topProducts" :key="product.id">
+                        <td>#{{ product.id }}</td>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.total_quantity }}</td>
+                        <td>{{ formatMoney(product.revenue) }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </section>
     </div>
 </template>
@@ -241,11 +243,14 @@ const paymentChartOptions = {
 
     &__hero {
         margin-bottom: 24px;
+        min-width: 0;
     }
 
     &__title {
         margin: 0 0 10px;
         font-size: 28px;
+        line-height: 1.3;
+        overflow-wrap: anywhere;
     }
 
     &__subtitle {
@@ -253,18 +258,20 @@ const paymentChartOptions = {
         color: #64748b;
         font-size: 12px;
         line-height: 1.6;
+        max-width: 920px;
+        overflow-wrap: anywhere;
     }
 
     &__stats {
         display: grid;
-        grid-template-columns: repeat(6, minmax(0, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
         gap: 16px;
         margin-bottom: 24px;
     }
 
     &__grid {
         display: grid;
-        grid-template-columns: 2fr 1fr;
+        grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
         gap: 20px;
         margin-bottom: 20px;
     }
@@ -281,19 +288,25 @@ const paymentChartOptions = {
 .stat-card {
     display: grid;
     gap: 10px;
+    min-width: 0;
 
     span {
         color: #64748b;
         font-size: 11px;
         line-height: 1.5;
+        overflow-wrap: anywhere;
     }
 
     strong {
-        font-size: 24px;
+        font-size: 18px;
+        line-height: 1.35;
+        overflow-wrap: anywhere;
     }
 }
 
 .panel {
+    min-width: 0;
+
     &--wide {
         min-height: 360px;
     }
@@ -301,10 +314,13 @@ const paymentChartOptions = {
     h2 {
         margin: 0 0 16px;
         font-size: 14px;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
     }
 
     &__chart {
         height: 280px;
+        min-width: 0;
     }
 
     &__chart--small {
@@ -326,20 +342,31 @@ const paymentChartOptions = {
     padding: 12px 14px;
     border-radius: 14px;
     background: #f8fafc;
+    min-width: 0;
 
     span {
         color: #64748b;
         font-size: 11px;
         line-height: 1.5;
+        overflow-wrap: anywhere;
     }
 
     strong {
         font-size: 12px;
+        line-height: 1.5;
+        text-align: right;
+        overflow-wrap: anywhere;
     }
+}
+
+.top-products__wrap {
+    width: 100%;
+    overflow-x: auto;
 }
 
 .top-products {
     width: 100%;
+    min-width: 640px;
     border-collapse: collapse;
 
     th,
@@ -348,10 +375,39 @@ const paymentChartOptions = {
         border-bottom: 1px solid #e2e8f0;
         text-align: left;
         font-size: 11px;
+        vertical-align: top;
+        overflow-wrap: anywhere;
     }
 
     th {
         background: #f8fafc;
+    }
+}
+
+@media (max-width: 1100px) {
+    .dashboard__grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 720px) {
+    .dashboard {
+        padding-inline: 0;
+    }
+
+    .dashboard__title {
+        font-size: 22px;
+    }
+
+    .funnel__row,
+    .recovery__card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .funnel__row strong,
+    .recovery__card strong {
+        text-align: left;
     }
 }
 </style>

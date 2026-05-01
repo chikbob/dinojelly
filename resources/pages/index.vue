@@ -59,13 +59,13 @@
                 <p v-if="assistantError" class="catalog-ai__error">{{ assistantError }}</p>
 
                 <div v-if="assistantResult" class="catalog-ai__result">
-                    <p class="catalog-ai__summary">{{ assistantResult.summary }}</p>
+                    <p class="catalog-ai__summary">{{ formatAssistantSummary(assistantResult.summary) }}</p>
                     <div class="catalog-ai__recommendations" style="width:100%; max-width:100%; min-width:0;">
                         <article v-for="item in assistantResult.products" :key="item.id" class="catalog-ai__card">
                             <img :src="item.image_url" :alt="item.name" class="catalog-ai__image" />
                             <div class="catalog-ai__content">
                                 <strong>{{ item.name }}</strong>
-                                <p>{{ item.recommendation_reason }}</p>
+                                <p>{{ formatRecommendationReason(item) }}</p>
                                 <small>{{ item.price }} {{ t("currency.symbol") }}</small>
                                 <div class="catalog-ai__actions">
                                     <button @click="goToProduct(item.id)" style="width:100%; max-width:100%; box-sizing:border-box;">{{ t("catalog.assistant.open") }}</button>
@@ -93,7 +93,7 @@
                         :class="{ 'catalog__category--active': localFilters.category === category.slug }"
                         @click="selectCategory(category.slug)"
                     >
-                        {{ category.name }}
+                        {{ getCategoryLabel(category) }}
                     </button>
                 </div>
 
@@ -155,6 +155,7 @@
                             v-for="product in products.data"
                             :key="product.id"
                             class="catalog__card product-card"
+                            :class="{ 'catalog__card--out-of-stock': !product.is_in_stock }"
                             @click="goToProduct(product.id)"
                         >
                             <img :src="product.image_url" :alt="product.name" class="product-card__image"/>
@@ -171,11 +172,17 @@
                             </button>
 
                             <div class="product-card__content">
-                                <div v-if="product.category?.name" class="product-card__category">
-                                    {{ product.category.name }}
+                                <div v-if="product.category" class="product-card__category">
+                                    {{ getCategoryLabel(product.category) }}
                                 </div>
                                 <div class="product-card__name">{{ product.name }}</div>
                                 <div class="product-card__weight">{{ product.weight }} г</div>
+                                <div
+                                    v-if="!product.is_in_stock"
+                                    class="product-card__stock product-card__stock--out"
+                                >
+                                    {{ t("catalog.outOfStock") }}
+                                </div>
 
                                 <div class="product-card__prices">
                                     <span class="product-card__price">{{ product.price }} {{ t("currency.symbol") }}</span>
@@ -202,8 +209,10 @@
                                     v-else
                                     @click.stop="addToCart(product.id)"
                                     class="product-card__button"
+                                    :class="{ 'product-card__button--disabled': !product.is_in_stock }"
+                                    :disabled="!product.is_in_stock"
                                 >
-                                    {{ t("catalog.addToCart") }}
+                                    {{ product.is_in_stock ? t("catalog.addToCart") : t("catalog.outOfStock") }}
                                 </button>
                             </div>
                         </div>
@@ -221,6 +230,7 @@
 </template>
 
 <script setup>
+import axios from 'axios'
 import {router} from '@inertiajs/vue3'
 import MainLayout from '../layouts/mainLayout.vue'
 import {route} from 'ziggy-js'
@@ -228,7 +238,7 @@ import {useI18n} from "../lang/useI18n"
 import {computed, onBeforeUnmount, onMounted, reactive, ref, watch} from 'vue'
 import Pagination from "../components/pagination.vue";
 
-const {t} = useI18n()
+const {t, currentLang} = useI18n()
 
 const props = defineProps({
     products: Object, // { data: [...], links: [...] }
@@ -307,6 +317,40 @@ const buildQuery = () => {
     return query
 }
 
+const getCategoryLabel = (category) => {
+    const translationKey = `catalog.categories.${category.slug}`
+    const translated = t(translationKey)
+
+    return translated === translationKey ? category.name : translated
+}
+
+const formatAssistantSummary = (summary) => {
+    if (typeof summary === 'string') {
+        return summary
+    }
+
+    if (!summary?.key) {
+        return ''
+    }
+
+    const params = {
+        ...summary.params,
+        occasion: summary.params?.occasion
+            ? t(`catalog.assistant.occasions.${summary.params.occasion}`)
+            : '',
+    }
+
+    return t(summary.key, params)
+}
+
+const formatRecommendationReason = (item) => {
+    if (Array.isArray(item.recommendation_reason_keys) && item.recommendation_reason_keys.length) {
+        return item.recommendation_reason_keys.map((key) => t(key)).join(', ')
+    }
+
+    return item.recommendation_reason ?? ''
+}
+
 const applyFilters = () => {
     router.get(route('products.index'), buildQuery(), {
         preserveState: true,
@@ -336,26 +380,22 @@ const goToProduct = (id) => {
 
 const requestRecommendations = async () => {
     assistantError.value = ''
-    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
-    const response = await fetch(route('assistant.recommend'), {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'X-CSRF-TOKEN': token ?? '',
-            'X-Requested-With': 'XMLHttpRequest',
-        },
-        body: JSON.stringify(assistantForm),
-    })
+    try {
+        const payload = {
+            ...assistantForm,
+            locale: currentLang.value,
+        }
 
-    const data = await response.json()
+        const { data } = await axios.post(route('assistant.recommend'), payload, {
+            headers: {
+                Accept: 'application/json',
+            },
+        })
 
-    if (!response.ok) {
-        assistantError.value = data.message ?? t('catalog.assistant.error')
-        return
+        assistantResult.value = data
+    } catch (error) {
+        assistantError.value = error.response?.data?.message ?? t('catalog.assistant.error')
     }
-
-    assistantResult.value = data
 }
 
 const addToCart = (productId) => {
@@ -549,6 +589,18 @@ const toggleFavorite = (productId) => {
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
             border-color: #3ecf8e;
         }
+
+        &--out-of-stock {
+            opacity: 0.75;
+            border-color: #d1d5db;
+            background: linear-gradient(180deg, #f8fafc 0%, #f3f4f6 100%);
+
+            &:hover {
+                transform: none;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+                border-color: #d1d5db;
+            }
+        }
     }
 
     &__empty {
@@ -721,6 +773,16 @@ const toggleFavorite = (productId) => {
         color: #777;
     }
 
+    &__stock {
+        font-size: 9px;
+        line-height: 1.4;
+        text-transform: uppercase;
+    }
+
+    &__stock--out {
+        color: #6b7280;
+    }
+
     &__prices {
         display: flex;
         align-items: center;
@@ -765,6 +827,21 @@ const toggleFavorite = (productId) => {
             transform: translateY(0);
         }
     }
+
+    &__button--disabled {
+        background-color: #9ca3af;
+        cursor: not-allowed;
+
+        &:hover,
+        &:active {
+            background-color: #9ca3af;
+            transform: none;
+        }
+    }
+}
+
+.catalog__card--out-of-stock .product-card__image {
+    filter: grayscale(1);
 }
 
 /* ✅ Счетчик */
@@ -854,12 +931,20 @@ const toggleFavorite = (productId) => {
         display: grid !important;
         grid-template-columns: 20px 1fr;
         gap: 10px;
+        cursor: pointer;
 
         input {
+            appearance: auto;
+            -webkit-appearance: checkbox;
             width: 18px;
+            height: 18px;
             min-height: 18px;
             margin: 0;
             align-self: center;
+            padding: 0;
+            border: none;
+            border-radius: 0;
+            background: transparent;
         }
 
         span {

@@ -12,7 +12,7 @@ class DeliverySlotFactory extends Factory
         $end = (clone $start)->modify('+3 hours');
 
         return [
-            'name' => 'Доставка ' . $start->format('d.m H:i') . '-' . $end->format('H:i'),
+            'name' => FactoryLocale::deliverySlotLabel() . ' ' . $start->format('d.m H:i') . '-' . $end->format('H:i'),
             'starts_at' => $start,
             'ends_at' => $end,
             'capacity' => fake()->numberBetween(15, 60),

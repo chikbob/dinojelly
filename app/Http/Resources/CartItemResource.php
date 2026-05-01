@@ -22,6 +22,9 @@ class CartItemResource extends JsonResource
             'available_quantity' => $this->product->stockItem
                 ? max(0, (int) $this->product->stockItem->quantity - (int) $this->product->stockItem->reserved_quantity)
                 : 0,
+            'is_in_stock' => $this->product->stockItem
+                ? $this->product->stockItem->is_active && ((int) $this->product->stockItem->quantity - (int) $this->product->stockItem->reserved_quantity) > 0
+                : false,
         ];
     }
 }

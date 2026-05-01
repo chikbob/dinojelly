@@ -1,37 +1,43 @@
 <template>
     <div class="admin-list">
-        <h1 class="admin-list__title">{{ t("admin.payments.title") }}</h1>
-        <table class="admin-list__table">
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>{{ t("admin.payments.order") }}</th>
-                <th>{{ t("admin.payments.provider") }}</th>
-                <th>{{ t("admin.payments.status") }}</th>
-                <th>{{ t("admin.payments.amount") }}</th>
-                <th>{{ t("admin.payments.createdAt") }}</th>
-                <th>{{ t("admin.orders.actions") }}</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-for="payment in payments.data" :key="payment.id">
-                <td>#{{ payment.id }}</td>
-                <td>{{ payment.order ? `#${payment.order.id} · ${payment.order.customer_name ?? '—'}` : '—' }}</td>
-                <td>{{ payment.provider }}</td>
-                <td>{{ t(`payments.status.${payment.status}`) }}</td>
-                <td>{{ payment.amount }} {{ payment.currency }}</td>
-                <td>{{ formatDate(payment.created_at) }}</td>
-                <td>
-                    <select class="admin-list__select" :value="payment.status" @change="updateStatus(payment.id, $event.target.value)" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;">
-                        <option value="pending">{{ t("payments.status.pending") }}</option>
-                        <option value="paid">{{ t("payments.status.paid") }}</option>
-                        <option value="failed">{{ t("payments.status.failed") }}</option>
-                        <option value="canceled">{{ t("payments.status.canceled") }}</option>
-                    </select>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+        <div class="admin-list__head">
+            <h1 class="admin-list__title">{{ t("admin.payments.title") }}</h1>
+        </div>
+        <div class="admin-table-card">
+            <div class="admin-table-wrap">
+                <table class="admin-table" style="min-width:980px;">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>{{ t("admin.payments.order") }}</th>
+                        <th>{{ t("admin.payments.provider") }}</th>
+                        <th>{{ t("admin.payments.status") }}</th>
+                        <th>{{ t("admin.payments.amount") }}</th>
+                        <th>{{ t("admin.payments.createdAt") }}</th>
+                        <th>{{ t("admin.orders.actions") }}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="payment in payments.data" :key="payment.id">
+                        <td>#{{ payment.id }}</td>
+                        <td>{{ payment.order ? `#${payment.order.id} · ${payment.order.customer_name ?? '—'}` : '—' }}</td>
+                        <td>{{ payment.provider }}</td>
+                        <td>{{ t(`payments.status.${payment.status}`) }}</td>
+                        <td>{{ payment.amount }} {{ payment.currency }}</td>
+                        <td>{{ formatDate(payment.created_at) }}</td>
+                        <td>
+                            <select class="admin-list__select admin-select" :value="payment.status" @change="updateStatus(payment.id, $event.target.value)" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;">
+                                <option value="pending">{{ t("payments.status.pending") }}</option>
+                                <option value="paid">{{ t("payments.status.paid") }}</option>
+                                <option value="failed">{{ t("payments.status.failed") }}</option>
+                                <option value="canceled">{{ t("payments.status.canceled") }}</option>
+                            </select>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
         <Paginate :links="payments.links" />
     </div>
 </template>
@@ -49,10 +55,4 @@ const updateStatus = (id, status) => router.put(route('admin.payments.update', i
 </script>
 
 <style scoped lang="scss">
-.admin-list { max-width: 1200px; margin: 0 auto; min-width: 0; }
-.admin-list__title { margin-bottom: 20px; font-size: 24px; }
-.admin-list__table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 16px; overflow: hidden; }
-.admin-list__table th, .admin-list__table td { padding: 14px; border-bottom: 1px solid #e2e8f0; text-align: left; font-size: 11px; }
-.admin-list__table th { background: #f8fafc; }
-.admin-list__select { width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; padding: 8px; border-radius: 8px; border: 1px solid #cbd5e1; font-family: inherit; font-size: 11px; }
 </style>

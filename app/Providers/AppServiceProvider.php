@@ -45,6 +45,17 @@ class AppServiceProvider extends ServiceProvider
                 return [];
             },
 
+            'activeSubscriptionsCount' => function () {
+                if (Auth::check()) {
+                    return (int) Auth::user()
+                        ->subscriptions()
+                        ->where('status', 'active')
+                        ->count();
+                }
+
+                return 0;
+            },
+
             'adminIndicators' => function () {
                 $user = Auth::user();
 

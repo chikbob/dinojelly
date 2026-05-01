@@ -12,7 +12,7 @@
                 <article v-for="subscription in subscriptions" :key="subscription.id" class="subscriptions__card">
                     <div class="subscriptions__card-head">
                         <div>
-                            <h2 class="subscriptions__name">{{ subscription.name }}</h2>
+                            <h2 class="subscriptions__name">{{ getSubscriptionName(subscription) }}</h2>
                             <p class="subscriptions__meta">
                                 {{ t(`subscriptions.status.${subscription.status}`) }} ·
                                 {{ t("subscriptions.every") }} {{ subscription.interval_days }} {{ t("subscriptions.days") }}
@@ -88,13 +88,36 @@ const { t, currentLang } = useI18n()
 const formatDate = (value) => {
     if (!value) return '—'
 
-    const locale = currentLang.value === 'en' ? 'en-US' : 'ru-RU'
+    const localeMap = {
+        ru: 'ru-RU',
+        uk: 'uk-UA',
+        en: 'en-US',
+    }
+    const locale = localeMap[currentLang.value] ?? 'ru-RU'
 
     return new Date(value).toLocaleDateString(locale, {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
     })
+}
+
+const getSubscriptionName = (subscription) => {
+    const name = subscription.name ?? ''
+    const orderId = subscription.source_order_id ?? subscription.last_order?.id
+    const legacyPattern = /^(subscription-order-|Подписка на заказ #|Підписка на замовлення #|Subscription for order #)(\d+)$/i
+    const matchedOrderId = name.match(legacyPattern)?.[2]
+    const resolvedOrderId = orderId ?? matchedOrderId
+
+    if (!resolvedOrderId) {
+        return name
+    }
+
+    if (!name || legacyPattern.test(name)) {
+        return t('subscriptions.defaultName').replace(':order', resolvedOrderId)
+    }
+
+    return name
 }
 
 const updateSubscription = (subscription, status) => {
@@ -160,6 +183,8 @@ const runNow = (subscriptionId) => {
 .subscriptions__name {
     margin: 0 0 8px;
     font-size: 14px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
 }
 
 .subscriptions__meta,
@@ -176,6 +201,8 @@ const runNow = (subscriptionId) => {
     border-radius: 999px;
     font-size: 9px;
     height: fit-content;
+    text-align: center;
+    line-height: 1.4;
 }
 
 .subscriptions__badge--active {
@@ -213,6 +240,8 @@ const runNow = (subscriptionId) => {
     font-family: inherit;
     font-size: 10px;
     cursor: pointer;
+    line-height: 1.5;
+    white-space: normal;
 }
 
 .subscriptions__action--primary {
@@ -224,5 +253,15 @@ const runNow = (subscriptionId) => {
 .subscriptions__action--danger {
     color: #b91c1c;
     border-color: #fecaca;
+}
+
+@media (max-width: 720px) {
+    .subscriptions__card-head {
+        flex-direction: column;
+    }
+
+    .subscriptions__badge {
+        align-self: flex-start;
+    }
 }
 </style>

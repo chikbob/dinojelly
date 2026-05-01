@@ -10,8 +10,8 @@ class ReviewFactory extends Factory
     {
         return [
             'rating' => fake()->numberBetween(3, 5),
-            'title' => fake('ru_RU')->sentence(4),
-            'body' => fake('ru_RU')->paragraph(3),
+            'title' => LocalizedTextFactory::reviewTitle(),
+            'body' => LocalizedTextFactory::reviewBody(),
             'is_published' => fake()->boolean(90),
             'published_at' => now(),
         ];

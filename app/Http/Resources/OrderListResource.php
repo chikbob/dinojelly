@@ -13,6 +13,15 @@ class OrderListResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'source_subscription' => $this->whenLoaded('sourceSubscriptions', function () {
+                $subscription = $this->pickSourceSubscription();
+
+                return $subscription ? [
+                    'id' => $subscription->id,
+                    'name' => $subscription->name,
+                    'status' => $subscription->status,
+                ] : null;
+            }),
             'id' => $this->id,
             'total_price' => $this->total_price,
             'delivery_price' => $this->delivery_price,
@@ -33,5 +42,24 @@ class OrderListResource extends JsonResource
                 return PaymentResource::make($this->latestPayment)->resolve($request);
             }),
         ];
+    }
+
+    protected function pickSourceSubscription(): mixed
+    {
+        return $this->sourceSubscriptions
+            ->sortBy([
+                fn ($left, $right) => $this->subscriptionPriority($left) <=> $this->subscriptionPriority($right),
+            ])
+            ->first();
+    }
+
+    protected function subscriptionPriority(mixed $subscription): int
+    {
+        return match ($subscription->status) {
+            'active' => 0,
+            'paused' => 1,
+            'canceled' => 2,
+            default => 3,
+        };
     }
 }

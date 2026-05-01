@@ -140,10 +140,17 @@ class OrderController extends Controller
     {
         try {
             $result = $this->reorderService->reorder($request->user(), $order);
+            $successMessage = "Товары из заказа добавлены в оформление. Добавлено {$result['added']} шт.";
 
-            return redirect()->route('cart.index')->with(
+            if ($request->header('X-Inertia')) {
+                $request->session()->flash('success', $successMessage);
+
+                return Inertia::location(route('checkout.create'));
+            }
+
+            return redirect()->route('checkout.create')->with(
                 'success',
-                "В корзину добавлено {$result['added']} шт."
+                $successMessage
             );
         } catch (\Throwable $e) {
             return back()->withErrors(['reorder' => $e->getMessage()]);

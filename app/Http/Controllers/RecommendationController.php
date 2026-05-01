@@ -20,10 +20,13 @@ class RecommendationController extends Controller
             'budget' => ['required', 'numeric', 'min:0'],
             'format' => ['required', 'in:set,single,variety'],
             'priority' => ['required', 'in:popular,new,value'],
+            'locale' => ['nullable', 'in:ru,uk,en'],
         ]);
 
+        app()->setLocale($data['locale'] ?? config('app.locale'));
+
         return response()->json(
-            $this->recommendationAssistantService->recommend($request->user(), $data)
+            $this->recommendationAssistantService->recommend($request->user(), collect($data)->except('locale')->all())
         );
     }
 }

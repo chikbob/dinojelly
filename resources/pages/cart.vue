@@ -23,16 +23,20 @@
                             :src="item.image_url"
                             alt=""
                             class="cart__item-image"
+                            :class="{ 'cart__item-image--out': !item.is_in_stock }"
                             @click="goToProduct(item.id)"
                         />
 
-                        <div class="cart__item-info" style="width:100%; max-width:100%; min-width:0;">
+                        <div class="cart__item-info" :class="{ 'cart__item-info--out': !item.is_in_stock }" style="width:100%; max-width:100%; min-width:0;">
                             <h2
                                 class="cart__item-name"
                                 @click="goToProduct(item.id)"
                             >
                                 {{ item.name }}
                             </h2>
+                            <p v-if="!item.is_in_stock" class="cart__item-stock">
+                                {{ t("catalog.outOfStock") }}
+                            </p>
                             <div class="cart__item-prices">
                                 <span class="cart__item-price">{{ item.price }} {{ t("currency.symbol") }}</span>
                                 <span v-if="item.old_price" class="cart__item-old">{{
@@ -50,10 +54,10 @@
                                 <button @click="removeFromCart(item.id)" class="cart__delete" style="max-width:100%; box-sizing:border-box;">
                                     {{ t("cart.delete") }}
                                 </button>
-                                <div class="cart__quantity" style="max-width:100%; min-width:0;">
+                                <div class="cart__quantity" :class="{ 'cart__quantity--out': !item.is_in_stock }" style="max-width:100%; min-width:0;">
                                     <button @click="decreaseQuantity(item.id)" class="cart__qty-btn">−</button>
                                     <span>{{ item.quantity }}</span>
-                                    <button @click="increaseQuantity(item.id)" class="cart__qty-btn">+</button>
+                                    <button @click="increaseQuantity(item.id)" class="cart__qty-btn" :disabled="!item.is_in_stock">+</button>
                                 </div>
                             </div>
                         </div>
@@ -62,9 +66,9 @@
 
                 <!-- Правая колонка -->
                 <div class="cart__summary" style="width:100%; max-width:100%; min-width:0; overflow:hidden; box-sizing:border-box;">
-                    <button class="cart__checkout" @click="goToCheckout" style="width:100%; max-width:100%; box-sizing:border-box;">{{ t("cart.checkout") }}</button>
+                    <button class="cart__checkout" :class="{ 'cart__checkout--disabled': hasOutOfStockItems }" :disabled="hasOutOfStockItems" @click="goToCheckout" style="width:100%; max-width:100%; box-sizing:border-box;">{{ t("cart.checkout") }}</button>
                     <p class="cart__hint">
-                        {{ t("cart.deliveryHint") }}
+                        {{ hasOutOfStockItems ? t("catalog.outOfStock") : t("cart.deliveryHint") }}
                     </p>
                     <div class="cart__summary-info">
                         <div class="cart__summary-row">
@@ -110,6 +114,7 @@ const props = defineProps({
 })
 
 const cartItems = computed(() => props.cart ? Object.values(props.cart) : [])
+const hasOutOfStockItems = computed(() => cartItems.value.some((item) => !item.is_in_stock))
 const finalTotal = computed(() => totalPrice.value - discountTotal.value)
 
 const totalQuantity = computed(() =>
@@ -208,6 +213,11 @@ function goToCheckout() {
         cursor: pointer;
     }
 
+    &__item-image--out {
+        filter: grayscale(1);
+        opacity: 0.78;
+    }
+
     &__item-name {
         font-size: 18px;
         font-weight: 600;
@@ -220,6 +230,17 @@ function goToCheckout() {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+    }
+
+    &__item-info--out {
+        opacity: 0.88;
+    }
+
+    &__item-stock {
+        margin: 8px 0 0;
+        color: #6b7280;
+        font-size: 12px;
+        text-transform: uppercase;
     }
 
     &__item-prices {
@@ -276,6 +297,11 @@ function goToCheckout() {
         border: none;
         font-size: 20px;
         cursor: pointer;
+
+        &:disabled {
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
     }
 
     /* Правая колонка */
@@ -300,6 +326,11 @@ function goToCheckout() {
         font-weight: bold;
         cursor: pointer;
         border: 0;
+    }
+
+    &__checkout--disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
     }
 
     &__hint {

@@ -47,15 +47,15 @@ class CheckoutService
             ->get();
         $defaultAddress = $addresses->firstWhere('is_default', true) ?? $addresses->first();
         $defaultSlot = $slots->first();
-        $subtotal = $cartItems->sum(fn ($item) => $item->product->price * $item->quantity);
-        $deliveryPrice = $defaultSlot?->price ?? 0;
+        $subtotal = (float) $cartItems->sum(fn ($item) => (float) $item->product->price * $item->quantity);
+        $deliveryPrice = (float) ($defaultSlot?->price ?? 0);
 
         return [
             'items' => $items,
             'totalQuantity' => $cartItems->sum('quantity'),
             'subtotalPrice' => $subtotal,
             'deliveryPrice' => $deliveryPrice,
-            'totalPrice' => $subtotal + $deliveryPrice,
+            'totalPrice' => (float) ($subtotal + $deliveryPrice),
             'referralCreditBalance' => (float) $user->referral_credit_balance,
             'giftCards' => $this->giftCardService->getProfilePayload($user)['giftCards'],
             'addresses' => AddressResource::collection($addresses)->resolve(request()),

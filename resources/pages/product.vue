@@ -3,10 +3,10 @@
         <div class="product-page">
             <div class="product">
                 <div class="product__gallery">
-                    <img :src="product.image_url" :alt="product.name" class="product__image"/>
+                    <img :src="product.image_url" :alt="product.name" class="product__image" :class="{ 'product__image--out': !product.is_in_stock }"/>
                 </div>
 
-                <div class="product__info">
+                <div class="product__info" :class="{ 'product__info--out': !product.is_in_stock }">
                     <h1 class="product__title">{{ product.name }}</h1>
                     <p class="product__meta">{{ product.weight }} г</p>
                     <div class="product__rating-summary">
@@ -39,13 +39,19 @@
                         </button>
 
                         <!-- Корзина -->
-                        <div v-if="cartItems[product.id]" class="cart-counter">
+                        <div v-if="cartItems[product.id]" class="cart-counter" :class="{ 'cart-counter--out': !product.is_in_stock }">
                             <button class="counter-btn" @click="updateQuantity(-1)">-</button>
                             <span class="counter-value">{{ cartItems[product.id].quantity }}</span>
-                            <button class="counter-btn" @click="updateQuantity(1)">+</button>
+                            <button class="counter-btn" :disabled="!product.is_in_stock" @click="updateQuantity(1)">+</button>
                         </div>
-                        <button v-else class="product__add-to-cart" :disabled="!product.is_in_stock" @click="addToCart">
-                            {{ t("product.addToCart") }}
+                        <button
+                            v-else
+                            class="product__add-to-cart"
+                            :class="{ 'product__add-to-cart--disabled': !product.is_in_stock }"
+                            :disabled="!product.is_in_stock"
+                            @click="addToCart"
+                        >
+                            {{ product.is_in_stock ? t("product.addToCart") : t("catalog.outOfStock") }}
                         </button>
                     </div>
                 </div>
@@ -243,7 +249,16 @@ function deleteReview() {
 }
 
 .product__stock--out {
-    color: #b91c1c;
+    color: #6b7280;
+}
+
+.product__image--out {
+    filter: grayscale(1);
+    opacity: 0.78;
+}
+
+.product__info--out {
+    opacity: 0.88;
 }
 
 .product__actions {
@@ -300,6 +315,12 @@ function deleteReview() {
     }
 }
 
+.product__add-to-cart--disabled,
+.product__add-to-cart:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+}
+
 .cart-counter {
     display: flex;
     align-items: center;
@@ -322,6 +343,12 @@ function deleteReview() {
             background-color: #2ebd7d;
             transform: scale(1.05);
         }
+
+        &:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
     }
 
     .counter-value {
@@ -331,6 +358,10 @@ function deleteReview() {
         min-width: 20px;
         text-align: center;
     }
+}
+
+.cart-counter--out .counter-value {
+    color: #6b7280;
 }
 
 .product-reviews {
