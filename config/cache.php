@@ -2,6 +2,13 @@
 
 use Illuminate\Support\Str;
 
+$redisEndpoint = env('REDIS_URL') ?: env('REDIS_HOST');
+$cacheDriver = env('CACHE_DRIVER', 'file');
+
+if ($cacheDriver === 'redis' && empty($redisEndpoint)) {
+    $cacheDriver = 'file';
+}
+
 return [
 
     /*
@@ -15,7 +22,7 @@ return [
     |
     */
 
-    'default' => env('CACHE_DRIVER', 'file'),
+    'default' => $cacheDriver,
 
     /*
     |--------------------------------------------------------------------------

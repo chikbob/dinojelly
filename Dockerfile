@@ -25,6 +25,7 @@ RUN apk add --no-cache \
         freetype-dev \
         libjpeg-turbo-dev \
         libpng-dev \
+        postgresql-dev \
         libzip-dev \
         nginx \
         nodejs \
@@ -38,6 +39,7 @@ RUN apk add --no-cache \
         gd \
         opcache \
         pdo_mysql \
+        pdo_pgsql \
         zip \
     && pecl install redis \
     && docker-php-ext-enable redis \
@@ -66,6 +68,7 @@ COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/default.conf /etc/nginx/http.d/default.conf
 COPY docker/php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
 COPY docker/php.ini /usr/local/etc/php/conf.d/custom.ini
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint
 COPY docker/supervisord.conf /etc/supervisord.conf
 
 # Copy application source and built frontend assets
@@ -87,8 +90,9 @@ RUN rm -f bootstrap/cache/*.php bootstrap/cache/*.json \
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \
-    && chmod +x artisan
+    && chmod +x artisan /usr/local/bin/entrypoint
 
 EXPOSE 80 5173
 
+ENTRYPOINT ["entrypoint"]
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
