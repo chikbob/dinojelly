@@ -27,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
 
             'cartCount' => function () {
                 if (Auth::check()) {
-                    return (int)\App\Models\CartItem::where('user_id', Auth::id())
+                    return (int) \App\Models\CartItem::where('user_id', Auth::id())
                         ->sum('quantity');
                 }
 
@@ -59,7 +59,7 @@ class AppServiceProvider extends ServiceProvider
             'adminIndicators' => function () {
                 $user = Auth::user();
 
-                if (!$user || $user->role !== 'admin') {
+                if (! $user || $user->role !== 'admin') {
                     return null;
                 }
 

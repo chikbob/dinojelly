@@ -12,8 +12,7 @@ class OrderController extends Controller
 {
     public function __construct(
         protected AdminOrderService $adminOrderService,
-    ) {
-    }
+    ) {}
 
     public function index(Request $request)
     {

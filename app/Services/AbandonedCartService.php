@@ -61,13 +61,13 @@ class AbandonedCartService
                 ->with(['cartItems.product'])
                 ->find($row->user_id);
 
-            if (!$user || !$user->email || $user->cartItems->isEmpty()) {
+            if (! $user || ! $user->email || $user->cartItems->isEmpty()) {
                 continue;
             }
 
             $lastActivityAt = $user->cartItems->max('updated_at');
 
-            if (!$lastActivityAt || $lastActivityAt->gt($threshold)) {
+            if (! $lastActivityAt || $lastActivityAt->gt($threshold)) {
                 continue;
             }
 
@@ -99,7 +99,7 @@ class AbandonedCartService
     }
 
     /**
-     * @param Collection<int, CartItem> $cartItems
+     * @param  Collection<int, CartItem>  $cartItems
      * @return array<int, array<string, mixed>>
      */
     protected function buildSnapshot(Collection $cartItems): array

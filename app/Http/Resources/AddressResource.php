@@ -30,7 +30,7 @@ class AddressResource extends JsonResource
                 $this->city,
                 $this->street,
                 $this->building,
-                $this->apartment ? 'кв. ' . $this->apartment : null,
+                $this->apartment ? 'кв. '.$this->apartment : null,
             ]))),
         ];
     }

@@ -9,8 +9,7 @@ class RecommendationController extends Controller
 {
     public function __construct(
         protected RecommendationAssistantService $recommendationAssistantService,
-    ) {
-    }
+    ) {}
 
     public function store(Request $request)
     {

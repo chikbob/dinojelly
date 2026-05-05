@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
-use App\Services\CheckoutService;
 use App\Services\CartService;
+use App\Services\CheckoutService;
 use App\Services\OrderService;
 use App\Services\PaymentService;
 use App\Services\ReorderService;
@@ -19,8 +19,7 @@ class OrderController extends Controller
         protected CartService $cartService,
         protected PaymentService $paymentService,
         protected ReorderService $reorderService,
-    ) {
-    }
+    ) {}
 
     /**
      * Страница оформления заказа (checkout)
@@ -28,7 +27,7 @@ class OrderController extends Controller
     public function create(Request $request)
     {
         $payload = $this->checkoutService->getCheckoutPage($request->user());
-        if (!$payload) {
+        if (! $payload) {
             return redirect()->route('cart.index')->with('error', 'Корзина пуста');
         }
 
@@ -73,7 +72,7 @@ class OrderController extends Controller
             return redirect()->route('orders.show', $order->id)
                 ->with('success', 'Заказ успешно оформлен!');
         } catch (\Exception $e) {
-            return back()->withErrors(['order' => 'Ошибка при создании заказа: ' . $e->getMessage()]);
+            return back()->withErrors(['order' => 'Ошибка при создании заказа: '.$e->getMessage()]);
         }
     }
 
@@ -121,7 +120,7 @@ class OrderController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Заказ успешно отменен'
+                'message' => 'Заказ успешно отменен',
             ]);
 
         } catch (\Exception $e) {
@@ -130,8 +129,9 @@ class OrderController extends Controller
                 $e instanceof \RuntimeException => 422,
                 default => 500,
             };
+
             return response()->json([
-                'error' => 'Ошибка при отмене заказа: ' . $e->getMessage()
+                'error' => 'Ошибка при отмене заказа: '.$e->getMessage(),
             ], $status);
         }
     }

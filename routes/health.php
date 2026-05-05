@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -60,7 +60,7 @@ Route::get('/health/detailed', function () {
     // Determine overall status
     $allOk = collect($checks)
         ->except(['timestamp', 'app'])
-        ->every(fn($value) => $value === 'ok');
+        ->every(fn ($value) => $value === 'ok');
 
     $status = $allOk ? 200 : 503;
 
@@ -71,6 +71,7 @@ Route::get('/health/ready', function () {
     // Check if app is ready to receive traffic
     try {
         DB::connection()->getPdo();
+
         return response()->json([
             'status' => 'ready',
             'timestamp' => now()->toIso8601String(),

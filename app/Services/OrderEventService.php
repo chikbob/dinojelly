@@ -9,7 +9,7 @@ use App\Models\User;
 class OrderEventService
 {
     /**
-     * @param array<string, mixed> $meta
+     * @param  array<string, mixed>  $meta
      */
     public function log(
         Order $order,

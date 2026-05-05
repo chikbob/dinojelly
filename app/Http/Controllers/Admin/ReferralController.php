@@ -10,8 +10,7 @@ class ReferralController extends Controller
 {
     public function __construct(
         protected ReferralService $referralService,
-    ) {
-    }
+    ) {}
 
     public function index()
     {

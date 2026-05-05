@@ -13,8 +13,7 @@ class PaymentController extends Controller
 {
     public function __construct(
         protected PaymentService $paymentService,
-    ) {
-    }
+    ) {}
 
     public function showMock(Payment $payment, Request $request)
     {

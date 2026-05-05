@@ -59,7 +59,7 @@ class CollectionController extends Controller
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('collections', 'public');
-        } elseif (!empty($validated['image_url'])) {
+        } elseif (! empty($validated['image_url'])) {
             $data['image'] = $validated['image_url'];
         }
 
@@ -79,7 +79,7 @@ class CollectionController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'slug' => ['required', 'string', 'max:255', 'unique:collections,slug,' . $collection->id],
+            'slug' => ['required', 'string', 'max:255', 'unique:collections,slug,'.$collection->id],
             'description' => ['nullable', 'string'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
             'is_active' => ['nullable', 'boolean'],
@@ -96,12 +96,12 @@ class CollectionController extends Controller
         ];
 
         if ($request->hasFile('image')) {
-            if ($collection->image && !filter_var($collection->image, FILTER_VALIDATE_URL)) {
+            if ($collection->image && ! filter_var($collection->image, FILTER_VALIDATE_URL)) {
                 Storage::disk('public')->delete($collection->image);
             }
 
             $data['image'] = $request->file('image')->store('collections', 'public');
-        } elseif (!empty($validated['image_url'])) {
+        } elseif (! empty($validated['image_url'])) {
             $data['image'] = $validated['image_url'];
         }
 
@@ -112,7 +112,7 @@ class CollectionController extends Controller
 
     public function destroy(Collection $collection)
     {
-        if ($collection->image && !filter_var($collection->image, FILTER_VALIDATE_URL)) {
+        if ($collection->image && ! filter_var($collection->image, FILTER_VALIDATE_URL)) {
             Storage::disk('public')->delete($collection->image);
         }
 

@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\AddressResource;
+use App\Http\Resources\SubscriptionResource;
 use App\Models\CartItem;
 use App\Models\Order;
-use App\Http\Resources\SubscriptionResource;
 use App\Services\GiftCardService;
 use App\Services\ReferralService;
 use Illuminate\Http\Request;
@@ -17,8 +17,7 @@ class ProfileController extends Controller
     public function __construct(
         protected ReferralService $referralService,
         protected GiftCardService $giftCardService,
-    ) {
-    }
+    ) {}
 
     public function index()
     {

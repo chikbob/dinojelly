@@ -10,15 +10,13 @@ class UserFactory extends Factory
 {
     /**
      * Define the model's default state.
-     *
-     * @return array
      */
     public function definition(): array
     {
         $faker = fake(FactoryLocale::fakerLocale());
 
         return [
-            'name' => $faker->firstName . ' ' . $faker->lastName,
+            'name' => $faker->firstName.' '.$faker->lastName,
             'email' => $faker->unique()->safeEmail,
             'phone' => FactoryLocale::phoneNumber(),
             'address' => $faker->address,

@@ -13,8 +13,7 @@ class ReorderService
     public function __construct(
         protected InventoryService $inventoryService,
         protected AbandonedCartService $abandonedCartService,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array{added:int, skipped:int}
@@ -34,22 +33,25 @@ class ReorderService
         $targetItems = [];
 
         foreach ($order->items as $item) {
-            if (!$item->product) {
+            if (! $item->product) {
                 $skipped++;
+
                 continue;
             }
 
             $stockItem = $item->product->stockItem;
             $available = $this->inventoryService->getAvailableQuantity($stockItem);
 
-            if (!$stockItem || !$stockItem->is_active || $available < 1) {
+            if (! $stockItem || ! $stockItem->is_active || $available < 1) {
                 $skipped++;
+
                 continue;
             }
             $targetQuantity = min($item->quantity, $available);
 
             if ($targetQuantity < 1) {
                 $skipped++;
+
                 continue;
             }
 

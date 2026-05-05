@@ -10,8 +10,7 @@ class ReviewController extends Controller
 {
     public function __construct(
         protected ReviewService $reviewService,
-    ) {
-    }
+    ) {}
 
     public function store(Product $product, Request $request)
     {

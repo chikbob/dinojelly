@@ -21,7 +21,7 @@ class Product extends Model
         'price',
         'old_price',
         'description',
-        'image'
+        'image',
     ];
 
     protected $appends = ['image_url'];
@@ -60,7 +60,7 @@ class Product extends Model
 
     public function getImageUrlAttribute(): ?string
     {
-        if (!$this->image) {
+        if (! $this->image) {
             return null;
         }
 
@@ -73,7 +73,7 @@ class Product extends Model
         return Storage::url($this->image);
     }
 
-//    'https://ir.ozone.ru/s3/multimedia-1-p/wc1000/7490917897.jpg';
+    //    'https://ir.ozone.ru/s3/multimedia-1-p/wc1000/7490917897.jpg';
 
-// https://cdn.27.ua/sc--media--prod/default/53/9e/a5/539ea5fa-f1cd-4e2b-bb07-823702dc1b6c.jpg
+    // https://cdn.27.ua/sc--media--prod/default/53/9e/a5/539ea5fa-f1cd-4e2b-bb07-823702dc1b6c.jpg
 }

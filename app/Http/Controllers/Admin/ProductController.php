@@ -14,14 +14,14 @@ class ProductController extends Controller
 {
     public function __construct(
         protected InventoryService $inventoryService,
-    ) {
-    }
+    ) {}
 
     public function index()
     {
         $products = Product::query()
             ->with(['category', 'stockItem'])
             ->paginate(15);
+
         return Inertia::render('admin/Products/Index', ['products' => $products]);
     }
 
@@ -98,7 +98,7 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'image' => 'nullable|image|max:2048',
             'image_url' => 'nullable|url',
-            'sku' => 'required|string|max:255|unique:stock_items,sku,' . optional($product->stockItem)->id,
+            'sku' => 'required|string|max:255|unique:stock_items,sku,'.optional($product->stockItem)->id,
             'stock_quantity' => 'required|integer|min:0',
             'low_stock_threshold' => 'nullable|integer|min:0',
             'stock_is_active' => 'nullable|boolean',
@@ -114,7 +114,7 @@ class ProductController extends Controller
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('products', 'public');
             $product->image = $path;  // вот так
-        } elseif (!empty($validated['image_url'])) {
+        } elseif (! empty($validated['image_url'])) {
             // Если пришла ссылка, можно либо сохранять в image, либо отдельно
             $product->image = $validated['image_url'];  // если хочешь хранить ссылку напрямую
         }
@@ -131,10 +131,9 @@ class ProductController extends Controller
         return redirect()->route('admin.products.index')->with('success', 'Product updated!');
     }
 
-
     public function destroy(Product $product)
     {
-        if ($product->image && !filter_var($product->image, FILTER_VALIDATE_URL)) {
+        if ($product->image && ! filter_var($product->image, FILTER_VALIDATE_URL)) {
             Storage::disk('public')->delete($product->image);
         }
 

@@ -13,7 +13,7 @@ class ReviewService
 {
     public function canUserReview(Product $product, ?User $user): bool
     {
-        if (!$user) {
+        if (! $user) {
             return false;
         }
 
@@ -32,7 +32,7 @@ class ReviewService
      */
     public function getUserReviewPayload(Product $product, ?User $user): ?array
     {
-        if (!$user) {
+        if (! $user) {
             return null;
         }
 
@@ -62,11 +62,11 @@ class ReviewService
     }
 
     /**
-     * @param array{rating:int,title?:?string,body?:?string} $data
+     * @param  array{rating:int,title?:?string,body?:?string}  $data
      */
     public function upsertReview(Product $product, User $user, array $data): Review
     {
-        if (!$this->canUserReview($product, $user)) {
+        if (! $this->canUserReview($product, $user)) {
             throw new AuthorizationException('Отзыв можно оставить только после покупки товара');
         }
 
@@ -95,7 +95,7 @@ class ReviewService
             ->where('user_id', $user->id)
             ->first();
 
-        if (!$review) {
+        if (! $review) {
             throw new \RuntimeException('Отзыв не найден');
         }
 

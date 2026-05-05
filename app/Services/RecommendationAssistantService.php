@@ -11,7 +11,7 @@ use Illuminate\Support\Collection;
 class RecommendationAssistantService
 {
     /**
-     * @param array{occasion: string, taste: string, budget: float|int, format: string, priority: string} $input
+     * @param  array{occasion: string, taste: string, budget: float|int, format: string, priority: string}  $input
      * @return array<string, mixed>
      */
     public function recommend(?User $user, array $input): array
@@ -61,7 +61,7 @@ class RecommendationAssistantService
     }
 
     /**
-     * @param array{occasion: string, taste: string, budget: float|int, format: string, priority: string} $input
+     * @param  array{occasion: string, taste: string, budget: float|int, format: string, priority: string}  $input
      * @return array{product: Product, score: int, reason_keys: array<int, string>}
      */
     protected function scoreProduct(Product $product, array $input, array $signals): array
@@ -163,7 +163,7 @@ class RecommendationAssistantService
     }
 
     /**
-     * @param Collection<int, array{product: Product, score: int, reason_keys: array<int, string>}> $products
+     * @param  Collection<int, array{product: Product, score: int, reason_keys: array<int, string>}>  $products
      */
     protected function buildSummary(Collection $products, array $input): array
     {
@@ -192,7 +192,7 @@ class RecommendationAssistantService
      */
     protected function buildUserSignals(?User $user): array
     {
-        if (!$user) {
+        if (! $user) {
             return [
                 'favorite_product_ids' => [],
                 'favorite_category_ids' => [],

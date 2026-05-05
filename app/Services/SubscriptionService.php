@@ -20,8 +20,7 @@ class SubscriptionService
         protected PaymentService $paymentService,
         protected InventoryService $inventoryService,
         protected OrderEventService $orderEventService,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array{subscriptions: array<int, array<string, mixed>>}
@@ -45,7 +44,7 @@ class SubscriptionService
     }
 
     /**
-     * @param array{name?: ?string, interval_days:int} $data
+     * @param  array{name?: ?string, interval_days:int}  $data
      */
     public function createFromOrder(User $user, Order $order, array $data): array
     {
@@ -57,7 +56,7 @@ class SubscriptionService
             throw new \RuntimeException('Нельзя создать подписку на пустой заказ');
         }
 
-        if (!$order->address_id || !$order->delivery_slot_id) {
+        if (! $order->address_id || ! $order->delivery_slot_id) {
             throw new \RuntimeException('Для подписки нужен адрес и слот доставки');
         }
 
@@ -154,7 +153,7 @@ class SubscriptionService
 
     protected function generatedSubscriptionName(int $orderId): string
     {
-        return self::GENERATED_NAME_PREFIX . $orderId;
+        return self::GENERATED_NAME_PREFIX.$orderId;
     }
 
     /**
@@ -164,14 +163,14 @@ class SubscriptionService
     {
         return [
             $this->generatedSubscriptionName($orderId),
-            'Подписка на заказ #' . $orderId,
-            'Підписка на замовлення #' . $orderId,
-            'Subscription for order #' . $orderId,
+            'Подписка на заказ #'.$orderId,
+            'Підписка на замовлення #'.$orderId,
+            'Subscription for order #'.$orderId,
         ];
     }
 
     /**
-     * @param array{name?: ?string, interval_days?: ?int, status?: ?string} $data
+     * @param  array{name?: ?string, interval_days?: ?int, status?: ?string}  $data
      *
      * @throws AuthorizationException
      */
@@ -185,15 +184,15 @@ class SubscriptionService
             $update['name'] = $data['name'] ?: $subscription->name;
         }
 
-        if (!empty($data['interval_days'])) {
+        if (! empty($data['interval_days'])) {
             $update['interval_days'] = (int) $data['interval_days'];
         }
 
-        if (!empty($data['status'])) {
+        if (! empty($data['status'])) {
             $update['status'] = $data['status'];
             $update['canceled_at'] = $data['status'] === 'canceled' ? now() : null;
 
-            if ($data['status'] === 'active' && !$subscription->next_run_at) {
+            if ($data['status'] === 'active' && ! $subscription->next_run_at) {
                 $update['next_run_at'] = now()->addDays((int) ($data['interval_days'] ?? $subscription->interval_days));
             }
         }
@@ -247,7 +246,7 @@ class SubscriptionService
             throw new \RuntimeException('Подписка отменена');
         }
 
-        if (!$subscription->address) {
+        if (! $subscription->address) {
             throw new \RuntimeException('Для подписки не найден адрес доставки');
         }
 
@@ -255,7 +254,7 @@ class SubscriptionService
             ->where('is_active', true)
             ->find($subscription->delivery_slot_id);
 
-        if (!$deliverySlot) {
+        if (! $deliverySlot) {
             throw new \RuntimeException('Слот доставки для подписки недоступен');
         }
 
@@ -266,7 +265,7 @@ class SubscriptionService
         }
 
         foreach ($subscriptionItems as $item) {
-            if (!$this->inventoryService->canPurchaseQuantity($item->product->stockItem, $item->quantity)) {
+            if (! $this->inventoryService->canPurchaseQuantity($item->product->stockItem, $item->quantity)) {
                 throw new \RuntimeException('Недостаточно остатка для подписки');
             }
         }

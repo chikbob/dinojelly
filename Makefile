@@ -60,7 +60,8 @@ dev-shell: ## Open shell in development app container
 
 test: ## Run tests
 	@echo "Running tests..."
-	docker compose exec app php artisan test
+	docker compose exec -T db mysql -uroot -proot -e "CREATE DATABASE IF NOT EXISTS testing CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+	docker compose exec -T -e DB_CONNECTION=mysql -e DB_HOST=db -e DB_PORT=3306 -e DB_DATABASE=testing -e DB_USERNAME=root -e DB_PASSWORD=root app php artisan test
 	@echo "✅ Tests complete"
 
 lint: ## Run code linters

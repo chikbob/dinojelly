@@ -10,8 +10,7 @@ class AdminHomeController extends Controller
 {
     public function __construct(
         protected AdminAnalyticsService $adminAnalyticsService,
-    ) {
-    }
+    ) {}
 
     public function index()
     {

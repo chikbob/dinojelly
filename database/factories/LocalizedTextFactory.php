@@ -31,7 +31,7 @@ class LocalizedTextFactory
         $prefix = fake()->randomElement(self::data()['product_prefixes']);
         $flavor = fake()->randomElement(self::data()['product_flavors']);
 
-        return Str::ucfirst($prefix . ' ' . $flavor . ' ' . FactoryLocale::productSuffix());
+        return Str::ucfirst($prefix.' '.$flavor.' '.FactoryLocale::productSuffix());
     }
 
     public static function productDescription(): string

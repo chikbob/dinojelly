@@ -13,8 +13,7 @@ class GiftCardController extends Controller
 {
     public function __construct(
         protected GiftCardService $giftCardService,
-    ) {
-    }
+    ) {}
 
     public function index()
     {

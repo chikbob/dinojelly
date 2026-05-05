@@ -33,8 +33,11 @@ use Illuminate\Support\Str;
 abstract class LocalizedDatabaseSeeder extends Seeder
 {
     protected const ADMIN_EMAIL = 'admin@dinojelly.local';
+
     protected const DEMO_EMAIL = 'demo@dinojelly.local';
+
     protected const DEFAULT_PASSWORD = 'password';
+
     /**
      * @var array<string, mixed>|null
      */
@@ -129,13 +132,13 @@ abstract class LocalizedDatabaseSeeder extends Seeder
     }
 
     /**
-     * @param Collection<int, User> $users
+     * @param  Collection<int, User>  $users
      */
     protected function seedReferralCodes(Collection $users): void
     {
         foreach ($users as $user) {
             $user->update([
-                'referral_code' => 'REF' . str_pad((string) $user->id, 6, '0', STR_PAD_LEFT),
+                'referral_code' => 'REF'.str_pad((string) $user->id, 6, '0', STR_PAD_LEFT),
             ]);
         }
     }
@@ -160,7 +163,7 @@ abstract class LocalizedDatabaseSeeder extends Seeder
     }
 
     /**
-     * @param Collection<int, Category> $categories
+     * @param  Collection<int, Category>  $categories
      * @return Collection<int, Product>
      */
     protected function seedProducts(Collection $categories): Collection
@@ -175,7 +178,7 @@ abstract class LocalizedDatabaseSeeder extends Seeder
         foreach ($products as $product) {
             StockItem::query()->create([
                 'product_id' => $product->id,
-                'sku' => 'SKU-' . strtoupper(Str::random(10)),
+                'sku' => 'SKU-'.strtoupper(Str::random(10)),
                 'quantity' => fake()->numberBetween(180, 1400),
                 'reserved_quantity' => 0,
                 'low_stock_threshold' => fake()->numberBetween(8, 40),
@@ -219,7 +222,7 @@ abstract class LocalizedDatabaseSeeder extends Seeder
     }
 
     /**
-     * @param Collection<int, Product> $products
+     * @param  Collection<int, Product>  $products
      */
     protected function seedCollections(Collection $products): void
     {
@@ -238,7 +241,7 @@ abstract class LocalizedDatabaseSeeder extends Seeder
     }
 
     /**
-     * @param Collection<int, User> $users
+     * @param  Collection<int, User>  $users
      */
     protected function seedAddresses(Collection $users): void
     {
@@ -255,8 +258,8 @@ abstract class LocalizedDatabaseSeeder extends Seeder
     }
 
     /**
-     * @param Collection<int, User> $users
-     * @param Collection<int, Product> $products
+     * @param  Collection<int, User>  $users
+     * @param  Collection<int, Product>  $products
      */
     protected function seedFavorites(Collection $users, Collection $products): void
     {
@@ -264,7 +267,7 @@ abstract class LocalizedDatabaseSeeder extends Seeder
 
         foreach ($users->random(190) as $user) {
             foreach ($products->random(fake()->numberBetween(4, 18)) as $product) {
-                $key = $user->id . ':' . $product->id;
+                $key = $user->id.':'.$product->id;
                 $rows[$key] = [
                     'user_id' => $user->id,
                     'product_id' => $product->id,
@@ -278,10 +281,10 @@ abstract class LocalizedDatabaseSeeder extends Seeder
     }
 
     /**
-     * @param Collection<int, User> $users
-     * @param Collection<int, Product> $products
-     * @param Collection<int, PromoCode> $promoCodes
-     * @param Collection<int, DeliverySlot> $deliverySlots
+     * @param  Collection<int, User>  $users
+     * @param  Collection<int, Product>  $products
+     * @param  Collection<int, PromoCode>  $promoCodes
+     * @param  Collection<int, DeliverySlot>  $deliverySlots
      * @return Collection<int, Order>
      */
     protected function seedOrders(
@@ -313,10 +316,10 @@ abstract class LocalizedDatabaseSeeder extends Seeder
     }
 
     /**
-     * @param Collection<int, Address> $addresses
-     * @param Collection<int, Product> $products
-     * @param Collection<int, PromoCode> $promoCodes
-     * @param Collection<int, DeliverySlot> $deliverySlots
+     * @param  Collection<int, Address>  $addresses
+     * @param  Collection<int, Product>  $products
+     * @param  Collection<int, PromoCode>  $promoCodes
+     * @param  Collection<int, DeliverySlot>  $deliverySlots
      */
     protected function createOrderForUser(
         User $user,
@@ -339,7 +342,7 @@ abstract class LocalizedDatabaseSeeder extends Seeder
 
         foreach ($selectedProducts as $product) {
             $stockItem = $product->stockItem;
-            if (!$stockItem || !$stockItem->is_active) {
+            if (! $stockItem || ! $stockItem->is_active) {
                 continue;
             }
 
@@ -432,7 +435,7 @@ abstract class LocalizedDatabaseSeeder extends Seeder
             'status' => $paymentStatus,
             'method' => $paymentMethod,
             'payload' => $paymentMethod === 'card'
-                ? ['payment_url' => url('/payments/mock/' . $order->id)]
+                ? ['payment_url' => url('/payments/mock/'.$order->id)]
                 : ['label' => 'cash_on_delivery'],
             'paid_at' => $paymentStatus === 'paid' ? $createdAt : null,
             'created_at' => $createdAt,
@@ -469,10 +472,10 @@ abstract class LocalizedDatabaseSeeder extends Seeder
     }
 
     /**
-     * @param Collection<int, Product> $products
-     * @param Collection<int, PromoCode> $promoCodes
-     * @param Collection<int, DeliverySlot> $deliverySlots
-     * @param Collection<int, Order> $orders
+     * @param  Collection<int, Product>  $products
+     * @param  Collection<int, PromoCode>  $promoCodes
+     * @param  Collection<int, DeliverySlot>  $deliverySlots
+     * @param  Collection<int, Order>  $orders
      */
     protected function seedDemoScenario(
         User $demoUser,
@@ -483,7 +486,7 @@ abstract class LocalizedDatabaseSeeder extends Seeder
     ): void {
         $addresses = $demoUser->addresses()->get();
 
-        if ($addresses->isNotEmpty() && !$orders->contains(fn (Order $order) => $order->user_id === $demoUser->id && $order->status === 'completed')) {
+        if ($addresses->isNotEmpty() && ! $orders->contains(fn (Order $order) => $order->user_id === $demoUser->id && $order->status === 'completed')) {
             $completedOrder = $this->createOrderForUser($demoUser, $addresses, $products, $promoCodes, $deliverySlots, 'completed');
 
             if ($completedOrder) {
@@ -491,7 +494,7 @@ abstract class LocalizedDatabaseSeeder extends Seeder
             }
         }
 
-        if ($addresses->isNotEmpty() && !$orders->contains(fn (Order $order) => $order->user_id === $demoUser->id && $order->status === 'pending')) {
+        if ($addresses->isNotEmpty() && ! $orders->contains(fn (Order $order) => $order->user_id === $demoUser->id && $order->status === 'pending')) {
             $pendingOrder = $this->createOrderForUser($demoUser, $addresses, $products, $promoCodes, $deliverySlots, 'pending');
 
             if ($pendingOrder) {
@@ -521,7 +524,7 @@ abstract class LocalizedDatabaseSeeder extends Seeder
 
     protected function calculateDiscount(?PromoCode $promoCode, float $subtotal): float
     {
-        if (!$promoCode || !$promoCode->is_active) {
+        if (! $promoCode || ! $promoCode->is_active) {
             return 0;
         }
 
@@ -535,7 +538,7 @@ abstract class LocalizedDatabaseSeeder extends Seeder
     }
 
     /**
-     * @param Collection<int, Order> $orders
+     * @param  Collection<int, Order>  $orders
      */
     protected function seedReviews(Collection $orders): void
     {
@@ -545,7 +548,7 @@ abstract class LocalizedDatabaseSeeder extends Seeder
             $order->loadMissing('items.product', 'user');
 
             foreach ($order->items as $item) {
-                $key = $order->user_id . ':' . $item->product_id;
+                $key = $order->user_id.':'.$item->product_id;
                 if (isset($reviewedPairs[$key])) {
                     continue;
                 }
@@ -566,8 +569,8 @@ abstract class LocalizedDatabaseSeeder extends Seeder
     }
 
     /**
-     * @param Collection<int, User> $users
-     * @param Collection<int, Product> $products
+     * @param  Collection<int, User>  $users
+     * @param  Collection<int, Product>  $products
      */
     protected function seedCartsAndRecoveries(Collection $users, Collection $products): void
     {
@@ -620,7 +623,7 @@ abstract class LocalizedDatabaseSeeder extends Seeder
     }
 
     /**
-     * @param Collection<int, Order> $orders
+     * @param  Collection<int, Order>  $orders
      */
     protected function seedSubscriptions(Collection $orders): void
     {
@@ -629,7 +632,7 @@ abstract class LocalizedDatabaseSeeder extends Seeder
         foreach ($sourceOrders as $order) {
             $order->loadMissing('items.product', 'address', 'deliverySlot', 'latestPayment');
 
-            if (!$order->address_id || !$order->delivery_slot_id) {
+            if (! $order->address_id || ! $order->delivery_slot_id) {
                 continue;
             }
 
@@ -641,7 +644,7 @@ abstract class LocalizedDatabaseSeeder extends Seeder
                 'delivery_slot_id' => $order->delivery_slot_id,
                 'last_order_id' => $order->id,
                 'source_order_id' => $order->id,
-                'name' => $this->content('subscription_prefix') . $order->id,
+                'name' => $this->content('subscription_prefix').$order->id,
                 'payment_method' => $order->payment_method,
                 'status' => $status,
                 'interval_days' => $interval,
@@ -664,8 +667,8 @@ abstract class LocalizedDatabaseSeeder extends Seeder
     }
 
     /**
-     * @param Collection<int, User> $users
-     * @param Collection<int, Order> $orders
+     * @param  Collection<int, User>  $users
+     * @param  Collection<int, Order>  $orders
      */
     protected function seedReferrals(Collection $users, Collection $orders): void
     {
@@ -678,7 +681,7 @@ abstract class LocalizedDatabaseSeeder extends Seeder
             }
 
             $referrer = $users->where('id', '!=', $candidate->id)->random();
-            if (!$referrer || $pairs->contains(fn (array $pair) => $pair['referred']->id === $candidate->id)) {
+            if (! $referrer || $pairs->contains(fn (array $pair) => $pair['referred']->id === $candidate->id)) {
                 continue;
             }
 
@@ -729,8 +732,8 @@ abstract class LocalizedDatabaseSeeder extends Seeder
     }
 
     /**
-     * @param Collection<int, User> $users
-     * @param Collection<int, Order> $orders
+     * @param  Collection<int, User>  $users
+     * @param  Collection<int, Order>  $orders
      */
     protected function seedGiftCards(Collection $users, Collection $orders): void
     {
@@ -743,8 +746,8 @@ abstract class LocalizedDatabaseSeeder extends Seeder
             $issuedAt = fake()->dateTimeBetween('-8 months', '-2 days');
 
             $giftCard = GiftCard::query()->create([
-                'code' => 'DG-SEED-' . str_pad((string) $index, 4, '0', STR_PAD_LEFT),
-                'name' => fake()->randomElement($this->content('gift_card_names')) . ' #' . $index,
+                'code' => 'DG-SEED-'.str_pad((string) $index, 4, '0', STR_PAD_LEFT),
+                'name' => fake()->randomElement($this->content('gift_card_names')).' #'.$index,
                 'message' => fake()->boolean(40) ? LocalizedTextFactory::sentence() : null,
                 'purchaser_user_id' => $purchaser?->id,
                 'recipient_user_id' => $recipient?->id,

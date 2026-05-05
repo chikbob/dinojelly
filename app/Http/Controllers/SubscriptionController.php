@@ -18,8 +18,7 @@ class SubscriptionController extends Controller
         protected OrderService $orderService,
         protected CartService $cartService,
         protected PaymentService $paymentService,
-    ) {
-    }
+    ) {}
 
     public function index(Request $request)
     {

@@ -2,6 +2,4 @@
 
 namespace Database\Seeders;
 
-class DatabaseSeeder extends RussianDatabaseSeeder
-{
-}
+class DatabaseSeeder extends UkrainianDatabaseSeeder {}

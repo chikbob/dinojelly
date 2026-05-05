@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\GiftCardService;
 use App\Services\CartService;
+use App\Services\GiftCardService;
 use Illuminate\Http\Request;
 
 class GiftCardController extends Controller
@@ -11,8 +11,7 @@ class GiftCardController extends Controller
     public function __construct(
         protected GiftCardService $giftCardService,
         protected CartService $cartService,
-    ) {
-    }
+    ) {}
 
     public function preview(Request $request)
     {

@@ -9,14 +9,13 @@ class ReferralController extends Controller
 {
     public function __construct(
         protected ReferralService $referralService,
-    ) {
-    }
+    ) {}
 
     public function capture(string $code, Request $request)
     {
         $referrer = $this->referralService->captureCode($code, $request);
 
-        if (!$referrer) {
+        if (! $referrer) {
             return redirect()->route('products.index')
                 ->withErrors(['referral' => 'Реферальная ссылка недействительна']);
         }

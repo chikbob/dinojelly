@@ -12,8 +12,7 @@ class InventoryController extends Controller
 {
     public function __construct(
         protected InventoryService $inventoryService,
-    ) {
-    }
+    ) {}
 
     public function index()
     {
@@ -44,7 +43,7 @@ class InventoryController extends Controller
     public function update(Request $request, StockItem $inventory)
     {
         $data = $request->validate([
-            'sku' => ['required', 'string', 'max:255', 'unique:stock_items,sku,' . $inventory->id],
+            'sku' => ['required', 'string', 'max:255', 'unique:stock_items,sku,'.$inventory->id],
             'quantity' => ['required', 'integer', 'min:0'],
             'low_stock_threshold' => ['required', 'integer', 'min:0'],
             'is_active' => ['required', 'boolean'],

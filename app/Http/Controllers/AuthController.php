@@ -15,8 +15,7 @@ class AuthController extends Controller
 {
     public function __construct(
         protected ReferralService $referralService,
-    ) {
-    }
+    ) {}
 
     public function showLoginForm()
     {
@@ -45,7 +44,6 @@ class AuthController extends Controller
             'email' => __('auth.failed'),
         ]);
     }
-
 
     public function register(RegisterRequest $request)
     {
@@ -76,6 +74,7 @@ class AuthController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return redirect()->route('products.index')
             ->with('success', __('auth.logged_out')); // <-- локализация
     }

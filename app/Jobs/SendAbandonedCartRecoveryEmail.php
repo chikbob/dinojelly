@@ -17,8 +17,7 @@ class SendAbandonedCartRecoveryEmail implements ShouldQueue
 
     public function __construct(
         public int $reminderId,
-    ) {
-    }
+    ) {}
 
     public function handle(): void
     {
@@ -26,7 +25,7 @@ class SendAbandonedCartRecoveryEmail implements ShouldQueue
             ->with('user')
             ->find($this->reminderId);
 
-        if (!$reminder || $reminder->status !== 'pending' || !$reminder->email) {
+        if (! $reminder || $reminder->status !== 'pending' || ! $reminder->email) {
             return;
         }
 

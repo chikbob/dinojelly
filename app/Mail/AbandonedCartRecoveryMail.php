@@ -13,8 +13,7 @@ class AbandonedCartRecoveryMail extends Mailable
 
     public function __construct(
         public CartRecoveryReminder $reminder,
-    ) {
-    }
+    ) {}
 
     public function build(): self
     {

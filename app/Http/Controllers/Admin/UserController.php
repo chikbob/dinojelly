@@ -6,11 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Inertia\Inertia;
 
-class UserController extends     Controller
+class UserController extends Controller
 {
     public function index()
     {
         $users = User::paginate(15);
+
         return Inertia::render('admin/Users/Index', ['users' => $users]);
     }
 

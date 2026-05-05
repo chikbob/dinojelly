@@ -16,8 +16,7 @@ class CatalogService
         protected CartService $cartService,
         protected OrderService $orderService,
         protected ReviewService $reviewService,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array<string, mixed>
@@ -38,16 +37,16 @@ class CatalogService
             ->withCount(['reviews' => fn ($query) => $query->where('is_published', true)])
             ->withAvg(['reviews as average_rating' => fn ($query) => $query->where('is_published', true)], 'rating');
 
-        if (!empty($filters['q'])) {
+        if (! empty($filters['q'])) {
             $query = trim((string) $filters['q']);
             $productsQuery->where(function ($builder) use ($query) {
                 $builder
-                    ->where('name', 'like', '%' . $query . '%')
-                    ->orWhere('description', 'like', '%' . $query . '%');
+                    ->where('name', 'like', '%'.$query.'%')
+                    ->orWhere('description', 'like', '%'.$query.'%');
             });
         }
 
-        if (!empty($filters['category'])) {
+        if (! empty($filters['category'])) {
             $categorySlug = (string) $filters['category'];
             $productsQuery->whereHas('category', fn ($builder) => $builder->where('slug', $categorySlug));
         }
@@ -60,19 +59,19 @@ class CatalogService
             $productsQuery->where('price', '<=', $filters['max_price']);
         }
 
-        if (!empty($filters['on_sale'])) {
+        if (! empty($filters['on_sale'])) {
             $productsQuery->whereNotNull('old_price')
                 ->whereColumn('old_price', '>', 'price');
         }
 
-        $productsQuery->orderByRaw("
+        $productsQuery->orderByRaw('
             CASE
                 WHEN stock_items.is_active = 1
                     AND COALESCE(stock_items.quantity, 0) - COALESCE(stock_items.reserved_quantity, 0) > 0
                 THEN 0
                 ELSE 1
             END ASC
-        ");
+        ');
 
         match ($filters['sort'] ?? 'new') {
             'popular' => $productsQuery
@@ -99,7 +98,7 @@ class CatalogService
                 'sort' => $filters['sort'] ?? 'new',
                 'min_price' => $filters['min_price'] ?? '',
                 'max_price' => $filters['max_price'] ?? '',
-                'on_sale' => !empty($filters['on_sale']),
+                'on_sale' => ! empty($filters['on_sale']),
             ],
             'favorites' => $favoriteIds,
             'cartItems' => $user ? $this->cartService->getCartMap($user) : [],
@@ -156,6 +155,7 @@ class CatalogService
             ->withQueryString()
             ->through(function (Favorite $favorite) use ($favoriteIds) {
                 $favorite->product->loadMissing(['category', 'stockItem']);
+
                 return $this->transformProduct($favorite->product, $favoriteIds);
             });
 
@@ -177,6 +177,7 @@ class CatalogService
 
         if ($favorite) {
             $favorite->delete();
+
             return;
         }
 
@@ -187,7 +188,7 @@ class CatalogService
     }
 
     /**
-     * @param array<int, int> $favoriteIds
+     * @param  array<int, int>  $favoriteIds
      * @return array<string, mixed>
      */
     protected function transformProduct(Product $product, array $favoriteIds): array
@@ -203,7 +204,7 @@ class CatalogService
      */
     protected function getFavoriteIds(?User $user): array
     {
-        if (!$user) {
+        if (! $user) {
             return [];
         }
 

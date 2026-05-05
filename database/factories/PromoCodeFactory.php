@@ -10,7 +10,7 @@ class PromoCodeFactory extends Factory
     public function definition(): array
     {
         $startsAt = fake()->boolean(70) ? fake()->dateTimeBetween('-30 days', '+10 days') : null;
-        $expiresAt = $startsAt ? (clone $startsAt)->modify('+' . fake()->numberBetween(10, 90) . ' days') : null;
+        $expiresAt = $startsAt ? (clone $startsAt)->modify('+'.fake()->numberBetween(10, 90).' days') : null;
         $type = fake()->randomElement(['fixed', 'percent']);
 
         return [

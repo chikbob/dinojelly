@@ -15,12 +15,12 @@ class IsAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             return redirect()->route('login')
                 ->with('error', 'Необходима авторизация');
         }
 
-        if (!auth()->user()->isAdmin()) {
+        if (! auth()->user()->isAdmin()) {
             abort(403, 'Доступ запрещен. Только для администраторов.');
         }
 

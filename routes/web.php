@@ -1,7 +1,8 @@
 <?php
 
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AddressController;
+use App\Http\Controllers\Admin\AdminHomeController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CartRecoveryController;
 use App\Http\Controllers\FavoriteController;
@@ -15,7 +16,6 @@ use App\Http\Controllers\RecommendationController;
 use App\Http\Controllers\ReferralController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SubscriptionController;
-use App\Http\Controllers\Admin\AdminHomeController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -77,7 +77,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/addresses/{address}', [AddressController::class, 'destroy'])->name('addresses.destroy');
     Route::post('/gift-cards/claim', [GiftCardController::class, 'claim'])->name('gift-cards.claim');
 });
-
 
 /*
 |--------------------------------------------------------------------------

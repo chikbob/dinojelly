@@ -15,8 +15,7 @@ class PaymentService
         protected InventoryService $inventoryService,
         protected ReferralService $referralService,
         protected GiftCardService $giftCardService,
-    ) {
-    }
+    ) {}
 
     public function createForOrder(Order $order): Payment
     {
@@ -138,7 +137,7 @@ class PaymentService
         $providerPaymentId = $payload['provider_payment_id'] ?? null;
         $status = $payload['status'] ?? null;
 
-        if (!$providerPaymentId || !in_array($status, ['paid', 'failed', 'canceled'], true)) {
+        if (! $providerPaymentId || ! in_array($status, ['paid', 'failed', 'canceled'], true)) {
             throw new \InvalidArgumentException('Некорректный payload вебхука');
         }
 

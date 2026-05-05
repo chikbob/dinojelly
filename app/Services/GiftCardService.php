@@ -6,7 +6,6 @@ use App\Models\GiftCard;
 use App\Models\GiftCardRedemption;
 use App\Models\Order;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class GiftCardService
@@ -14,7 +13,7 @@ class GiftCardService
     public function generateCode(): string
     {
         do {
-            $code = 'DG-' . strtoupper(Str::random(10));
+            $code = 'DG-'.strtoupper(Str::random(10));
         } while (GiftCard::query()->where('code', $code)->exists());
 
         return $code;
@@ -47,7 +46,7 @@ class GiftCardService
             ->where('code', strtoupper(trim($code)))
             ->firstOrFail();
 
-        if (!$giftCard->is_active || ($giftCard->expires_at && $giftCard->expires_at->isPast()) || $giftCard->balance <= 0) {
+        if (! $giftCard->is_active || ($giftCard->expires_at && $giftCard->expires_at->isPast()) || $giftCard->balance <= 0) {
             throw new \RuntimeException('Подарочная карта недоступна');
         }
 
@@ -68,7 +67,7 @@ class GiftCardService
      */
     public function resolveForOrder(User $user, ?string $code, float $orderAmount): array
     {
-        if (!$code) {
+        if (! $code) {
             return ['gift_card' => null, 'amount' => 0];
         }
 
@@ -86,7 +85,7 @@ class GiftCardService
             return;
         }
 
-        if (!$giftCard->recipient_user_id) {
+        if (! $giftCard->recipient_user_id) {
             $giftCard->update([
                 'recipient_user_id' => $user->id,
             ]);
@@ -116,7 +115,7 @@ class GiftCardService
 
     public function refundOrderDiscounts(Order $order): void
     {
-        if ($order->gift_card_id && $order->gift_card_amount > 0 && !$order->gift_card_refunded_at) {
+        if ($order->gift_card_id && $order->gift_card_amount > 0 && ! $order->gift_card_refunded_at) {
             $giftCard = GiftCard::query()->find($order->gift_card_id);
 
             if ($giftCard) {
@@ -142,7 +141,7 @@ class GiftCardService
             ])->save();
         }
 
-        if ($order->referral_credit_amount > 0 && !$order->referral_credit_refunded_at) {
+        if ($order->referral_credit_amount > 0 && ! $order->referral_credit_refunded_at) {
             $order->user()->increment('referral_credit_balance', (float) $order->referral_credit_amount);
             $order->forceFill([
                 'referral_credit_refunded_at' => now(),
@@ -183,7 +182,7 @@ class GiftCardService
             ->where('code', strtoupper(trim($code)))
             ->firstOrFail();
 
-        if (!$giftCard->is_active || ($giftCard->expires_at && $giftCard->expires_at->isPast()) || $giftCard->balance <= 0) {
+        if (! $giftCard->is_active || ($giftCard->expires_at && $giftCard->expires_at->isPast()) || $giftCard->balance <= 0) {
             throw new \RuntimeException('Подарочная карта недоступна');
         }
 

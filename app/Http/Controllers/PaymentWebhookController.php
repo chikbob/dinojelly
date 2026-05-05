@@ -9,8 +9,7 @@ class PaymentWebhookController extends Controller
 {
     public function __construct(
         protected PaymentService $paymentService,
-    ) {
-    }
+    ) {}
 
     public function mock(Request $request)
     {

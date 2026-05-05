@@ -15,11 +15,10 @@ class AdminOrderService
         protected InventoryService $inventoryService,
         protected ReferralService $referralService,
         protected GiftCardService $giftCardService,
-    ) {
-    }
+    ) {}
 
     /**
-     * @param array{status?: ?string, payment_status?: ?string, search?: ?string} $filters
+     * @param  array{status?: ?string, payment_status?: ?string, search?: ?string}  $filters
      * @return array{orders: LengthAwarePaginator, filters: array<string, mixed>}
      */
     public function getOrdersPage(array $filters): array
@@ -29,26 +28,26 @@ class AdminOrderService
             ->withCount('items')
             ->orderByDesc('created_at');
 
-        if (!empty($filters['status'])) {
+        if (! empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }
 
-        if (!empty($filters['payment_status'])) {
+        if (! empty($filters['payment_status'])) {
             $query->whereHas('latestPayment', function ($paymentQuery) use ($filters) {
                 $paymentQuery->where('status', $filters['payment_status']);
             });
         }
 
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $search = trim((string) $filters['search']);
             $query->where(function ($builder) use ($search) {
                 $builder
                     ->where('id', $search)
                     ->orWhereHas('user', function ($userQuery) use ($search) {
                         $userQuery
-                            ->where('name', 'like', '%' . $search . '%')
-                            ->orWhere('email', 'like', '%' . $search . '%')
-                            ->orWhere('phone', 'like', '%' . $search . '%');
+                            ->where('name', 'like', '%'.$search.'%')
+                            ->orWhere('email', 'like', '%'.$search.'%')
+                            ->orWhere('phone', 'like', '%'.$search.'%');
                     });
             });
         }

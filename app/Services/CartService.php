@@ -12,8 +12,7 @@ class CartService
     public function __construct(
         protected AbandonedCartService $abandonedCartService,
         protected InventoryService $inventoryService,
-    ) {
-    }
+    ) {}
 
     public function getCartItems(User $user): Collection
     {
@@ -49,7 +48,7 @@ class CartService
         $this->abandonedCartService->markRecovered($user, 'cart_updated');
 
         $stockItem = $this->inventoryService->ensureProductInventory($productId);
-        if (!$stockItem->is_active || $this->inventoryService->getAvailableQuantity($stockItem) < 1) {
+        if (! $stockItem->is_active || $this->inventoryService->getAvailableQuantity($stockItem) < 1) {
             throw new \RuntimeException('Товар временно недоступен');
         }
 
@@ -58,7 +57,7 @@ class CartService
             ['quantity' => 0]
         );
 
-        if (!$this->inventoryService->canPurchaseQuantity($stockItem, $cartItem->quantity + 1)) {
+        if (! $this->inventoryService->canPurchaseQuantity($stockItem, $cartItem->quantity + 1)) {
             throw new \RuntimeException('Недостаточно остатка на складе');
         }
 
@@ -74,12 +73,12 @@ class CartService
             ->where('product_id', $productId)
             ->first();
 
-        if (!$cartItem) {
+        if (! $cartItem) {
             return;
         }
 
         $stockItem = $this->inventoryService->ensureProductInventory($productId);
-        if (!$this->inventoryService->canPurchaseQuantity($stockItem, $cartItem->quantity + 1)) {
+        if (! $this->inventoryService->canPurchaseQuantity($stockItem, $cartItem->quantity + 1)) {
             throw new \RuntimeException('Недостаточно остатка на складе');
         }
 
@@ -95,12 +94,13 @@ class CartService
             ->where('product_id', $productId)
             ->first();
 
-        if (!$cartItem) {
+        if (! $cartItem) {
             return;
         }
 
         if ($cartItem->quantity > 1) {
             $cartItem->decrement('quantity');
+
             return;
         }
 

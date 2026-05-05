@@ -12,8 +12,7 @@ class ProductController extends Controller
 {
     public function __construct(
         protected CatalogService $catalogService,
-    ) {
-    }
+    ) {}
 
     /**
      * Display a listing of the products.

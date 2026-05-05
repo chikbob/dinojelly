@@ -9,8 +9,7 @@ class CartRecoveryController extends Controller
 {
     public function __construct(
         protected AbandonedCartService $abandonedCartService,
-    ) {
-    }
+    ) {}
 
     public function recover(string $token, Request $request)
     {
@@ -18,8 +17,9 @@ class CartRecoveryController extends Controller
 
         abort_unless($reminder, 404);
 
-        if (!$request->user()) {
+        if (! $request->user()) {
             $request->session()->put('url.intended', route('cart.recover', $token));
+
             return redirect()->route('login');
         }
 

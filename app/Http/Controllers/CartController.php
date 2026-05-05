@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Services\CartService;
 use App\Services\OrderService;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class CartController extends Controller
@@ -12,8 +12,7 @@ class CartController extends Controller
     public function __construct(
         protected CartService $cartService,
         protected OrderService $orderService,
-    ) {
-    }
+    ) {}
 
     public function index(Request $request)
     {

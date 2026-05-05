@@ -17,13 +17,13 @@ class FactoryLocale
     public static function phoneNumber(): string
     {
         if (config('database.seeding.app_locale') === 'uk') {
-            return '+380' . fake()->randomElement([
+            return '+380'.fake()->randomElement([
                 '39', '50', '63', '66', '67', '68', '73',
                 '91', '92', '93', '94', '95', '96', '97', '98', '99',
-            ]) . fake()->numerify('#######');
+            ]).fake()->numerify('#######');
         }
 
-        return self::phonePrefix() . fake()->numerify('#########');
+        return self::phonePrefix().fake()->numerify('#########');
     }
 
     /**

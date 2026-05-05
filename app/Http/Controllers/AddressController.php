@@ -24,7 +24,7 @@ class AddressController extends Controller
             'is_default' => 'nullable|boolean',
         ]);
 
-        if (!empty($validated['is_default'])) {
+        if (! empty($validated['is_default'])) {
             Address::query()
                 ->where('user_id', $request->user()->id)
                 ->update(['is_default' => false]);
@@ -54,7 +54,7 @@ class AddressController extends Controller
             'is_default' => 'nullable|boolean',
         ]);
 
-        if (!empty($validated['is_default'])) {
+        if (! empty($validated['is_default'])) {
             Address::query()
                 ->where('user_id', $request->user()->id)
                 ->whereKeyNot($address->id)

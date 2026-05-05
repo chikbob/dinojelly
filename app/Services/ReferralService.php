@@ -6,7 +6,6 @@ use App\Models\Order;
 use App\Models\Referral;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class ReferralService
@@ -36,7 +35,7 @@ class ReferralService
             ->where('referral_code', strtoupper(trim($code)))
             ->first();
 
-        if (!$referrer) {
+        if (! $referrer) {
             return null;
         }
 
@@ -52,7 +51,7 @@ class ReferralService
         }
 
         $code = $request->session()->pull(self::SESSION_KEY);
-        if (!$code) {
+        if (! $code) {
             return null;
         }
 
@@ -60,7 +59,7 @@ class ReferralService
             ->where('referral_code', $code)
             ->first();
 
-        if (!$referrer || $referrer->id === $user->id) {
+        if (! $referrer || $referrer->id === $user->id) {
             return null;
         }
 
@@ -85,7 +84,7 @@ class ReferralService
     public function completeForOrder(Order $order): void
     {
         $user = $order->user()->first();
-        if (!$user || !$user->referred_by_user_id) {
+        if (! $user || ! $user->referred_by_user_id) {
             return;
         }
 
@@ -104,7 +103,7 @@ class ReferralService
             ->where('referred_user_id', $user->id)
             ->first();
 
-        if (!$referral || $referral->status === 'rewarded') {
+        if (! $referral || $referral->status === 'rewarded') {
             return;
         }
 

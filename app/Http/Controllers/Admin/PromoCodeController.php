@@ -70,7 +70,7 @@ class PromoCodeController extends Controller
     public function update(Request $request, PromoCode $promoCode)
     {
         $validated = $request->validate([
-            'code' => ['required', 'string', 'max:255', 'unique:promo_codes,code,' . $promoCode->id],
+            'code' => ['required', 'string', 'max:255', 'unique:promo_codes,code,'.$promoCode->id],
             'name' => ['required', 'string', 'max:255'],
             'type' => ['required', 'in:fixed,percent'],
             'value' => ['required', 'numeric', 'min:0'],

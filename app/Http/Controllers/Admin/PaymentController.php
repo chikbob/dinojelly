@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Order;
 use App\Models\Payment;
 use App\Services\InventoryService;
 use App\Services\OrderEventService;
@@ -15,8 +14,7 @@ class PaymentController extends Controller
     public function __construct(
         protected InventoryService $inventoryService,
         protected OrderEventService $orderEventService,
-    ) {
-    }
+    ) {}
 
     public function index()
     {

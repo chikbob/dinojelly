@@ -22,8 +22,7 @@ class CheckoutService
         protected AbandonedCartService $abandonedCartService,
         protected InventoryService $inventoryService,
         protected GiftCardService $giftCardService,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array<string, mixed>|null
@@ -75,8 +74,7 @@ class CheckoutService
         int $deliverySlotId,
         ?string $giftCardCode = null,
         bool $useReferralCredit = false,
-    ): Order
-    {
+    ): Order {
         $cartItems = $this->cartService->getCartItems($user);
 
         if ($cartItems->isEmpty()) {
@@ -92,7 +90,7 @@ class CheckoutService
             ->where('user_id', $user->id)
             ->find($addressId);
 
-        if (!$address) {
+        if (! $address) {
             throw new \RuntimeException('Адрес доставки не найден');
         }
 
@@ -100,7 +98,7 @@ class CheckoutService
             ->where('is_active', true)
             ->find($deliverySlotId);
 
-        if (!$deliverySlot) {
+        if (! $deliverySlot) {
             throw new \RuntimeException('Слот доставки недоступен');
         }
 

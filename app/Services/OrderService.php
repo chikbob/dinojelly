@@ -15,8 +15,7 @@ class OrderService
         protected OrderEventService $orderEventService,
         protected InventoryService $inventoryService,
         protected GiftCardService $giftCardService,
-    ) {
-    }
+    ) {}
 
     public function getPendingOrdersCount(User $user): int
     {
