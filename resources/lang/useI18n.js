@@ -4,10 +4,10 @@ import uk from "./uk"
 import en from "./en"
 
 const messages = { ru, uk, en }
-const defaultLang = "ru"
+const defaultLang = "uk"
 const resolveLang = (lang) => (lang && messages[lang] ? lang : defaultLang)
 
-// Загружаем язык из localStorage или ставим ru по умолчанию
+// Загружаем язык из localStorage или ставим uk по умолчанию
 const currentLang = ref(resolveLang(localStorage.getItem("lang")))
 
 export function useI18n() {

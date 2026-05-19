@@ -480,4 +480,43 @@ function deleteReview() {
         width: 100%;
     }
 }
+
+@media (max-width: 960px) {
+    .product-page {
+        padding: 20px 16px 40px;
+    }
+
+    .product {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .product-page {
+        padding: 16px 14px 32px;
+    }
+
+    .product {
+        gap: 20px;
+        margin-bottom: 28px;
+    }
+
+    .product__title {
+        font-size: 20px;
+    }
+
+    .product__actions {
+        flex-wrap: wrap;
+    }
+
+    .product__add-to-cart,
+    .cart-counter {
+        width: 100%;
+    }
+
+    .product-reviews__card-top {
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+}
 </style>

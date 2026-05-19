@@ -61,18 +61,24 @@
                 <div v-if="assistantResult" class="catalog-ai__result">
                     <p class="catalog-ai__summary">{{ formatAssistantSummary(assistantResult.summary) }}</p>
                     <div class="catalog-ai__recommendations" style="width:100%; max-width:100%; min-width:0;">
-                        <article v-for="item in assistantResult.products" :key="item.id" class="catalog-ai__card">
-                            <img :src="item.image_url" :alt="item.name" class="catalog-ai__image" />
-                            <div class="catalog-ai__content">
-                                <strong>{{ item.name }}</strong>
-                                <p>{{ formatRecommendationReason(item) }}</p>
-                                <small>{{ item.price }} {{ t("currency.symbol") }}</small>
-                                <div class="catalog-ai__actions">
-                                    <button @click="goToProduct(item.id)" style="width:100%; max-width:100%; box-sizing:border-box;">{{ t("catalog.assistant.open") }}</button>
-                                    <button @click="addToCart(item.id)" style="width:100%; max-width:100%; box-sizing:border-box;">{{ t("catalog.addToCart") }}</button>
-                                </div>
-                            </div>
-                        </article>
+                        <StoreProductCard
+                            v-for="item in assistantResult.products"
+                            :key="item.id"
+                            :product="item"
+                            :favorite="favorites.includes(item.id)"
+                            :cart-item="cart[item.id] ?? null"
+                            :show-category="Boolean(item.category)"
+                            :category-label="item.category ? getCategoryLabel(item.category) : ''"
+                            :recommendation-reason="formatRecommendationReason(item)"
+                            :add-to-cart-label="t('catalog.addToCart')"
+                            :out-of-stock-label="t('catalog.outOfStock')"
+                            :currency-symbol="t('currency.symbol')"
+                            @open="goToProduct"
+                            @favorite-toggle="toggleFavorite"
+                            @add-to-cart="addToCart"
+                            @increase="increaseQuantity"
+                            @decrease="decreaseQuantity"
+                        />
                     </div>
                 </div>
             </section>
@@ -151,71 +157,23 @@
                         class="catalog__grid"
                         style="width:100%; max-width:100%; min-width:0;"
                     >
-                        <div
+                        <StoreProductCard
                             v-for="product in products.data"
                             :key="product.id"
-                            class="catalog__card product-card"
-                            :class="{ 'catalog__card--out-of-stock': !product.is_in_stock }"
-                            @click="goToProduct(product.id)"
-                        >
-                            <img :src="product.image_url" :alt="product.name" class="product-card__image"/>
-
-                            <button
-                                @click.stop="toggleFavorite(product.id)"
-                                class="product-card__favorite"
-                            >
-                                <img
-                                    :src="favorites.includes(product.id) ? '/images/Favorite.png' : '/images/unFavorite.png'"
-                                    alt="favorite"
-                                    class="favorite-icon"
-                                />
-                            </button>
-
-                            <div class="product-card__content">
-                                <div v-if="product.category" class="product-card__category">
-                                    {{ getCategoryLabel(product.category) }}
-                                </div>
-                                <div class="product-card__name">{{ product.name }}</div>
-                                <div class="product-card__weight">{{ product.weight }} г</div>
-                                <div
-                                    v-if="!product.is_in_stock"
-                                    class="product-card__stock product-card__stock--out"
-                                >
-                                    {{ t("catalog.outOfStock") }}
-                                </div>
-
-                                <div class="product-card__prices">
-                                    <span class="product-card__price">{{ product.price }} {{ t("currency.symbol") }}</span>
-                                    <span v-if="product.old_price" class="product-card__old-price">
-                                        {{ product.old_price }} {{ t("currency.symbol") }}
-                                    </span>
-                                </div>
-
-                                <div v-if="cart[product.id]" class="cart-controls">
-                                    <button
-                                        @click.stop="decreaseQuantity(product.id)"
-                                        class="cart-controls__btn"
-                                    >-
-                                    </button>
-                                    <span class="cart-controls__count">{{ cart[product.id].quantity }}</span>
-                                    <button
-                                        @click.stop="increaseQuantity(product.id)"
-                                        class="cart-controls__btn"
-                                    >+
-                                    </button>
-                                </div>
-
-                                <button
-                                    v-else
-                                    @click.stop="addToCart(product.id)"
-                                    class="product-card__button"
-                                    :class="{ 'product-card__button--disabled': !product.is_in_stock }"
-                                    :disabled="!product.is_in_stock"
-                                >
-                                    {{ product.is_in_stock ? t("catalog.addToCart") : t("catalog.outOfStock") }}
-                                </button>
-                            </div>
-                        </div>
+                            :product="product"
+                            :favorite="favorites.includes(product.id)"
+                            :cart-item="cart[product.id] ?? null"
+                            :show-category="Boolean(product.category)"
+                            :category-label="product.category ? getCategoryLabel(product.category) : ''"
+                            :add-to-cart-label="t('catalog.addToCart')"
+                            :out-of-stock-label="t('catalog.outOfStock')"
+                            :currency-symbol="t('currency.symbol')"
+                            @open="goToProduct"
+                            @favorite-toggle="toggleFavorite"
+                            @add-to-cart="addToCart"
+                            @increase="increaseQuantity"
+                            @decrease="decreaseQuantity"
+                        />
                     </div>
 
                     <div v-else class="catalog__empty">
@@ -237,6 +195,7 @@ import {route} from 'ziggy-js'
 import {useI18n} from "../lang/useI18n"
 import {computed, onBeforeUnmount, onMounted, reactive, ref, watch} from 'vue'
 import Pagination from "../components/pagination.vue";
+import StoreProductCard from "../components/StoreProductCard.vue";
 
 const {t, currentLang} = useI18n()
 
@@ -653,8 +612,7 @@ const toggleFavorite = (productId) => {
     appearance: none;
 }
 
-.catalog-ai__cta,
-.catalog-ai__actions button {
+.catalog-ai__cta {
     border: none;
     border-radius: 12px;
     padding: 10px 12px;
@@ -673,33 +631,8 @@ const toggleFavorite = (productId) => {
 
 .catalog-ai__recommendations {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 14px;
-}
-
-.catalog-ai__card {
-    background: rgba(255,255,255,0.82);
-    border-radius: 16px;
-    overflow: hidden;
-    border: 1px solid rgba(15, 23, 42, 0.08);
-}
-
-.catalog-ai__image {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-}
-
-.catalog-ai__content {
-    padding: 14px;
-    display: grid;
-    gap: 10px;
-}
-
-.catalog-ai__actions {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
 }
 
 .catalog-ai__error {
@@ -709,6 +642,7 @@ const toggleFavorite = (productId) => {
 .product-card {
     cursor: pointer;
     position: relative;
+    min-width: 0;
 
     &__pagination {
         display: flex;
@@ -773,6 +707,12 @@ const toggleFavorite = (productId) => {
         color: #777;
     }
 
+    &__recommendation {
+        font-size: 9px;
+        line-height: 1.6;
+        color: #475569;
+    }
+
     &__stock {
         font-size: 9px;
         line-height: 1.4;
@@ -787,22 +727,19 @@ const toggleFavorite = (productId) => {
         display: flex;
         align-items: center;
         gap: 8px;
-        flex-wrap: nowrap;
-        white-space: nowrap;
+        flex-wrap: wrap;
     }
 
     &__price {
         font-size: 14px;
         font-weight: 400;
         color: #ff6b6b;
-        white-space: nowrap;
     }
 
     &__old-price {
         font-size: 10px;
         text-decoration: line-through;
         color: #aaa;
-        white-space: nowrap;
     }
 
     &__button {
@@ -998,6 +935,41 @@ const toggleFavorite = (productId) => {
 
     .catalog-filter {
         position: static;
+    }
+}
+
+@media (max-width: 640px) {
+    .catalog {
+        padding: 24px 14px 40px;
+
+        &__title {
+            font-size: 18px;
+        }
+
+        &__subtitle,
+        &__sort,
+        &__category {
+            font-size: 8px;
+        }
+
+        &__grid {
+            grid-template-columns: minmax(0, 1fr);
+            gap: 18px;
+        }
+    }
+
+    .catalog-ai {
+        padding: 16px;
+    }
+
+    .product-card {
+        &__image {
+            height: 240px;
+        }
+
+        &__content {
+            padding: 14px;
+        }
     }
 }
 </style>

@@ -339,6 +339,23 @@ const handleCartClick = () => {
 
 /* Адаптивность */
 @media (max-width: 768px) {
+    .header {
+        padding: 10px 14px;
+    }
+
+    .header__top {
+        gap: 10px;
+    }
+
+    .header__nav {
+        width: 100%;
+        gap: 8px !important;
+    }
+
+    .header__nav .header__link {
+        margin-left: 0;
+    }
+
     .header__bottom {
         flex-wrap: wrap;
     }
@@ -349,9 +366,19 @@ const handleCartClick = () => {
         gap: 10px;
     }
 
+    .header__login-btn,
+    .header__logout-btn,
+    .header__favorites,
+    .header__cart,
+    .header__orders {
+        padding: 8px 10px;
+        font-size: 10px;
+    }
+
     .header__user-name,
     .header__favorites span:not(.header__icon),
-    .header__cart span:not(.header__icon) {
+    .header__cart span:not(.header__icon),
+    .header__orders span:not(.header__icon) {
         display: none;
     }
 
@@ -361,6 +388,26 @@ const handleCartClick = () => {
 
     .header__lang option {
         font-size: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header__actions {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .header__lang-wrapper {
+        max-width: none !important;
+    }
+
+    .header__login-btn,
+    .header__logout-btn,
+    .header__favorites,
+    .header__cart,
+    .header__orders {
+        width: 100%;
+        justify-content: center;
     }
 }
 </style>

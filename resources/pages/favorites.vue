@@ -15,56 +15,21 @@
             </div>
 
             <div v-if="favorites.data.length" class="favorites__grid">
-                <div
+                <StoreProductCard
                     v-for="product in favorites.data"
                     :key="product.id"
-                    class="favorites__card product-card"
-                    :class="{ 'product-card--out-of-stock': !product.is_in_stock }"
-                    @click="goToProduct(product.id)"
-                >
-                    <img :src="product.image_url" :alt="product.name" class="product-card__image"/>
-
-                    <!-- КНОПКА УДАЛЕНИЯ ИЗ ИЗБРАННОГО -->
-                    <button
-                        @click.stop="removeFavorite(product.id)"
-                        class="product-card__favorite"
-                    >
-                        <img src="/images/Favorite.png" alt="remove" class="favorite-icon"/>
-                    </button>
-
-                    <div class="product-card__content">
-                        <div class="product-card__name">{{ product.name }}</div>
-                        <div class="product-card__weight">{{ product.weight }} г</div>
-                        <div v-if="!product.is_in_stock" class="product-card__stock product-card__stock--out">
-                            {{ t("catalog.outOfStock") }}
-                        </div>
-
-                        <div class="product-card__prices">
-                            <span class="product-card__price">{{ product.price }}{{ t("currency.symbol") }}</span>
-                            <span v-if="product.old_price" class="product-card__old-price">
-                                {{ product.old_price }}{{ t("currency.symbol") }}
-                            </span>
-                        </div>
-
-                        <!-- ЕСЛИ ТОВАРА НЕТ В КОРЗИНЕ -->
-                        <button
-                            v-if="!cartItems[product.id]"
-                            @click.stop="addToCart(product.id)"
-                            class="product-card__button"
-                            :class="{ 'product-card__button--disabled': !product.is_in_stock }"
-                            :disabled="!product.is_in_stock"
-                        >
-                            {{ product.is_in_stock ? t("catalog.addToCart") : t("catalog.outOfStock") }}
-                        </button>
-
-                        <!-- ЕСЛИ ТОВАР УЖЕ В КОРЗИНЕ -->
-                        <div v-else class="cart-counter" :class="{ 'cart-counter--out': !product.is_in_stock }">
-                            <button @click.stop="decreaseQty(product.id)" class="counter-btn">-</button>
-                            <span class="counter-value">{{ cartItems[product.id].quantity }}</span>
-                            <button @click.stop="increaseQty(product.id)" class="counter-btn" :disabled="!product.is_in_stock">+</button>
-                        </div>
-                    </div>
-                </div>
+                    :product="product"
+                    :favorite="true"
+                    :cart-item="cartItems[product.id] ?? null"
+                    :add-to-cart-label="t('catalog.addToCart')"
+                    :out-of-stock-label="t('catalog.outOfStock')"
+                    :currency-symbol="t('currency.symbol')"
+                    @open="goToProduct"
+                    @favorite-toggle="removeFavorite"
+                    @add-to-cart="addToCart"
+                    @increase="increaseQty"
+                    @decrease="decreaseQty"
+                />
             </div>
 
             <p v-else class="favorites__empty">{{ t("favorites.empty") }}</p>
@@ -81,6 +46,7 @@ import MainLayout from "../layouts/mainLayout.vue"
 import {route} from "ziggy-js"
 import Pagination from "../components/pagination.vue";
 import {ref, watch} from "vue";
+import StoreProductCard from "../components/StoreProductCard.vue";
 
 const {t} = useI18n()
 
@@ -215,7 +181,7 @@ const decreaseQty = (productId) => {
         }
     }
 
-    .product-card {
+    :deep(.product-card) {
         cursor: pointer;
         position: relative;
         background-color: #fff;
@@ -233,7 +199,7 @@ const decreaseQty = (productId) => {
             border-color: #3ecf8e;
         }
 
-        &--out-of-stock {
+        &.product-card--out-of-stock {
             opacity: 0.75;
             border-color: #d1d5db;
             background: linear-gradient(180deg, #f8fafc 0%, #f3f4f6 100%);
@@ -245,7 +211,7 @@ const decreaseQty = (productId) => {
             }
         }
 
-        &__favorite {
+        .product-card__favorite {
             position: absolute;
             top: 10px;
             right: 10px;
@@ -265,14 +231,14 @@ const decreaseQty = (productId) => {
             }
         }
 
-        &__image {
+        .product-card__image {
             width: 100%;
             height: 300px;
             object-fit: cover;
             border-bottom: 2px solid #eaeaea;
         }
 
-        &__content {
+        .product-card__content {
             padding: 16px;
             display: flex;
             flex-direction: column;
@@ -280,7 +246,7 @@ const decreaseQty = (productId) => {
             flex-grow: 1;
         }
 
-        &__name {
+        .product-card__name {
             font-size: 12px;
             font-weight: 400;
             color: #333;
@@ -288,42 +254,41 @@ const decreaseQty = (productId) => {
             min-height: 34px;
         }
 
-        &__weight {
+        .product-card__weight {
             font-size: 10px;
             color: #777;
         }
 
-        &__stock {
+        .product-card__stock {
             font-size: 9px;
             line-height: 1.4;
             text-transform: uppercase;
         }
 
-        &__stock--out {
+        .product-card__stock--out {
             color: #6b7280;
         }
 
-        &__prices {
+        .product-card__prices {
             display: flex;
             align-items: center;
             gap: 8px;
-            flex-wrap: nowrap;
-            white-space: nowrap;
+            flex-wrap: wrap;
         }
 
-        &__price {
+        .product-card__price {
             font-size: 14px;
             font-weight: 400;
             color: #ff6b6b;
         }
 
-        &__old-price {
+        .product-card__old-price {
             font-size: 10px;
             text-decoration: line-through;
             color: #aaa;
         }
 
-        &__button {
+        .product-card__button {
             margin-top: auto;
             padding: 12px;
             background-color: #3ecf8e;
@@ -346,26 +311,26 @@ const decreaseQty = (productId) => {
             }
         }
 
-        &__button--disabled,
-        &__button:disabled {
+        .product-card__button--disabled,
+        .product-card__button:disabled {
             background-color: #9ca3af;
             cursor: not-allowed;
         }
     }
 
-    .product-card--out-of-stock .product-card__image {
+    :deep(.product-card--out-of-stock .product-card__image) {
         filter: grayscale(1);
     }
 
     /* Красивый блок с +/- */
-    .cart-counter {
+    :deep(.cart-counter) {
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 12px;
         margin-top: auto;
 
-        .counter-btn {
+        .cart-controls__btn {
             width: 28px;
             height: 28px;
             border-radius: 50%;
@@ -389,7 +354,7 @@ const decreaseQty = (productId) => {
             }
         }
 
-        .counter-value {
+        .cart-controls__count {
             font-size: 17px;
             font-weight: 600;
             color: #333;
@@ -398,7 +363,7 @@ const decreaseQty = (productId) => {
         }
     }
 
-    .cart-counter--out .counter-value {
+    :deep(.cart-counter--out .counter-value) {
         color: #6b7280;
     }
 }

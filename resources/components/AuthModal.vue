@@ -2,106 +2,17 @@
     <div v-if="isOpen" class="modal modal--active">
         <div class="modal__overlay" @click="closeModal"></div>
 
-        <div class="modal__content" style="width:100%; max-width:420px; box-sizing:border-box; overflow:hidden;">
-            <button class="modal__close" @click="closeModal">&times;</button>
-
-            <!-- Заголовок DinoJelly -->
-            <h1 class="auth-logo">
-                <span class="auth-logo__dino">Dino</span>
-                <span class="auth-logo__jelly">Jelly</span>
-            </h1>
-
-            <!-- Форма входа -->
-            <form v-if="activeTab === 'login' || showAuth === true" @submit.prevent="submitLogin" class="auth-form" style="width:100%; max-width:100%; min-width:0;">
-                <div class="auth-form__title">{{ t("auth.loginTitle") }}</div>
-
-                <div class="auth-form__group">
-                    <input v-model="loginForm.email" type="email" class="auth-form__input"
-                           style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"
-                           :placeholder="t('auth.email')" required>
-                    <div v-if="errors.email" class="auth-form__error">{{ t(errors.email) }}</div>
-                </div>
-
-                <div class="auth-form__group">
-                    <input v-model="loginForm.password" type="password" class="auth-form__input"
-                           style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"
-                           :placeholder="t('auth.password')" required>
-                    <div v-if="errors.password" class="auth-form__error">{{ t(errors.password) }}</div>
-                </div>
-
-                <!-- Ссылка над кнопкой -->
-                <p class="auth-form__switch">
-                    <a href="#" @click.prevent="switchToRegister">{{ t("auth.register") }}?</a>
-                </p>
-
-                <button type="submit" class="auth-form__submit" :disabled="processing" style="width:100%; max-width:100%; box-sizing:border-box;">
-                    <span v-if="processing">{{ t("auth.wait") }}</span>
-                    <span v-else>{{ t("auth.login") }}</span>
-                </button>
-            </form>
-
-            <!-- Форма регистрации -->
-            <form v-else @submit.prevent="submitRegister" class="auth-form" style="width:100%; max-width:100%; min-width:0;">
-                <div class="auth-form__title">{{ t("auth.registerTitle") }}</div>
-
-                <div class="auth-form__group">
-                    <input v-model="registerForm.name" type="text" class="auth-form__input"
-                           style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"
-                           :placeholder="t('auth.name')" required>
-                    <div v-if="errors.name" class="auth-form__error">{{ t(errors.name) }}</div>
-                </div>
-
-                <div class="auth-form__group">
-                    <input v-model="registerForm.phone" type="tel" class="auth-form__input"
-                           style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"
-                           :placeholder="t('auth.phone')" required>
-                    <div v-if="errors.phone" class="auth-form__error">{{ t(errors.phone) }}</div>
-                </div>
-
-                <div class="auth-form__group">
-                    <input v-model="registerForm.email" type="email" class="auth-form__input"
-                           style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"
-                           :placeholder="t('auth.email')" required>
-                    <div v-if="errors.email" class="auth-form__error">{{ t(errors.email) }}</div>
-                </div>
-
-                <div class="auth-form__group">
-                    <input v-model="registerForm.password" type="password" class="auth-form__input"
-                           style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"
-                           :placeholder="t('auth.password')" required>
-                    <div v-if="errors.password" class="auth-form__error">{{ t(errors.password) }}</div>
-                </div>
-
-                <div class="auth-form__group">
-                    <input v-model="registerForm.password_confirmation" type="password" class="auth-form__input"
-                           style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;"
-                           :placeholder="t('auth.passwordConfirm')" required>
-                </div>
-
-                <!-- Ссылка над кнопкой -->
-                <p class="auth-form__switch">
-                    <a href="#" @click.prevent="switchToLogin">{{ t("auth.login") }}?</a>
-                </p>
-
-                <button type="submit" class="auth-form__submit" :disabled="processing" style="width:100%; max-width:100%; box-sizing:border-box;">
-                    <span v-if="processing">{{ t("auth.wait") }}</span>
-                    <span v-else>{{ t("auth.register") }}</span>
-                </button>
-            </form>
+        <div class="modal__content">
+            <AuthPanel :initial-tab="showAuth ? 'login' : activeTab" :show-close="true" @close="closeModal" />
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useForm, usePage } from '@inertiajs/vue3'
-import { useI18n } from '../lang/useI18n'
+import { onMounted, onBeforeUnmount, ref } from 'vue'
+import AuthPanel from './AuthPanel.vue'
 
-const { t } = useI18n()
-const page = usePage()
-let showAuth = ref(false)
-
-import { onMounted, onBeforeUnmount } from 'vue'
+const showAuth = ref(false)
 
 const handleOpenAuthModal = () => {
     showAuth.value = true
@@ -122,65 +33,11 @@ const props = defineProps({
 const emit = defineEmits(['close'])
 
 const activeTab = ref('login')
-const processing = ref(false)
-const errors = computed(() => usePage().props.errors || {})
-
-const loginForm = useForm({
-    email: '',
-    password: '',
-})
-
-const registerForm = useForm({
-    name: '',
-    phone: '',
-    email: '',
-    password: '',
-    password_confirmation: '',
-})
 
 const closeModal = () => {
-    loginForm.reset()
-    registerForm.reset()
-    emit('close')
-}
-
-const switchToRegister = () => {
-    activeTab.value = 'register'
-    loginForm.reset()
-}
-
-const switchToLogin = () => {
     activeTab.value = 'login'
-    registerForm.reset()
-}
-
-const submitLogin = () => {
-    processing.value = true
-    loginForm.post('/login', {
-        preserveScroll: true,
-        onSuccess: () => {
-            closeModal()
-            window.location.reload()
-        },
-        onFinish: () => {
-            processing.value = false
-        },
-    })
-}
-
-const submitRegister = () => {
-    processing.value = true
-    registerForm.post('/register', {
-        preserveScroll: true,
-        onSuccess: () => {
-            registerForm.reset()
-            activeTab.value = 'login'
-            window.location.reload()
-        },
-        onFinish: () => {
-            processing.value = false
-        },
-    })
+    showAuth.value = false
+    emit('close')
 }
 </script>
 
@@ -207,7 +64,7 @@ const submitRegister = () => {
         position: relative;
         background: #fff;
         border-radius: 24px;
-        padding: 40px 32px;
+        padding: 40px 32px 32px;
         width: 100%;
         max-width: 420px;
         max-height: calc(100dvh - 32px);
@@ -226,6 +83,8 @@ const submitRegister = () => {
         display: flex;
         align-items: center;
         justify-content: center;
+        padding: 0;
+        line-height: 1;
         font-weight: bold;
         border: none;
         cursor: pointer;
@@ -241,7 +100,7 @@ const submitRegister = () => {
 .auth-logo {
     font-size: 26px;
     font-weight: 900;
-    margin-bottom: 20px;
+    margin: 0 0 20px;
     text-align: left;
 
     &__dino {
@@ -352,6 +211,11 @@ const submitRegister = () => {
 
     .modal__content {
         padding: 24px 18px;
+    }
+
+    .modal__close {
+        top: 14px;
+        right: 14px;
     }
 }
 

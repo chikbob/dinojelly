@@ -553,17 +553,28 @@ function selectGiftCard(code) {
 
 @media (max-width: 640px) {
     .checkout {
+        padding: 18px 14px 32px;
+    }
+
+    .checkout__section {
         padding: 16px;
     }
 
     .checkout__gift-row,
     .checkout__payment-methods,
     .checkout-option,
-    .checkout__item {
+    .checkout__item,
+    .checkout__bonus-label {
         flex-direction: column;
         align-items: stretch;
     }
 
+    .checkout__img {
+        width: 100%;
+        height: 220px;
+    }
+
+    .checkout__date-chip,
     .checkout__btn,
     .checkout__gift-preview {
         width: 100%;

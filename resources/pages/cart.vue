@@ -368,4 +368,57 @@ function goToCheckout() {
         margin-top: 100px;
     }
 }
+
+@media (max-width: 960px) {
+    .cart {
+        padding: 24px 16px 40px;
+
+        &__layout {
+            grid-template-columns: 1fr;
+        }
+    }
+}
+
+@media (max-width: 640px) {
+    .cart {
+        padding: 20px 14px 32px;
+
+        &__title {
+            font-size: 22px;
+        }
+
+        &__item {
+            flex-direction: column;
+        }
+
+        &__item-image {
+            width: 100%;
+            height: 220px;
+        }
+
+        &__item-name {
+            font-size: 14px;
+        }
+
+        &__item-price {
+            font-size: 16px;
+        }
+
+        &__item-old,
+        &__summary-row,
+        &__delete {
+            font-size: 12px;
+        }
+
+        &__item-actions,
+        &__item-prices {
+            flex-wrap: wrap;
+        }
+
+        &__checkout {
+            font-size: 14px;
+            padding: 16px 12px;
+        }
+    }
+}
 </style>
