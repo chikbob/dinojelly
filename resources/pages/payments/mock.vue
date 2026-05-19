@@ -148,4 +148,24 @@ defineProps({
     background: #e2e8f0;
     color: #0f172a;
 }
+
+@media (max-width: 640px) {
+    .mock-payment {
+        padding: 20px 14px 32px;
+        min-height: auto;
+    }
+
+    .mock-payment__card {
+        padding: 20px 16px;
+    }
+
+    .mock-payment h1 {
+        font-size: 18px;
+        line-height: 1.35;
+    }
+
+    .mock-payment__summary {
+        grid-template-columns: 1fr;
+    }
+}
 </style>

@@ -256,12 +256,34 @@ const runNow = (subscriptionId) => {
 }
 
 @media (max-width: 720px) {
+    .subscriptions {
+        padding: 24px 14px 40px;
+    }
+
+    .subscriptions__title {
+        font-size: 18px;
+        line-height: 1.3;
+    }
+
+    .subscriptions__subtitle {
+        font-size: 10px;
+        line-height: 1.8;
+    }
+
     .subscriptions__card-head {
         flex-direction: column;
     }
 
     .subscriptions__badge {
         align-self: flex-start;
+    }
+
+    .subscriptions__actions {
+        flex-direction: column;
+    }
+
+    .subscriptions__action {
+        width: 100%;
     }
 }
 </style>

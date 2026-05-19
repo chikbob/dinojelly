@@ -944,12 +944,18 @@ const toggleFavorite = (productId) => {
 
         &__title {
             font-size: 18px;
+            line-height: 1.25;
         }
 
         &__subtitle,
         &__sort,
         &__category {
             font-size: 8px;
+        }
+
+        &__search {
+            flex-direction: column;
+            align-items: stretch;
         }
 
         &__grid {
@@ -960,6 +966,21 @@ const toggleFavorite = (productId) => {
 
     .catalog-ai {
         padding: 16px;
+    }
+
+    .catalog-ai__intro {
+        flex-direction: column;
+    }
+
+    .catalog-ai__intro h2 {
+        margin: 0 0 10px;
+        font-size: 18px;
+        line-height: 1.3;
+    }
+
+    .catalog-ai__intro p {
+        font-size: 10px;
+        line-height: 1.8;
     }
 
     .product-card {

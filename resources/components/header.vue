@@ -345,11 +345,14 @@ const handleCartClick = () => {
 
     .header__top {
         gap: 10px;
+        justify-content: center;
+        text-align: center;
     }
 
     .header__nav {
         width: 100%;
         gap: 8px !important;
+        justify-content: center;
     }
 
     .header__nav .header__link {
@@ -357,13 +360,25 @@ const handleCartClick = () => {
     }
 
     .header__bottom {
-        flex-wrap: wrap;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+    }
+
+    .header__logo-block {
+        justify-content: center;
+    }
+
+    .header__logo-img {
+        width: 112px;
     }
 
     .header__actions {
         width: 100%;
-        justify-content: flex-start;
+        justify-content: stretch;
         gap: 10px;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .header__login-btn,
@@ -373,12 +388,12 @@ const handleCartClick = () => {
     .header__orders {
         padding: 8px 10px;
         font-size: 10px;
+        width: 100%;
+        justify-content: center;
+        min-height: 48px;
     }
 
-    .header__user-name,
-    .header__favorites span:not(.header__icon),
-    .header__cart span:not(.header__icon),
-    .header__orders span:not(.header__icon) {
+    .header__user-wrapper {
         display: none;
     }
 
@@ -393,12 +408,12 @@ const handleCartClick = () => {
 
 @media (max-width: 480px) {
     .header__actions {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .header__lang-wrapper {
         max-width: none !important;
+        width: 100% !important;
     }
 
     .header__login-btn,
@@ -408,6 +423,18 @@ const handleCartClick = () => {
     .header__orders {
         width: 100%;
         justify-content: center;
+    }
+
+    .header__icon {
+        margin-right: 0;
+    }
+
+    .header__favorites span:not(.header__badge),
+    .header__cart span:not(.header__badge),
+    .header__orders span:not(.header__badge),
+    .header__login-btn span:last-child,
+    .header__logout-btn span:last-child {
+        display: none;
     }
 }
 </style>

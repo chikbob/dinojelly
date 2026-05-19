@@ -489,6 +489,18 @@ function deleteReview() {
     .product {
         grid-template-columns: minmax(0, 1fr);
     }
+
+    .product__gallery,
+    .product__info {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .product__image {
+        width: 100%;
+        max-height: 420px;
+        object-fit: cover;
+    }
 }
 
 @media (max-width: 640px) {
@@ -503,6 +515,8 @@ function deleteReview() {
 
     .product__title {
         font-size: 20px;
+        line-height: 1.25;
+        word-break: break-word;
     }
 
     .product__actions {
@@ -517,6 +531,20 @@ function deleteReview() {
     .product-reviews__card-top {
         gap: 10px;
         flex-wrap: wrap;
+    }
+
+    .product__rating-summary,
+    .product__prices {
+        flex-wrap: wrap;
+    }
+
+    .product__description,
+    .product-reviews__head p,
+    .product-reviews__gate,
+    .product-reviews__empty,
+    .product-reviews__card p {
+        font-size: 10px;
+        line-height: 1.8;
     }
 }
 </style>

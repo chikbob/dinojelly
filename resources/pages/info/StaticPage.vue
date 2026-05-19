@@ -132,5 +132,20 @@ const content = computed(() => ({
     .info-page__card {
         padding: 20px;
     }
+
+    .info-page__title {
+        font-size: 20px;
+        line-height: 1.35;
+    }
+
+    .info-page__subtitle,
+    .info-page__card p {
+        font-size: 10px;
+        line-height: 1.9;
+    }
+
+    .info-page__card h2 {
+        font-size: 12px;
+    }
 }
 </style>

@@ -680,18 +680,20 @@ const formatPhoneNumber = (phone) => {
 /* Адаптивность */
 @media (max-width: 600px) {
     .profile {
-        padding: 1.5rem 1rem;
+        padding: 1.5rem 0.875rem 2rem;
 
         &__title {
-            font-size: 2rem;
+            font-size: 1.6rem;
+            line-height: 1.25;
         }
     }
 
     .profile-card {
-        padding: 1.8rem;
+        padding: 1.1rem;
 
         &__name {
-            font-size: 1.6rem;
+            font-size: 1.2rem;
+            line-height: 1.35;
         }
     }
 
@@ -708,7 +710,7 @@ const formatPhoneNumber = (phone) => {
     }
 
     .profile-addresses {
-        padding: 18px;
+        padding: 16px 14px;
 
         &__grid {
             grid-template-columns: 1fr;
@@ -720,10 +722,20 @@ const formatPhoneNumber = (phone) => {
         flex-direction: column;
     }
 
+    .profile-addresses__header,
+    .profile-addresses__checkbox {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
     .profile-card__button,
     .profile-edit .btn-save,
     .profile-edit .btn-cancel {
         width: 100%;
+    }
+
+    .profile-edit {
+        padding: 1.1rem;
     }
 }
 </style>

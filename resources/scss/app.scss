@@ -24,6 +24,19 @@ body {
     font-style: normal;
 }
 
+h1,
+h2,
+h3,
+p,
+a,
+span,
+button,
+label,
+small,
+strong {
+    overflow-wrap: anywhere;
+}
+
 #app {
     min-height: 100dvh;
 }
@@ -194,6 +207,10 @@ form,
 }
 
 @media (max-width: 640px) {
+    body {
+        font-size: 12px;
+    }
+
     .modal {
         padding: 16px;
     }
@@ -219,5 +236,9 @@ form,
     .profile-address,
     .checkout__item {
         flex-direction: column;
+    }
+
+    .layout__content {
+        overflow: hidden;
     }
 }

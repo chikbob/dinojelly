@@ -505,12 +505,22 @@ const subscribeToOrder = () => {
     }
 
     @media (max-width: 600px) {
+        padding: 20px 14px 32px;
+
         &__container {
-            padding: 20px;
+            padding: 18px 14px;
+        }
+
+        &__title {
+            font-size: 16px;
+            line-height: 1.35;
         }
 
         &__summary-item {
             font-size: 9px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
         }
 
         &__item {
@@ -520,8 +530,25 @@ const subscribeToOrder = () => {
 
         &__details {
             margin-left: 0;
-            flex-direction: column;
-            align-items: flex-start;
+            display: grid;
+            grid-template-columns: 1fr;
+            width: 100%;
+        }
+
+        &__img {
+            width: 100%;
+            height: 220px;
+        }
+
+        &__quantity,
+        &__price {
+            width: auto;
+            text-align: left;
+        }
+
+        &__cancel-btn,
+        &__retry-btn {
+            width: 100%;
         }
     }
 }

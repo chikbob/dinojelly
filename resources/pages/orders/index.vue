@@ -380,6 +380,13 @@ const subscriptionLabel = (order) => {
 
 @media (max-width: 640px) {
     .orders {
+        padding: 24px 14px 40px;
+
+        &__title {
+            font-size: 18px;
+            line-height: 1.3;
+        }
+
         &__filter,
         &__actions,
         &__header {
@@ -390,6 +397,12 @@ const subscriptionLabel = (order) => {
         &__action,
         &__select {
             width: 100%;
+        }
+
+        &__info {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
         }
     }
 }
