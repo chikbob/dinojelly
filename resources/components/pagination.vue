@@ -25,7 +25,7 @@
 </template>
 
 <script setup>
-import {computed} from 'vue'
+import {computed, onBeforeUnmount, onMounted, ref} from 'vue'
 import {Link} from "@inertiajs/vue3"
 import {useI18n} from "../lang/useI18n"
 
@@ -33,6 +33,21 @@ const {t} = useI18n()
 
 const props = defineProps({
     links: Array,
+})
+
+const isCompactViewport = ref(false)
+
+const syncViewport = () => {
+    isCompactViewport.value = window.innerWidth <= 480
+}
+
+onMounted(() => {
+    syncViewport()
+    window.addEventListener('resize', syncViewport)
+})
+
+onBeforeUnmount(() => {
+    window.removeEventListener('resize', syncViewport)
 })
 
 const visibleLinks = computed(() => {
@@ -79,10 +94,54 @@ const visibleLinks = computed(() => {
     return result
 })
 
+const decodeHtml = (value) => {
+    return value
+        .replaceAll('&laquo;', '«')
+        .replaceAll('&raquo;', '»')
+        .replaceAll('&amp;', '&')
+        .replaceAll('&nbsp;', ' ')
+}
+
+const stripTags = (value) => value.replace(/<[^>]*>/g, '').trim()
+
 const sanitizeLabel = (label) => {
-    return label
-        .replace("&laquo; Previous", `« ${t("pagination.previous")}`)
-        .replace("Next &raquo;", `${t("pagination.next")} »`)
+    const normalized = stripTags(decodeHtml(String(label))).toLowerCase()
+
+    const previousLabels = [
+        '« previous',
+        'previous',
+        '« попередня',
+        'попередня',
+        '« предыдущая',
+        'предыдущая',
+        '« pagination.previous',
+        'pagination.previous',
+    ]
+
+    const nextLabels = [
+        'next »',
+        'next',
+        'наступна »',
+        'наступна',
+        'следующая »',
+        'следующая',
+        'pagination.next »',
+        'pagination.next',
+    ]
+
+    if (previousLabels.includes(normalized)) {
+        return isCompactViewport.value ? '‹' : `« ${t("pagination.previous")}`
+    }
+
+    if (nextLabels.includes(normalized)) {
+        return isCompactViewport.value ? '›' : `${t("pagination.next")} »`
+    }
+
+    if (normalized === '...') {
+        return '...'
+    }
+
+    return stripTags(decodeHtml(String(label)))
 }
 </script>
 
@@ -96,7 +155,9 @@ const sanitizeLabel = (label) => {
     font-size: 11px;
     color: #333;
     flex-wrap: nowrap;
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 4px;
 
     &__link {
         padding: 6px 10px;
@@ -124,6 +185,18 @@ const sanitizeLabel = (label) => {
             cursor: default;
             background: #fafafa;
         }
+    }
+}
+
+@media (max-width: 640px) {
+    .pagination {
+        justify-content: flex-start;
+        gap: 6px;
+    }
+
+    .pagination__link {
+        min-width: 38px;
+        font-size: 10px;
     }
 }
 </style>

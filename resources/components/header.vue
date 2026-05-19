@@ -429,9 +429,9 @@ const handleCartClick = () => {
         margin-right: 0;
     }
 
-    .header__favorites span:not(.header__badge),
-    .header__cart span:not(.header__badge),
-    .header__orders span:not(.header__badge),
+    .header__favorites span:not(.header__icon):not(.header__badge),
+    .header__cart span:not(.header__icon):not(.header__badge),
+    .header__orders span:not(.header__icon):not(.header__badge),
     .header__login-btn span:last-child,
     .header__logout-btn span:last-child {
         display: none;
