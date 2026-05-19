@@ -408,7 +408,7 @@ const handleCartClick = () => {
 
 @media (max-width: 480px) {
     .header__actions {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: 1fr;
     }
 
     .header__lang-wrapper {
@@ -426,15 +426,22 @@ const handleCartClick = () => {
     }
 
     .header__icon {
-        margin-right: 0;
+        margin-right: 6px;
     }
 
-    .header__favorites span:not(.header__icon):not(.header__badge),
-    .header__cart span:not(.header__icon):not(.header__badge),
-    .header__orders span:not(.header__icon):not(.header__badge),
-    .header__login-btn span:last-child,
-    .header__logout-btn span:last-child {
-        display: none;
+    .header__login-btn,
+    .header__logout-btn,
+    .header__favorites,
+    .header__cart,
+    .header__orders {
+        font-size: 9px;
+        padding: 10px 12px;
+        min-height: 44px;
+    }
+
+    .header__badge {
+        margin-left: 4px;
+        font-size: 9px;
     }
 }
 </style>
