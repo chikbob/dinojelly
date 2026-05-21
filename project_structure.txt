@@ -1,0 +1,285 @@
+.
+├── ADMIN_ACCESS.md
+├── DEPLOYMENT.md
+├── DEPLOYMENT_QUICK_START.md
+├── Dockerfile
+├── Dockerfile.dev
+├── Makefile
+├── PIPELINE.md
+├── Pologhenie_o_vypusknoi_kvalifikacionnoi_rabote_bakalavrov_specialistov.pdf
+├── README.md
+├── app
+│   ├── Console
+│   │   ├── Commands
+│   │   └── Kernel.php
+│   ├── Exceptions
+│   │   └── Handler.php
+│   ├── Http
+│   │   ├── Controllers
+│   │   ├── Kernel.php
+│   │   ├── Middleware
+│   │   ├── Requests
+│   │   └── Resources
+│   ├── Jobs
+│   │   └── SendAbandonedCartRecoveryEmail.php
+│   ├── Mail
+│   │   └── AbandonedCartRecoveryMail.php
+│   ├── Models
+│   │   ├── Address.php
+│   │   ├── CartItem.php
+│   │   ├── CartRecoveryReminder.php
+│   │   ├── Category.php
+│   │   ├── Collection.php
+│   │   ├── DeliverySlot.php
+│   │   ├── Favorite.php
+│   │   ├── GiftCard.php
+│   │   ├── GiftCardRedemption.php
+│   │   ├── Order.php
+│   │   ├── OrderEvent.php
+│   │   ├── OrderItem.php
+│   │   ├── Payment.php
+│   │   ├── Product.php
+│   │   ├── PromoCode.php
+│   │   ├── RecommendationRequest.php
+│   │   ├── Referral.php
+│   │   ├── Review.php
+│   │   ├── StockItem.php
+│   │   ├── Subscription.php
+│   │   ├── SubscriptionItem.php
+│   │   └── User.php
+│   ├── Providers
+│   │   ├── AppServiceProvider.php
+│   │   ├── AuthServiceProvider.php
+│   │   ├── BroadcastServiceProvider.php
+│   │   ├── EventServiceProvider.php
+│   │   └── RouteServiceProvider.php
+│   └── Services
+│       ├── AbandonedCartService.php
+│       ├── AdminAnalyticsService.php
+│       ├── AdminOrderService.php
+│       ├── CartService.php
+│       ├── CatalogService.php
+│       ├── CheckoutService.php
+│       ├── GiftCardService.php
+│       ├── InventoryService.php
+│       ├── OrderEventService.php
+│       ├── OrderService.php
+│       ├── PaymentService.php
+│       ├── RecommendationAssistantService.php
+│       ├── ReferralService.php
+│       ├── ReorderService.php
+│       ├── ReviewService.php
+│       └── SubscriptionService.php
+├── artisan
+├── bootstrap
+│   └── app.php
+├── composer.json
+├── composer.lock
+├── config
+│   ├── app.php
+│   ├── auth.php
+│   ├── broadcasting.php
+│   ├── cache.php
+│   ├── cors.php
+│   ├── database.php
+│   ├── filesystems.php
+│   ├── hashing.php
+│   ├── logging.php
+│   ├── mail.php
+│   ├── queue.php
+│   ├── sanctum.php
+│   ├── services.php
+│   ├── session.php
+│   └── view.php
+├── database
+│   ├── factories
+│   │   ├── AddressFactory.php
+│   │   ├── CategoryFactory.php
+│   │   ├── CollectionFactory.php
+│   │   ├── DeliverySlotFactory.php
+│   │   ├── FactoryLocale.php
+│   │   ├── LocalizedTextFactory.php
+│   │   ├── ProductFactory.php
+│   │   ├── PromoCodeFactory.php
+│   │   ├── ReviewFactory.php
+│   │   └── UserFactory.php
+│   ├── migrations
+│   │   ├── 2014_10_12_000000_create_users_table.php
+│   │   ├── 2014_10_12_100000_create_password_reset_tokens_table.php
+│   │   ├── 2019_08_19_000000_create_failed_jobs_table.php
+│   │   ├── 2019_12_14_000001_create_personal_access_tokens_table.php
+│   │   ├── 2025_07_19_161046_create_products_table.php
+│   │   ├── 2025_07_19_161206_create_cart_items_table.php
+│   │   ├── 2025_07_19_161220_create_orders_table.php
+│   │   ├── 2025_09_17_135609_create_favorites_table.php
+│   │   ├── 2025_10_01_085610_create_order_items_table.php
+│   │   ├── 2026_01_12_134132_add_role_to_users_table.php
+│   │   ├── 2026_03_23_120000_create_categories_table.php
+│   │   ├── 2026_03_23_120100_create_collections_table.php
+│   │   ├── 2026_03_23_120200_create_addresses_table.php
+│   │   ├── 2026_03_23_120300_create_delivery_slots_table.php
+│   │   ├── 2026_03_23_120400_create_promo_codes_table.php
+│   │   ├── 2026_03_23_120500_create_payments_table.php
+│   │   ├── 2026_03_23_120600_create_stock_items_table.php
+│   │   ├── 2026_03_23_120700_create_reviews_table.php
+│   │   ├── 2026_03_23_130000_create_order_events_table.php
+│   │   ├── 2026_03_23_140000_create_cart_recovery_reminders_table.php
+│   │   ├── 2026_03_23_150000_create_subscriptions_table.php
+│   │   ├── 2026_03_24_001000_create_referrals_table.php
+│   │   ├── 2026_03_24_001100_create_gift_cards_table.php
+│   │   ├── 2026_03_24_001200_create_gift_card_redemptions_table.php
+│   │   ├── 2026_03_24_001300_add_referral_and_gift_card_fields.php
+│   │   ├── 2026_03_24_001400_add_refund_tracking_to_orders.php
+│   │   ├── 2026_03_24_002000_create_recommendation_requests_table.php
+│   │   └── 2026_04_11_150000_add_source_order_id_to_subscriptions_table.php
+│   └── seeders
+│       ├── DatabaseSeeder.php
+│       ├── LocalizedDatabaseSeeder.php
+│       ├── RussianDatabaseSeeder.php
+│       └── UkrainianDatabaseSeeder.php
+├── deploy.sh
+├── docker
+│   ├── default.conf
+│   ├── entrypoint.sh
+│   ├── nginx.conf
+│   ├── php-fpm.conf
+│   ├── php.ini
+│   └── supervisord.conf
+├── docker-compose.dev.yml
+├── docker-compose.yml
+├── docs
+│   ├── database
+│   │   └── physical_schema.sql
+│   └── database-diagrams.md
+├── k8s
+│   ├── deployment.yml
+│   ├── ingress.yml
+│   ├── mysql.yml
+│   ├── redis.yml
+│   └── secrets.example.yml
+├── lang
+│   ├── en
+│   ├── ru
+│   └── uk
+├── package-lock.json
+├── package.json
+├── phpunit.xml
+├── project_structure.txt
+├── public
+│   ├── build
+│   │   ├── assets
+│   │   └── manifest.json
+│   ├── favicon.ico
+│   ├── images
+│   │   ├── Favorite.png
+│   │   └── unFavorite.png
+│   ├── index.php
+│   ├── logo.png
+│   └── robots.txt
+├── railway.json
+├── resources
+│   ├── components
+│   │   ├── AuthModal.vue
+│   │   ├── footer.vue
+│   │   ├── header.vue
+│   │   └── pagination.vue
+│   ├── js
+│   │   ├── app.js
+│   │   ├── bootstrap.js
+│   │   └── ziggy.js
+│   ├── lang
+│   │   ├── en.js
+│   │   ├── ru.js
+│   │   ├── uk.js
+│   │   └── useI18n.js
+│   ├── layouts
+│   │   ├── AdminLayout.vue
+│   │   └── mainLayout.vue
+│   ├── pages
+│   │   ├── Auth
+│   │   ├── Profile
+│   │   ├── admin
+│   │   ├── cart.vue
+│   │   ├── checkout.vue
+│   │   ├── favorites.vue
+│   │   ├── index.vue
+│   │   ├── info
+│   │   ├── orders
+│   │   ├── payments
+│   │   ├── product.vue
+│   │   └── subscriptions
+│   ├── scss
+│   │   ├── app.scss
+│   │   ├── blocks
+│   │   ├── main.scss
+│   │   └── utilities
+│   └── views
+│       ├── app.blade.php
+│       ├── emails
+│       └── errors
+├── routes
+│   ├── api.php
+│   ├── channels.php
+│   ├── console.php
+│   ├── health.php
+│   └── web.php
+├── scripts
+│   ├── backup-db.sh
+│   ├── generate_architecture_section_docx.py
+│   ├── generate_internship_report.py
+│   ├── generate_thesis_docx.py
+│   ├── generate_vkr_docx.py
+│   ├── health-check.sh
+│   ├── pre-deploy-check.sh
+│   ├── refresh_vkr_assets.py
+│   └── rollback.sh
+├── tests
+│   ├── CreatesApplication.php
+│   ├── Feature
+│   │   ├── CartServiceTest.php
+│   │   ├── CheckoutServiceTest.php
+│   │   └── GiftCardServiceTest.php
+│   ├── TestCase.php
+│   └── Unit
+│       └── InventoryServiceTest.php
+├── thesis_assets
+│   ├── diagrams
+│   │   ├── 01_architecture.png
+│   │   ├── 02_er_diagram.png
+│   │   ├── 03_use_case.png
+│   │   ├── 04_sequence.png
+│   │   ├── 05_component.png
+│   │   ├── 06_deployment.png
+│   │   ├── figure_2_1_architecture.png
+│   │   ├── figure_2_1_architecture.puml
+│   │   ├── figure_2_2_component.png
+│   │   ├── figure_2_2_component.puml
+│   │   ├── figure_2_5_deployment.png
+│   │   └── figure_2_5_deployment.puml
+│   └── screenshots
+│       ├── 01_catalog.png
+│       ├── 01_catalog_part1.png
+│       ├── 01_catalog_part2.png
+│       ├── 02_product.png
+│       ├── 03_checkout.png
+│       ├── 03_login.png
+│       ├── 04_checkout.png
+│       ├── 04_order.png
+│       ├── 05_order.png
+│       ├── 05_subscriptions.png
+│       ├── 06_admin_dashboard.png
+│       ├── 06_subscriptions.png
+│       ├── 07_admin_dashboard.png
+│       ├── 07_admin_dashboard_part1.png
+│       ├── 07_admin_dashboard_part2.png
+│       ├── 08_project_tree.png
+│       ├── 09_routes_web.png
+│       └── 10_checkout_service.png
+├── vite.config.js
+├── Ісіченко Курсовий проєкт.docx
+├── Ісіченко Переддипломна.docx
+├── Дипломна_робота_Ісіченко.docx
+├── ПЗ_Бухарова_КН-16.pdf
+└── Розділ_2_1_архітектура_DinoJelly.docx
+
+60 directories, 223 files
