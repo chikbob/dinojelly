@@ -36,10 +36,13 @@
                         <span class="header__icon">👤</span>
                         <a href="/profile" class="header__user-name">{{ user.name }}</a>
                     </div>
-                    <button @click="logout" class="header__logout-btn" style="max-width:100%; box-sizing:border-box;">
-                        <span class="header__icon">🚪</span>
-                        {{ t("header.logout") }}
-                    </button>
+                    <form method="post" action="/logout">
+                        <input type="hidden" name="_token" :value="csrfToken" />
+                        <button type="submit" class="header__logout-btn" style="max-width:100%; box-sizing:border-box;">
+                            <span class="header__icon">🚪</span>
+                            {{ t("header.logout") }}
+                        </button>
+                    </form>
                 </template>
                 <template v-else>
                     <button @click="showAuth = true" class="header__login-btn" style="max-width:100%; box-sizing:border-box;">
@@ -127,10 +130,7 @@ const handleSubscriptionsClick = () => {
 
 const user = computed(() => page.props.auth?.user)
 const showAuth = ref(false)
-
-const logout = () => {
-    router.post("/logout", {}, {preserveScroll: true})
-}
+const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? ''
 
 const handleFavoritesClick = () => {
     if (!user.value) {

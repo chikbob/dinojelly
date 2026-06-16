@@ -48,15 +48,16 @@
                         <option value="en">EN</option>
                     </select>
 
-                    <Link
-                        method="post"
-                        as="button"
-                        href="/logout"
-                        class="admin__logout"
-                        style="width:auto; min-width:100px; box-sizing:border-box; display: inline-flex; justify-content: center"
-                    >
-                        {{ t("admin.header.logout") }}
-                    </Link>
+                    <form method="post" action="/logout">
+                        <input type="hidden" name="_token" :value="csrfToken" />
+                        <button
+                            type="submit"
+                            class="admin__logout"
+                            style="width:auto; min-width:100px; box-sizing:border-box; display: inline-flex; justify-content: center"
+                        >
+                            {{ t("admin.header.logout") }}
+                        </button>
+                    </form>
                 </div>
             </header>
 
@@ -75,6 +76,7 @@ import { useI18n } from '../lang/useI18n'
 
 const { t, setLang, currentLang } = useI18n()
 const page = usePage()
+const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? ''
 
 const sections = [
     {
