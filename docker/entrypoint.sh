@@ -27,7 +27,7 @@ mv /tmp/default.conf /etc/nginx/http.d/default.conf
 php artisan config:clear --no-interaction >/dev/null 2>&1 || true
 php artisan config:cache --no-interaction
 
-if [ "${RUN_MIGRATIONS:-true}" = "true" ]; then
+if [ "${RUN_MIGRATIONS:-false}" = "true" ]; then
     attempts=0
     max_attempts="${MIGRATION_ATTEMPTS:-10}"
 
