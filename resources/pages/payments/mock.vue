@@ -15,7 +15,7 @@
                     </div>
                     <div>
                         <span>{{ t("payments.amount") }}</span>
-                        <strong>{{ payment.amount }} {{ payment.currency }}</strong>
+                        <strong>{{ payment.amount }} {{ t("currency.symbol") }}</strong>
                     </div>
                     <div>
                         <span>{{ t("payments.provider") }}</span>
