@@ -74,11 +74,11 @@
         </div>
     </div>
     <script>
-        const lang = localStorage.getItem('lang') || 'ru';
+        const storedLang = localStorage.getItem('lang');
+        const lang = storedLang === 'uk' ? 'ru' : (storedLang || 'ru');
         const translations = {
             ru: { title: "Доступ запрещён", message: "У вас нет прав для входа в админ-панель. Только администраторы могут получить доступ к этому разделу.", button: "На главную", hint: "Если вы считаете, что это ошибка, свяжитесь с администратором сайта." },
-            en: { title: "Access Denied", message: "You don't have permission to access the admin panel. Only administrators can access this section.", button: "Go Home", hint: "If you think this is a mistake, please contact the site administrator." },
-            uk: { title: "Доступ заборонено", message: "Ви не маєте прав для входу в адмін-панель. Тільки адміністратори можуть отримати доступ до цього розділу.", button: "На головну", hint: "Якщо ви вважаєте, що це помилка, будь ласка, зв'яжіться з адміністратором сайту." }
+            en: { title: "Access Denied", message: "You don't have permission to access the admin panel. Only administrators can access this section.", button: "Go Home", hint: "If you think this is a mistake, please contact the site administrator." }
         };
         const current = translations[lang] || translations.ru;
         document.getElementById('title').textContent = current.title;

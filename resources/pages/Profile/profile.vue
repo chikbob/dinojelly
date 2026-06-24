@@ -342,7 +342,6 @@ const formatDate = (dateString) => {
 
     const localeMap = {
         ru: "ru-RU",
-        uk: "uk-UA",
         en: "en-US",
     }
 

@@ -19,7 +19,7 @@ class RecommendationController extends Controller
             'budget' => ['required', 'numeric', 'min:0'],
             'format' => ['required', 'in:set,single,variety'],
             'priority' => ['required', 'in:popular,new,value'],
-            'locale' => ['nullable', 'in:ru,uk,en'],
+            'locale' => ['nullable', 'in:ru,en'],
         ]);
 
         app()->setLocale($data['locale'] ?? config('app.locale'));

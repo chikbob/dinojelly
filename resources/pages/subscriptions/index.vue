@@ -90,7 +90,6 @@ const formatDate = (value) => {
 
     const localeMap = {
         ru: 'ru-RU',
-        uk: 'uk-UA',
         en: 'en-US',
     }
     const locale = localeMap[currentLang.value] ?? 'ru-RU'

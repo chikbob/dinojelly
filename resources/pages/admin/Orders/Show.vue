@@ -167,7 +167,7 @@ const noteForm = useForm({
 const formatDateTime = (dateString) => {
     if (!dateString) return t("profile.notProvided")
 
-    const localeMap = {ru: "ru-RU", uk: "uk-UA", en: "en-US"}
+    const localeMap = {ru: "ru-RU", en: "en-US"}
     const lang = currentLang?.value ?? "ru"
 
     return new Date(dateString).toLocaleDateString(localeMap[lang], {

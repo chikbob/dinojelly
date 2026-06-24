@@ -1,13 +1,25 @@
 import { ref } from "vue"
 import ru from "./ru"
-import uk from "./uk"
 import en from "./en"
 
-const messages = { ru, uk, en }
-const defaultLang = "uk"
-const resolveLang = (lang) => (lang && messages[lang] ? lang : defaultLang)
+const messages = { ru, en }
+const defaultLang = "ru"
 
-// Загружаем язык из localStorage или ставим uk по умолчанию
+const normalizeLang = (lang) => {
+    if (lang === "uk") {
+        return defaultLang
+    }
+
+    return lang
+}
+
+const resolveLang = (lang) => {
+    const normalizedLang = normalizeLang(lang)
+
+    return normalizedLang && messages[normalizedLang] ? normalizedLang : defaultLang
+}
+
+// Загружаем язык из localStorage, старое значение uk мигрируем на ru
 const currentLang = ref(resolveLang(localStorage.getItem("lang")))
 
 export function useI18n() {

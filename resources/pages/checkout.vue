@@ -181,7 +181,7 @@ const selectedSlot = computed(() =>
 )
 
 const locale = computed(() => {
-    const localeMap = { ru: "ru-RU", uk: "uk-UA", en: "en-US" }
+    const localeMap = { ru: "ru-RU", en: "en-US" }
     return localeMap[currentLang?.value ?? 'ru']
 })
 

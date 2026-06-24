@@ -44,7 +44,6 @@
                         style="width:auto; min-width:84px; box-sizing:border-box;"
                     >
                         <option value="ru">RU</option>
-                        <option value="uk">UA</option>
                         <option value="en">EN</option>
                     </select>
 

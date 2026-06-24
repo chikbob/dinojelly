@@ -25,7 +25,6 @@
                     <span class="header__icon">🌐</span>
                     <select v-model="currentLang" @change="setLang(currentLang)" class="header__lang" style="width:100%; max-width:100%; min-width:0; box-sizing:border-box;">
                         <option value="ru">RU</option>
-                        <option value="uk">UA</option>
                         <option value="en">EN</option>
                     </select>
                 </div>
