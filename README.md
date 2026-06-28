@@ -1,51 +1,88 @@
 # DinoJelly
 
-Интернет-магазин сладостей на Laravel + Inertia + Vue.
+Коммерческий demo storefront для интернет-магазина мармелада на `Laravel + Inertia + Vue`.
 
-## Локальная разработка с мгновенным обновлением UI
+DinoJelly показывает полный e-commerce цикл: каталог, карточки товаров, избранное, корзину, checkout, заказы, подписки, промокоды, gift cards, referral-механику и отдельную админ-панель с операционной аналитикой.
 
-Для разработки используй dev-стек с отдельным Vite HMR. Тогда изменения во `vue`, `js` и `scss` появляются в браузере сразу, без `docker build`.
+## Showcase
 
-### Первый запуск
+<p align="center">
+  <img src="./docs/screenshots/storefront-catalog.png" alt="DinoJelly catalog" width="100%" />
+</p>
+
+<table>
+  <tr>
+    <td width="50%">
+      <img src="./docs/screenshots/storefront-product.png" alt="Product page" width="100%" />
+    </td>
+    <td width="50%">
+      <img src="./docs/screenshots/storefront-checkout.png" alt="Checkout page" width="100%" />
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src="./docs/screenshots/storefront-cart.png" alt="Cart page" width="100%" />
+    </td>
+    <td width="50%">
+      <img src="./docs/screenshots/admin-dashboard.png" alt="Admin dashboard" width="100%" />
+    </td>
+  </tr>
+</table>
+
+## Product Scope
+
+- Витрина каталога с категориями, поиском, сортировкой и фильтрами.
+- AI-подборщик сладостей по сценарию покупки, вкусу и бюджету.
+- Карточки товаров с отзывами, рейтингами и контролем остатков.
+- Избранное, корзина, delivery slots и checkout с бонусами и gift cards.
+- Личный кабинет с заказами, подписками и повторными покупками.
+- Admin dashboard с выручкой, заказами, recovery и топ-товарами.
+
+## Stack
+
+- `Laravel 10`
+- `PHP 8.2`
+- `Vue 3`
+- `Inertia.js`
+- `Vite`
+- `MySQL 8`
+- `Redis`
+- `Docker Compose`
+
+## Quick Start
+
+### Development
 
 ```bash
 cp .env.example .env
-make dev-up
+docker compose -f docker-compose.dev.yml up -d --build
 docker compose -f docker-compose.dev.yml exec app composer install
-docker compose -f docker-compose.dev.yml exec app php artisan migrate --seed
+docker compose -f docker-compose.dev.yml exec app php artisan migrate:fresh --seed
 ```
 
-Доступные адреса:
+Локальные адреса:
 
-- приложение: `http://localhost:8000`
-- Vite HMR: `http://localhost:5173`
-- Adminer: `http://localhost:8080`
+- storefront: `http://localhost:8000`
+- vite: `http://localhost:5173`
+- adminer: `http://localhost:8080`
 
-### Обычный рабочий цикл
-
-```bash
-make dev-up
-make dev-logs
-```
-
-После этого редактируй файлы в `resources/` и обновляй страницу. Если dev-сервер активен, фронтенд будет подтягиваться из Vite, а не из `public/build`.
-
-### Полезные команды
-
-```bash
-make dev-up
-make dev-down
-make dev-logs
-make dev-fresh
-make dev-shell
-```
-
-## Production-like режим
-
-Если нужен режим, близкий к production:
+### Production-like
 
 ```bash
 docker compose up -d --build
 ```
 
-В этом режиме изменения во фронтенде не появляются автоматически, пока не пересоберешь bundle.
+## Demo Accounts
+
+- customer: `demo@dinojelly.local` / `password`
+- admin: `admin@dinojelly.local` / `password`
+
+## Screenshots
+
+README-скриншоты снимаются локально из работающего docker-стека:
+
+```bash
+node scripts/capture-readme-screenshots.mjs
+```
+
+Файлы сохраняются в `docs/screenshots/`.
