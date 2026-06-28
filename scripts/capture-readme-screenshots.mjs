@@ -24,6 +24,34 @@ async function waitForStableUi(page) {
   await page.waitForTimeout(1200)
 }
 
+async function clearCart(page) {
+  await page.goto(`${baseUrl}/cart`, { waitUntil: 'domcontentloaded' })
+  await waitForStableUi(page)
+
+  let removeButtons = page.locator('.cart__delete')
+  while (await removeButtons.count()) {
+    await removeButtons.first().click()
+    await page.waitForLoadState('networkidle')
+    await page.waitForTimeout(600)
+    removeButtons = page.locator('.cart__delete')
+  }
+}
+
+async function addInStockProducts(page, count = 3) {
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' })
+  await waitForStableUi(page)
+
+  const addButtons = page.locator('.product-card:not(.product-card--out-of-stock) .product-card__button')
+  const total = await addButtons.count()
+  const limit = Math.min(total, count)
+
+  for (let index = 0; index < limit; index += 1) {
+    await addButtons.nth(index).click()
+    await page.waitForLoadState('networkidle')
+    await page.waitForTimeout(500)
+  }
+}
+
 async function login(page, credentials, destination = '/') {
   await page.goto(`${baseUrl}/login`, { waitUntil: 'domcontentloaded' })
   await page.locator('input[type="email"]').fill(credentials.email)
@@ -59,10 +87,8 @@ async function captureStorefront(browser) {
   })
 
   await login(page, demoUser)
-  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' })
-  await waitForStableUi(page)
-  await page.locator('.product-card__button').first().click()
-  await page.waitForTimeout(1000)
+  await clearCart(page)
+  await addInStockProducts(page, 3)
 
   await page.goto(`${baseUrl}/cart`, { waitUntil: 'domcontentloaded' })
   await waitForStableUi(page)
